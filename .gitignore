@@ -234,4 +234,9 @@ _Pvt_Extensions
 
 # FAKE - F# Make
 .fake/
+
+# MAC
 .DS_Store
+
+# Project music file
+music/
