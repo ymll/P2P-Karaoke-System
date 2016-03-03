@@ -67,6 +67,10 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Model\AbstractNotifyPropertyChanged.cs" />
+    <Compile Include="Model\KaraokeSystemModel.cs" />
+    <Compile Include="Model\PlaybackModel.cs" />
+    <Compile Include="Model\PlayerViewModel.cs" />
     <Compile Include="PlaybackLogic\AviDecoder.cs" />
     <Compile Include="PlaybackLogic\IDecoder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
@@ -96,7 +100,6 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Model\" />
     <Folder Include="View\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
