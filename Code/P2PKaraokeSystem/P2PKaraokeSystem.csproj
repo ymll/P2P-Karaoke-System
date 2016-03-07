@@ -111,6 +111,22 @@
   <ItemGroup>
     <Resource Include="icon.ico" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="View\UIMaterial\Image\backward.png" />
+    <Resource Include="View\UIMaterial\Image\fastforward.png" />
+    <Resource Include="View\UIMaterial\Image\play.png" />
+    <Resource Include="View\UIMaterial\Image\stop.png" />
+    <Resource Include="View\UIMaterial\Image\volumeoff.png" />
+    <Resource Include="View\UIMaterial\Image\volumeup.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="View\UIMaterial\Image\backward_blue.png" />
+    <Resource Include="View\UIMaterial\Image\fastforward_blue.png" />
+    <Resource Include="View\UIMaterial\Image\play_blue.png" />
+    <Resource Include="View\UIMaterial\Image\stop_blue.png" />
+    <Resource Include="View\UIMaterial\Image\volumeoff_blue.png" />
+    <Resource Include="View\UIMaterial\Image\volumeup_blue.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
