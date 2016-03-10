@@ -8,13 +8,15 @@ namespace P2PKaraokeSystem.Model
 {
     public class KaraokeSystemModel
     {
-        public PlaybackModel Playback { get; set; }
-        public PlayerViewModel View { get; set; }
+        public PlaybackModel Playback { get; private set; }
+        public PlayerViewModel View { get; private set; }
+        public VideoDatabase VideoDatabase { get; private set; }
 
         public KaraokeSystemModel()
         {
-            Playback = new PlaybackModel();
-            View = new PlayerViewModel();
+            this.Playback = new PlaybackModel();
+            this.View = new PlayerViewModel();
+            this.VideoDatabase = new VideoDatabase();
         }
     }
 }
