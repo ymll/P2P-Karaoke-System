@@ -62,6 +62,17 @@ namespace P2PKaraokeSystem.View
                 SetImage(playImg, "pack://application:,,,/View/UIMaterial/Image/play_blue.png");
 
             isStopping = !isStopping;
+
+            var aviDecoder = new P2PKaraokeSystem.PlaybackLogic.AviFileDecoder();
+            aviDecoder.LoadFile("Z:\\Code\\P2PKaraokeSystem\\VideoDatabase\\Video\\only_time.avi");
+
+            var timeSpan = new TimeSpan(0, 0, 0, 0, 0);
+            var oneSecond = new TimeSpan(0, 0, 1);
+            while (aviDecoder.ReadAudioFrame(timeSpan))
+            {
+                timeSpan = timeSpan.Add(oneSecond);
+            }
+            aviDecoder.UnLoadFile();
         }
 
         //Backward Button Enter

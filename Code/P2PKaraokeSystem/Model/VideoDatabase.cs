@@ -20,7 +20,14 @@ namespace P2PKaraokeSystem.Model
         public VideoDatabase()
         {
             _videos = new List<Video>();
-            LoadFromFile("db.csv");
+            try
+            {
+                LoadFromFile("db.csv");
+            }
+            catch (Exception)
+            {
+
+            }
         }
 
         public void LoadFromFile(string path)
@@ -140,7 +147,7 @@ namespace P2PKaraokeSystem.Model
             {
                 try
                 {
-                    TimeSpan timeSpan = new TimeSpan(hours, minutes, seconds, milliseconds);
+                    TimeSpan timeSpan = new TimeSpan(0, hours, minutes, seconds, milliseconds);
                     IOneLineLyric oneLineLyric = _lyricFile.AfterOrAt(timeSpan);
                     return oneLineLyric.Content;
                 }
