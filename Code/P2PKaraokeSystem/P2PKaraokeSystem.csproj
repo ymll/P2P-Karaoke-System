@@ -71,6 +71,8 @@
     </ApplicationDefinition>
     <Compile Include="Model\VideoDatabase.cs" />
     <Compile Include="PlaybackLogic\Native\Avi.cs" />
+    <Compile Include="PlaybackLogic\Native\Winmm.cs" />
+    <Compile Include="PlaybackLogic\PlayAudio.cs" />
     <Compile Include="View\MainUI.xaml.cs">
       <DependentUpon>MainUI.xaml</DependentUpon>
     </Compile>
