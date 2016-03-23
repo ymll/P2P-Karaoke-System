@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using WinmmLib;
 
 namespace P2PKaraokeSystem.PlaybackLogic
 {
@@ -29,7 +30,7 @@ namespace P2PKaraokeSystem.PlaybackLogic
         private IntPtr _aviAudioStream;
         private IntPtr _ptrAudioRawData;
 
-        private PlayAudio playAudio = new PlayAudio();
+        private AudioPlayer audioPlayer = new AudioPlayer();
 
         public void LoadFile(string filePath)
         {
@@ -47,7 +48,21 @@ namespace P2PKaraokeSystem.PlaybackLogic
 
             ParseVideoInfo(aviVideoStream, videoStreamInfo);
             ParseAudioInfo(audioStreamInfo, this._audioFormatInfo);
-            playAudio.Play(this._audioFormatInfo);
+            audioPlayer.OpenDevice(this._audioFormatInfo, OnAudioFinished);
+        }
+
+        private void OnAudioFinished(Winmm.WOM_Messages msg)
+        {
+            switch (msg)
+            {
+                case Winmm.WOM_Messages.OPEN:
+                    break;
+                case Winmm.WOM_Messages.DONE:
+                    this.UnLoadFile();
+                    break;
+                case Winmm.WOM_Messages.CLOSE:
+                    break;
+            }
         }
 
         public void UnLoadFile()
@@ -125,11 +140,12 @@ namespace P2PKaraokeSystem.PlaybackLogic
             this._firstAudioFrame = Avi.AVIStreamStart(this._aviAudioStream.ToInt32());
             this._countAudioFrames = Avi.AVIStreamLength(this._aviAudioStream.ToInt32());
 
-            this._audioStreamLength = this._audioNumOfBitsPerSample * this._audioNumOfSamplesPerSecond * this._audioNumOfChannels / 8;
+            this._audioStreamLength = this._countAudioFrames * this._audioSampleSize;
             this._ptrAudioRawData = Marshal.AllocHGlobal(this._audioStreamLength);
 
             int startByte = this._firstAudioFrame;
             int endByte = this._firstAudioFrame + this._audioStreamLength;
+
             ThrowExceptionWhenResultNotZero("Cannot read audio stream",
                 Avi.AVIStreamRead(this._aviAudioStream, startByte, endByte, this._ptrAudioRawData, this._audioStreamLength, 0, 0));
         }
@@ -154,14 +170,15 @@ namespace P2PKaraokeSystem.PlaybackLogic
 
         private void ReadAudioFrame(int startByteIndex, int endByteIndex)
         {
+            int numOfByteOfFrame = endByteIndex - startByteIndex;
             startByteIndex += this._firstAudioFrame;
             endByteIndex += this._firstAudioFrame;
             System.Diagnostics.Trace.WriteLine(string.Format("{0} ~ {1} [{2}~{3}]", startByteIndex, endByteIndex, this._firstAudioFrame, this._firstAudioFrame + this._countAudioFrames));
 
             ThrowExceptionWhenResultNotZero("Cannot read audio stream",
-                Avi.AVIStreamRead(this._aviAudioStream, startByteIndex, endByteIndex, this._ptrAudioRawData, this._audioStreamLength, 0, 0));
+                Avi.AVIStreamRead(this._aviAudioStream, startByteIndex, endByteIndex, this._ptrAudioRawData, numOfByteOfFrame, 0, 0));
 
-            playAudio.WriteToStream(this._ptrAudioRawData, endByteIndex - startByteIndex);
+            audioPlayer.WriteToStream(this._ptrAudioRawData, numOfByteOfFrame);
         }
 
         private void ThrowExceptionWhenResultNotZero(string errorMessage, int result)

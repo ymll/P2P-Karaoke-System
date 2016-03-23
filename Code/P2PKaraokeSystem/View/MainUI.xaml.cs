@@ -65,14 +65,8 @@ namespace P2PKaraokeSystem.View
 
             var aviDecoder = new P2PKaraokeSystem.PlaybackLogic.AviFileDecoder();
             aviDecoder.LoadFile("Z:\\Code\\P2PKaraokeSystem\\VideoDatabase\\Video\\only_time.avi");
-
-            var timeSpan = new TimeSpan(0, 0, 0, 0, 0);
-            var oneSecond = new TimeSpan(0, 0, 1);
-            while (aviDecoder.ReadAudioFrame(timeSpan))
-            {
-                timeSpan = timeSpan.Add(oneSecond);
-            }
-            aviDecoder.UnLoadFile();
+            aviDecoder.ReadAudioFrame(TimeSpan.Zero);
+            System.Threading.Thread.Sleep(5);
         }
 
         //Backward Button Enter

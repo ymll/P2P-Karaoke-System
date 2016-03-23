@@ -8,13 +8,17 @@ using WinmmLib;
 
 namespace P2PKaraokeSystem.PlaybackLogic
 {
-    public class PlayAudio
+    public class AudioPlayer
     {
-        private IntPtr audioOut = new IntPtr();
+        public delegate void DelegateAudioFinished(Winmm.WOM_Messages msg);
 
-        public void Play(AviFile.Avi.PCMWAVEFORMAT audioFormatInfo)
+        private IntPtr audioOut = new IntPtr();
+        private DelegateAudioFinished finishCallback;
+
+        public void OpenDevice(AviFile.Avi.PCMWAVEFORMAT audioFormatInfo, DelegateAudioFinished finishCallback)
         {
-            uint err = Winmm.waveOutOpen(ref audioOut, new IntPtr(Winmm.WAVE_MAPPER), ref audioFormatInfo, null, IntPtr.Zero, 0);
+            this.finishCallback = finishCallback;
+            uint err = Winmm.waveOutOpen(ref audioOut, new IntPtr(Winmm.WAVE_MAPPER), ref audioFormatInfo, this.WaveOutProc, IntPtr.Zero, Winmm.WaveInOpenFlags.CALLBACK_FUNCTION);
 
             if (err != 0)
             {
@@ -46,8 +50,11 @@ namespace P2PKaraokeSystem.PlaybackLogic
                 string errString = Winmm.waveOutGetErrorText(err);
                 System.Diagnostics.Trace.WriteLine(errString);
             }
+        }
 
-            System.Threading.Thread.Sleep(1000);
+        private void WaveOutProc(IntPtr hWaveOut, Winmm.WOM_Messages msg, IntPtr dwInstance, ref Winmm.WAVEHDR wavehdr, IntPtr lParam)
+        {
+            finishCallback(msg);
         }
     }
 }
