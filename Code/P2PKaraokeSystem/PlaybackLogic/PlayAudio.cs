@@ -27,7 +27,7 @@ namespace P2PKaraokeSystem.PlaybackLogic
         {
             Winmm.WAVEHDR hdr = new Winmm.WAVEHDR();
             hdr.lpData = buffer;
-            hdr.dwBufferLength = (uint)(bufferSize / 4);
+            hdr.dwBufferLength = (uint)(bufferSize);
             hdr.dwFlags = Winmm.WaveHdrFlags.WHDR_PREPARED;
 
             var waveHdrPtr = Marshal.AllocHGlobal(Marshal.SizeOf(hdr));
@@ -47,7 +47,7 @@ namespace P2PKaraokeSystem.PlaybackLogic
                 System.Diagnostics.Trace.WriteLine(errString);
             }
 
-            System.Threading.Thread.Sleep(500);
+            System.Threading.Thread.Sleep(1000);
         }
     }
 }
