@@ -50,6 +50,7 @@ namespace P2PKaraokeSystem.PlaybackLogic
                 string errString = Winmm.waveOutGetErrorText(err);
                 System.Diagnostics.Trace.WriteLine(errString);
             }
+            System.Threading.Thread.Sleep(5);
         }
 
         private void WaveOutProc(IntPtr hWaveOut, Winmm.WOM_Messages msg, IntPtr dwInstance, ref Winmm.WAVEHDR wavehdr, IntPtr lParam)

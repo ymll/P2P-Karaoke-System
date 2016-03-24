@@ -70,9 +70,14 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Model\VideoDatabase.cs" />
+    <Compile Include="PlaybackLogic\AudioFrameReader.cs" />
+    <Compile Include="PlaybackLogic\AudioHeaderReader.cs" />
+    <Compile Include="PlaybackLogic\MediaHeaderReader.cs" />
     <Compile Include="PlaybackLogic\Native\Avi.cs" />
     <Compile Include="PlaybackLogic\Native\Winmm.cs" />
     <Compile Include="PlaybackLogic\AudioPlayer.cs" />
+    <Compile Include="PlaybackLogic\Util.cs" />
+    <Compile Include="PlaybackLogic\VideoHeaderReader.cs" />
     <Compile Include="View\MainUI.xaml.cs">
       <DependentUpon>MainUI.xaml</DependentUpon>
     </Compile>
@@ -90,8 +95,7 @@
     <Compile Include="Model\KaraokeSystemModel.cs" />
     <Compile Include="Model\PlaybackModel.cs" />
     <Compile Include="Model\PlayerViewModel.cs" />
-    <Compile Include="PlaybackLogic\AviFileDecoder.cs" />
-    <Compile Include="PlaybackLogic\IDecoder.cs" />
+    <Compile Include="PlaybackLogic\AviHeaderParser.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>

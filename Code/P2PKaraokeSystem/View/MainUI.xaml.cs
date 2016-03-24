@@ -1,4 +1,5 @@
-﻿using System;
+﻿using P2PKaraokeSystem.PlaybackLogic;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -63,10 +64,17 @@ namespace P2PKaraokeSystem.View
 
             isStopping = !isStopping;
 
-            var aviDecoder = new P2PKaraokeSystem.PlaybackLogic.AviFileDecoder();
-            aviDecoder.LoadFile("Z:\\Code\\P2PKaraokeSystem\\VideoDatabase\\Video\\only_time.avi");
-            aviDecoder.ReadAudioFrame(TimeSpan.Zero);
-            System.Threading.Thread.Sleep(5);
+            var aviHeaderParser = new P2PKaraokeSystem.PlaybackLogic.AviHeaderParser();
+            aviHeaderParser.LoadFile("Z:\\Code\\P2PKaraokeSystem\\VideoDatabase\\Video\\only_time.avi");
+
+            AudioFrameReader frameReader = new AudioFrameReader();
+            frameReader.Load(aviHeaderParser.AudioHeaderReader);
+            frameReader.ReadFrameFully(aviHeaderParser.AudioHeaderReader);
+
+            AudioPlayer audioPlayer = new AudioPlayer();
+
+            audioPlayer.OpenDevice(aviHeaderParser.AudioHeaderReader.FormatInfo, delegate { });
+            audioPlayer.WriteToStream(frameReader.FramePointer, frameReader.FrameSize);
         }
 
         //Backward Button Enter
