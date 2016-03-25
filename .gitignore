@@ -15,8 +15,6 @@
 [Dd]ebugPublic/
 [Rr]elease/
 [Rr]eleases/
-x64/
-x86/
 bld/
 [Bb]in/
 [Oo]bj/
@@ -240,3 +238,6 @@ _Pvt_Extensions
 
 # Project music file
 **/VideoDatabase/Video/
+
+#FFmpeg library
+-Code/P2PKaraokeSystem/lib

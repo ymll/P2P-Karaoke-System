@@ -12,7 +12,7 @@ namespace WinmmLib
         public const int WAVE_MAPPER = -1;
 
         [DllImport("winmm.dll", SetLastError = true, CharSet = CharSet.Auto)]
-        public static extern uint waveOutOpen(ref IntPtr hWaveOut, IntPtr uDeviceID, ref AviFile.Avi.PCMWAVEFORMAT lpFormat, DelegateWaveOutProc dwCallback, IntPtr dwInstance, uint dwFlags);
+        public static extern uint waveOutOpen(ref IntPtr hWaveOut, IntPtr uDeviceID, ref AviFile.Avi.PCMWAVEFORMAT lpFormat, DelegateWaveOutProc dwCallback, IntPtr dwInstance, WaveInOpenFlags dwFlags);
 
         [DllImport("winmm.dll", SetLastError = true, CharSet = CharSet.Auto)]
         public static extern uint waveOutPrepareHeader(IntPtr hWaveOut, IntPtr pwh, int uSize);
@@ -44,6 +44,19 @@ namespace WinmmLib
             WHDR_BEGINLOOP = 4,
             WHDR_ENDLOOP = 8,
             WHDR_INQUEUE = 16
+        }
+
+        [Flags]
+        public enum WaveInOpenFlags : uint
+        {
+            CALLBACK_NULL = 0,
+            CALLBACK_FUNCTION = 0x30000,
+            CALLBACK_EVENT = 0x50000,
+            CALLBACK_WINDOW = 0x10000,
+            CALLBACK_THREAD = 0x20000,
+            WAVE_FORMAT_QUERY = 1,
+            WAVE_MAPPED = 4,
+            WAVE_FORMAT_DIRECT = 8
         }
 
         public enum WOM_Messages : int

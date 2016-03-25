@@ -1,4 +1,6 @@
-﻿using System;
+﻿using P2PKaraokeSystem.PlaybackLogic;
+using P2PKaraokeSystem.PlaybackLogic.Native.FFmpeg;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -24,6 +26,7 @@ namespace P2PKaraokeSystem.View
         public MainUI()
         {
             InitializeComponent();
+            FFmpegLoader.LoadFFmpeg();
         }
 
         //Set Image Source for an image throught Uri
@@ -63,16 +66,17 @@ namespace P2PKaraokeSystem.View
 
             isStopping = !isStopping;
 
-            var aviDecoder = new P2PKaraokeSystem.PlaybackLogic.AviFileDecoder();
-            aviDecoder.LoadFile("Z:\\Code\\P2PKaraokeSystem\\VideoDatabase\\Video\\only_time.avi");
+            var aviHeaderParser = new P2PKaraokeSystem.PlaybackLogic.AviHeaderParser();
+            aviHeaderParser.LoadFile("Z:\\Code\\P2PKaraokeSystem\\VideoDatabase\\Video\\only_time.avi");
 
-            var timeSpan = new TimeSpan(0, 0, 0, 0, 0);
-            var oneSecond = new TimeSpan(0, 0, 1);
-            while (aviDecoder.ReadAudioFrame(timeSpan))
-            {
-                timeSpan = timeSpan.Add(oneSecond);
-            }
-            aviDecoder.UnLoadFile();
+            AudioFrameReader frameReader = new AudioFrameReader();
+            frameReader.Load(aviHeaderParser.AudioHeaderReader);
+            frameReader.ReadFrameFully(aviHeaderParser.AudioHeaderReader);
+
+            AudioPlayer audioPlayer = new AudioPlayer();
+
+            audioPlayer.OpenDevice(aviHeaderParser.AudioHeaderReader.FormatInfo, delegate { });
+            audioPlayer.WriteToStream(frameReader.FramePointer, frameReader.FrameSize);
         }
 
         //Backward Button Enter
