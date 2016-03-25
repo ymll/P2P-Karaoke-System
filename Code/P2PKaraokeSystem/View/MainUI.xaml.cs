@@ -1,4 +1,5 @@
 ﻿using P2PKaraokeSystem.PlaybackLogic;
+using P2PKaraokeSystem.PlaybackLogic.Native.FFmpeg;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,6 +26,7 @@ namespace P2PKaraokeSystem.View
         public MainUI()
         {
             InitializeComponent();
+            FFmpegLoader.LoadFFmpeg();
         }
 
         //Set Image Source for an image throught Uri
