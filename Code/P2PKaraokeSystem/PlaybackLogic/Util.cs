@@ -8,11 +8,26 @@ namespace P2PKaraokeSystem.PlaybackLogic
 {
     class Util
     {
-        public static void ThrowExceptionWhenResultNotZero(string errorMessage, int result)
+        public static void AssertZero(string errorMessage, int result)
         {
-            if (result != 0)
+            AssertTrue(errorMessage, result == 0);
+        }
+
+        public static void AssertNonNegative(string errorMessage, int result)
+        {
+            AssertTrue(errorMessage, result >= 0);
+        }
+
+        public static void AssertFalse(string errorMessage, bool result)
+        {
+            AssertTrue(errorMessage, !result);
+        }
+
+        public static void AssertTrue(string errorMessage, bool result)
+        {
+            if (!result)
             {
-                throw new Exception(errorMessage);
+                throw new ApplicationException(errorMessage);
             }
         }
     }

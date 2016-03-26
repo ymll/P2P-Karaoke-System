@@ -48,7 +48,7 @@ namespace P2PKaraokeSystem.PlaybackLogic
             endByteIndex += header.FirstAudioFrame;
             System.Diagnostics.Trace.WriteLine(string.Format("{0} ~ {1} [{2}~{3}]", startByteIndex, endByteIndex, header.FirstAudioFrame, header.FirstAudioFrame + header.FrameCount));
 
-            Util.ThrowExceptionWhenResultNotZero("Cannot read audio stream",
+            Util.AssertZero("Cannot read audio stream",
                 Avi.AVIStreamRead(header.Stream, startByteIndex, endByteIndex, this.FramePointer, numOfByteOfFrame, 0, 0));
 
             FrameSize = numOfByteOfFrame;
