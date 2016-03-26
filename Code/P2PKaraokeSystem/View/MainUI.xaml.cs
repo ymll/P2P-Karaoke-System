@@ -26,7 +26,6 @@ namespace P2PKaraokeSystem.View
 
         public System.Diagnostics.Stopwatch musicTime;
         public P2PKaraokeSystem.Model.VideoDatabase.Lyric currentLyricFile;
-        string preLyric;
 
         public MainUI()
         {
@@ -66,9 +65,20 @@ namespace P2PKaraokeSystem.View
         private void playBtn_Click(object sender, EventArgs e)
         {
             if (isStopping)
+            {
                 SetImage(playImg, "pack://application:,,,/View/UIMaterial/Image/stop_blue.png");
+                if (musicTime == null)
+                    musicTime = System.Diagnostics.Stopwatch.StartNew();
+                else
+                    musicTime.Start();
+                Thread test = new Thread(new ThreadStart(LyricThread));
+                test.Start();
+            }
             else
+            {
                 SetImage(playImg, "pack://application:,,,/View/UIMaterial/Image/play_blue.png");
+                musicTime.Stop();
+            }
 
             isStopping = !isStopping;
 
@@ -83,10 +93,6 @@ namespace P2PKaraokeSystem.View
 
             audioPlayer.OpenDevice(aviHeaderParser.AudioHeaderReader.FormatInfo, delegate { });
             audioPlayer.WriteToStream(frameReader.FramePointer, frameReader.FrameSize);
-
-            musicTime = System.Diagnostics.Stopwatch.StartNew();
-            Thread test = new Thread(new ThreadStart(LyricThread));
-            test.Start();
         }
 
         //Backward Button Enter
@@ -161,14 +167,8 @@ namespace P2PKaraokeSystem.View
             var musicTimeSpan = TimeSpan.FromMilliseconds(musicTime.Elapsed.TotalMilliseconds);
             string currentLyric = currentLyricFile.GetCurrentLyric(Convert.ToInt32(musicTimeSpan.TotalHours), Convert.ToInt32(musicTimeSpan.TotalMinutes),
                 Convert.ToInt32(musicTimeSpan.TotalSeconds), Convert.ToInt32(musicTimeSpan.TotalMilliseconds - Convert.ToInt32(musicTimeSpan.TotalSeconds)*1000));
-            if (currentLyric == "" && preLyric != null)
-            {
-                currentLyric = preLyric;
-            }
 
-            lyricText.Text = currentLyric + "       " + Convert.ToInt32(musicTimeSpan.TotalHours) + ":" + Convert.ToInt32(musicTimeSpan.TotalMinutes) + ":" + Convert.ToInt32(musicTimeSpan.TotalSeconds);
-;
-            preLyric = currentLyric;
+            lyricText.Text =  Convert.ToInt32(musicTimeSpan.TotalHours) + ":" + Convert.ToInt32(musicTimeSpan.TotalMinutes) + ":" + Convert.ToInt32(musicTimeSpan.TotalSeconds) + "  " +currentLyric;
         }
     }
 }
