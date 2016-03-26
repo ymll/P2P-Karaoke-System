@@ -12,11 +12,13 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Threading;
 
 namespace P2PKaraokeSystem.PlaybackLogic
 {
     public unsafe class FFmpegDecoder
     {
+        private bool IS_FRAME_SAVE_TO_FILE = false;
         private const AVPixelFormat DISPLAY_COLOR_FORMAT = AVPixelFormat.AV_PIX_FMT_BGR24;
         private PixelFormat WRITEABLE_BITMAP_FORMAT = PixelFormats.Bgr24;
 
@@ -78,7 +80,7 @@ namespace P2PKaraokeSystem.PlaybackLogic
                         ConvertFrameToImage();
                         WriteImageToBuffer();
 
-                        if (currentFrame % 20 == 0)
+                        if (IS_FRAME_SAVE_TO_FILE && currentFrame % 20 == 0)
                         {
                             SaveBufferToFile();
                         }
@@ -197,8 +199,8 @@ namespace P2PKaraokeSystem.PlaybackLogic
 
             ffmpeg.avpicture_fill((AVPicture*)this.pImageFrame, pImageBuffer, DISPLAY_COLOR_FORMAT, width, height);
 
-            this.playerViewModel.VideoScreenBitmap = new WriteableBitmap(this.width, this.height, 72, 72, WRITEABLE_BITMAP_FORMAT, null);
-            this.videoScreenBitmap = this.playerViewModel.VideoScreenBitmap;
+            this.videoScreenBitmap = new WriteableBitmap(this.width, this.height, 72, 72, WRITEABLE_BITMAP_FORMAT, null);
+            this.playerViewModel.VideoScreenBitmap = this.videoScreenBitmap;
         }
 
         private bool ReadFrame(AVPacket* pVideoPacket)
@@ -237,20 +239,27 @@ namespace P2PKaraokeSystem.PlaybackLogic
             var imageBufferPtr = new IntPtr(pImageBuffer);
             var linesize = this.pImageFrame->linesize[0];
 
-            this.videoScreenBitmap.Lock();
-            CopyMemory(this.videoScreenBitmap.BackBuffer, imageBufferPtr, this.imageFrameBufferSize);
-            this.videoScreenBitmap.AddDirtyRect(new Int32Rect(0, 0, this.width, this.height));
-            this.videoScreenBitmap.Unlock();
+            this.videoScreenBitmap.Dispatcher.Invoke(() =>
+            {
+                this.videoScreenBitmap.Lock();
+                CopyMemory(this.videoScreenBitmap.BackBuffer, imageBufferPtr, this.imageFrameBufferSize);
+                this.videoScreenBitmap.AddDirtyRect(new Int32Rect(0, 0, this.width, this.height));
+                this.videoScreenBitmap.Unlock();
+            });
         }
 
         private void SaveBufferToFile()
         {
-            using (FileStream stream = new FileStream("images/" + currentFrame + ".jpg", FileMode.Create))
+            this.videoScreenBitmap.Dispatcher.Invoke(() =>
             {
-                JpegBitmapEncoder encoder = new JpegBitmapEncoder();
-                encoder.Frames.Add(BitmapFrame.Create(this.videoScreenBitmap));
-                encoder.Save(stream);
-            }
+                using (FileStream stream = new FileStream("images/" + currentFrame + ".jpg", FileMode.Create))
+                {
+                    JpegBitmapEncoder encoder = new JpegBitmapEncoder();
+
+                    encoder.Frames.Add(BitmapFrame.Create(this.videoScreenBitmap));
+                    encoder.Save(stream);
+                }
+            });
         }
 
         [DllImport("Kernel32.dll", EntryPoint = "RtlMoveMemory")]
