@@ -1,6 +1,7 @@
 ﻿using FFmpeg.AutoGen;
 using P2PKaraokeSystem.Model;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
@@ -8,6 +9,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
@@ -19,8 +21,8 @@ namespace P2PKaraokeSystem.PlaybackLogic
     public unsafe class FFmpegDecoder
     {
         private bool IS_FRAME_SAVE_TO_FILE = false;
-        private const AVPixelFormat DISPLAY_COLOR_FORMAT = AVPixelFormat.AV_PIX_FMT_BGR24;
-        private PixelFormat WRITEABLE_BITMAP_FORMAT = PixelFormats.Bgr24;
+        private const AVPixelFormat DISPLAY_COLOR_FORMAT = AVPixelFormat.AV_PIX_FMT_BGRA;
+        private PixelFormat WRITEABLE_BITMAP_FORMAT = PixelFormats.Bgr32;
 
         private PlayerViewModel playerViewModel;
         private int currentFrame;
@@ -38,14 +40,13 @@ namespace P2PKaraokeSystem.PlaybackLogic
         private SwsContext* pConvertContext;
         private int width;
         private int height;
-        private int numOfFrame;
+        private AVRational frameRate;
 
         // Filled by PrepareDecodeFrameAndPacket()
         private AVFrame* pDecodedVideoFrame;
         private AVPacket videoPacket;
 
         // Filled by PrepareImageFrameAndBuffer()
-        private AVFrame* pImageFrame;
         private int imageFrameBufferSize;
         private WriteableBitmap videoScreenBitmap;
 
@@ -71,22 +72,48 @@ namespace P2PKaraokeSystem.PlaybackLogic
 
         public void Play()
         {
-            fixed (AVPacket* pVideoPacket = &this.videoPacket)
+            // Decode thread
+            new Thread(() =>
             {
-                while (ReadFrame(pVideoPacket))
+                fixed (AVPacket* pVideoPacket = &this.videoPacket)
                 {
-                    if (IsVideoFrame(pVideoPacket) && DecodeVideoFrame(pVideoPacket))
-                    {
-                        ConvertFrameToImage();
-                        WriteImageToBuffer();
+                    IntPtr imageFramePtr = this.playerViewModel.AvailableImageBufferPool.Take();
 
-                        if (IS_FRAME_SAVE_TO_FILE && currentFrame % 20 == 0)
+                    while (ReadFrame(pVideoPacket))
+                    {
+                        if (IsVideoFrame(pVideoPacket) && DecodeVideoFrame(pVideoPacket))
                         {
-                            SaveBufferToFile();
+                            var pImageFrame = (AVFrame*)imageFramePtr.ToPointer();
+
+                            ConvertFrameToImage(pImageFrame);
+
+                            if (IS_FRAME_SAVE_TO_FILE && currentFrame % 20 == 0)
+                            {
+                                SaveBufferToFile();
+                            }
+
+                            this.playerViewModel.PendingVideoFrames.Add(imageFramePtr);
+                            imageFramePtr = this.playerViewModel.AvailableImageBufferPool.Take();
                         }
                     }
                 }
-            }
+            }).Start();
+
+            // Playback thread
+            new Thread(() =>
+            {
+                while (true)
+                {
+                    IntPtr imageFramePtr = this.playerViewModel.PendingVideoFrames.Take();
+                    var pImageFrame = (AVFrame*)imageFramePtr.ToPointer();
+
+                    WriteImageToBuffer(pImageFrame);
+                    this.playerViewModel.AvailableImageBufferPool.Add(imageFramePtr);
+
+                    int sleepTime = (int)(frameRate.den * 1000.0 / frameRate.num);
+                    Thread.Sleep(sleepTime);
+                }
+            }).Start();
         }
 
         public void UnLoad()
@@ -153,7 +180,7 @@ namespace P2PKaraokeSystem.PlaybackLogic
             this.pVideoCodecContext = this.pVideoStream->codec;
             this.width = this.pVideoCodecContext->width;
             this.height = this.pVideoCodecContext->height;
-            this.numOfFrame = this.pVideoCodecContext->frame_number;
+            this.frameRate = this.pVideoCodecContext->framerate;
             var srcColorSpace = this.pVideoCodecContext->pix_fmt;
 
             this.codecId = this.pVideoCodecContext->codec_id;
@@ -187,17 +214,22 @@ namespace P2PKaraokeSystem.PlaybackLogic
             fixed (AVPacket* pVideoPacket = &this.videoPacket)
             {
                 ffmpeg.av_init_packet(pVideoPacket);
-
             }
         }
 
         private void PrepareImageFrameAndBuffer()
         {
-            this.pImageFrame = ffmpeg.av_frame_alloc();
             this.imageFrameBufferSize = ffmpeg.avpicture_get_size(DISPLAY_COLOR_FORMAT, width, height);
-            var pImageBuffer = (sbyte*)ffmpeg.av_malloc((ulong)this.imageFrameBufferSize);
 
-            ffmpeg.avpicture_fill((AVPicture*)this.pImageFrame, pImageBuffer, DISPLAY_COLOR_FORMAT, width, height);
+            for (int i = 0; i < this.playerViewModel.NumberOfBufferedImageFrame; i++)
+            {
+                var pImageFrame = ffmpeg.av_frame_alloc();
+                var pImageBuffer = (sbyte*)ffmpeg.av_malloc((ulong)this.imageFrameBufferSize);
+                var imageFramePtr = new IntPtr(pImageFrame);
+
+                ffmpeg.avpicture_fill((AVPicture*)pImageFrame, pImageBuffer, DISPLAY_COLOR_FORMAT, width, height);
+                this.playerViewModel.AvailableImageBufferPool.Add(imageFramePtr);
+            }
 
             this.videoScreenBitmap = new WriteableBitmap(this.width, this.height, 72, 72, WRITEABLE_BITMAP_FORMAT, null);
             this.playerViewModel.VideoScreenBitmap = this.videoScreenBitmap;
@@ -223,21 +255,21 @@ namespace P2PKaraokeSystem.PlaybackLogic
             return gotPicture == 1;
         }
 
-        private void ConvertFrameToImage()
+        private void ConvertFrameToImage(AVFrame* pImageFrame)
         {
             var src = &this.pDecodedVideoFrame->data0;
-            var dest = &this.pImageFrame->data0;
+            var dest = &pImageFrame->data0;
             var srcStride = this.pDecodedVideoFrame->linesize;
-            var destStride = this.pImageFrame->linesize;
+            var destStride = pImageFrame->linesize;
 
             ffmpeg.sws_scale(pConvertContext, src, srcStride, 0, height, dest, destStride);
         }
 
-        private void WriteImageToBuffer()
+        private void WriteImageToBuffer(AVFrame* pImageFrame)
         {
-            var pImageBuffer = this.pImageFrame->data0;
+            var pImageBuffer = pImageFrame->data0;
             var imageBufferPtr = new IntPtr(pImageBuffer);
-            var linesize = this.pImageFrame->linesize[0];
+            var linesize = pImageFrame->linesize[0];
 
             this.videoScreenBitmap.Dispatcher.Invoke(() =>
             {
