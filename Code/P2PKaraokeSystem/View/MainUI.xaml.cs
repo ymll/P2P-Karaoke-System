@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -23,9 +24,14 @@ namespace P2PKaraokeSystem.View
         bool isStopping = true;
         bool soundOn = true;
 
+        public System.Diagnostics.Stopwatch musicTime;
+        public P2PKaraokeSystem.Model.VideoDatabase.Lyric currentLyricFile;
+        string preLyric;
+
         public MainUI()
         {
             InitializeComponent();
+            currentLyricFile = new P2PKaraokeSystem.Model.VideoDatabase.Lyric("Z:\\Code\\P2PKaraokeSystem\\VideoDatabase\\Lyrics\\Enya - Only Time.lrc");
             FFmpegLoader.LoadFFmpeg();
         }
 
@@ -77,6 +83,10 @@ namespace P2PKaraokeSystem.View
 
             audioPlayer.OpenDevice(aviHeaderParser.AudioHeaderReader.FormatInfo, delegate { });
             audioPlayer.WriteToStream(frameReader.FramePointer, frameReader.FrameSize);
+
+            musicTime = System.Diagnostics.Stopwatch.StartNew();
+            Thread test = new Thread(new ThreadStart(LyricThread));
+            test.Start();
         }
 
         //Backward Button Enter
@@ -130,6 +140,35 @@ namespace P2PKaraokeSystem.View
                 SetImage(soundImg, "pack://application:,,,/View/UIMaterial/Image/volumeup_blue.png");
 
             soundOn = !soundOn;
+        }
+
+        //Thred for updating the lyric
+        public delegate void UpdateLyricCallback(string message);
+        private void LyricThread()
+        {
+            for (int i = 0; i <= 1000000000; i++)
+            {
+                Thread.Sleep(1000);
+                lyricText.Dispatcher.Invoke(
+                    new UpdateLyricCallback(this.UpdateText),
+                    new object[] { i.ToString() }
+                );
+            }
+        }
+
+        private void UpdateText(string message)
+        {
+            var musicTimeSpan = TimeSpan.FromMilliseconds(musicTime.Elapsed.TotalMilliseconds);
+            string currentLyric = currentLyricFile.GetCurrentLyric(Convert.ToInt32(musicTimeSpan.TotalHours), Convert.ToInt32(musicTimeSpan.TotalMinutes),
+                Convert.ToInt32(musicTimeSpan.TotalSeconds), Convert.ToInt32(musicTimeSpan.TotalMilliseconds - Convert.ToInt32(musicTimeSpan.TotalSeconds)*1000));
+            if (currentLyric == "" && preLyric != null)
+            {
+                currentLyric = preLyric;
+            }
+
+            lyricText.Text = currentLyric + "       " + Convert.ToInt32(musicTimeSpan.TotalHours) + ":" + Convert.ToInt32(musicTimeSpan.TotalMinutes) + ":" + Convert.ToInt32(musicTimeSpan.TotalSeconds);
+;
+            preLyric = currentLyric;
         }
     }
 }

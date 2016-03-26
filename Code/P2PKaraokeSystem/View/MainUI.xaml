@@ -65,7 +65,7 @@
                HorizontalContentAlignment="Stretch" VerticalContentAlignment="Center"
                Margin="0,5,328,0" Height="50" Width="960">
             <Label.Content>
-                <AccessText x:Name="lyricText" TextWrapping="Wrap" Text="Here is the place for lyric"/>
+                <AccessText x:Name="lyricText" TextWrapping="Wrap" Text=""/>
             </Label.Content>
         </Label>
 
