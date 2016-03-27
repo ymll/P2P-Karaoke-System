@@ -2,7 +2,7 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:local_model="clr-namespace:P2PKaraokeSystem.Model"
-        Title="P2P Karaoke System" Height="677" Width="1289" Icon="..\View\UIMaterial\Image\icon.ico">
+        Title="P2P Karaoke System" Height="677" Width="1289" Icon="..\View\UIMaterial\Image\icon.ico" WindowState="Maximized" WindowStartupLocation="CenterScreen">
     <Window.DataContext>
         <local_model:KaraokeSystemModel />
     </Window.DataContext>
@@ -73,15 +73,24 @@
 
         <ScrollViewer x:Name="musicList"
             Grid.RowSpan="3" Grid.ColumnSpan="2"
-            HorizontalAlignment="Left" VerticalAlignment="Top"
             Margin="958,0,0,0"
-            HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Auto"
-            Background="Black">
-            <Border BorderBrush="DeepPink" BorderThickness="2" Width="{DynamicResource {x:Static SystemParameters.VirtualScreenWidthKey}}" Height="{DynamicResource {x:Static SystemParameters.VirtualScreenHeightKey}}">
-                <TextBlock Name="textBlock1"
-                           Text="TextBlock TextBlockTextBlock"
-                           Foreground="White"
-                           TextWrapping="Wrap" />
+            HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Auto">
+            <Border BorderBrush="DeepPink" BorderThickness="2">
+                <ListView ItemsSource="{Binding VideoDatabase.Videos}" SelectionMode="Single" Background="Black" MouseDoubleClick="ListView_MouseDoubleClick">
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <DockPanel Height="40">
+                                <TextBlock Text="{Binding Title}" HorizontalAlignment="Stretch" Foreground="White" VerticalAlignment="Center" FontSize="24" FontWeight="Bold"></TextBlock>
+                                <TextBlock Text="[Time]" HorizontalAlignment="Right" Foreground="White" VerticalAlignment="Center"></TextBlock>
+                            </DockPanel>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                    <ListView.ItemContainerStyle>
+                        <Style TargetType="ListViewItem">
+                            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                        </Style>
+                    </ListView.ItemContainerStyle>
+                </ListView>
             </Border>
         </ScrollViewer>
 

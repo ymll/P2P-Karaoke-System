@@ -25,7 +25,7 @@ namespace P2PKaraokeSystem.PlaybackLogic
         private PixelFormat WRITEABLE_BITMAP_FORMAT = PixelFormats.Bgr32;
 
         private PlayerViewModel playerViewModel;
-        private Thread decodeThread;
+        private PlaybackModel playbackModel;
         private int currentFrame;
 
         // Filled by RetrieveFormatAndStreamInfo()
@@ -50,16 +50,32 @@ namespace P2PKaraokeSystem.PlaybackLogic
         // Filled by PrepareImageFrameAndBuffer()
         private int imageFrameBufferSize;
 
-        public FFmpegDecoder(PlayerViewModel playerViewModel)
+        public FFmpegDecoder(PlayerViewModel playerViewModel, PlaybackModel playbackModel)
         {
             this.playerViewModel = playerViewModel;
-            this.decodeThread = new Thread(this.DecodeFunc);
+            this.playbackModel = playbackModel;
             pFormatContext = ffmpeg.avformat_alloc_context();
 
+            playbackModel.PropertyChanged += playbackModel_PropertyChanged;
+
             this.StartPlaybackThread();
+            this.StartDecodeThread();
         }
 
-        public void Load(string path)
+        void playbackModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if ("CurrentVideo".Equals(e.PropertyName))
+            {
+                UnLoad();
+
+                if (this.playbackModel.CurrentVideo != null)
+                {
+                    Load(this.playbackModel.CurrentVideo.FilePath);
+                }
+            }
+        }
+
+        private void Load(string path)
         {
             currentFrame = 0;
 
@@ -71,14 +87,6 @@ namespace P2PKaraokeSystem.PlaybackLogic
             FindAndOpenVideoDecoder();
             PrepareDecodedFrameAndPacket();
             PrepareImageFrameAndBuffer();
-        }
-
-        public void StartDecode()
-        {
-            if (decodeThread.ThreadState != System.Threading.ThreadState.Suspended)
-            {
-                decodeThread.Start();
-            }
         }
 
         private void StartPlaybackThread()
@@ -94,41 +102,57 @@ namespace P2PKaraokeSystem.PlaybackLogic
                     WriteImageToBuffer(pImageFrame);
                     this.playerViewModel.AvailableImageBufferPool.Add(imageFramePtr);
 
-                    int sleepTime = (int)(frameRate.den * 1000.0 / frameRate.num);
+                    int sleepTime = (int)(frameRate.den * 1000.0 / Math.Max(frameRate.num, 10));
                     Thread.Sleep(sleepTime);
                 }
             }).Start();
         }
 
-        private void DecodeFunc()
+        public void StartDecodeThread()
         {
-            fixed (AVPacket* pVideoPacket = &this.videoPacket)
+            new Thread(() =>
             {
-                IntPtr imageFramePtr = this.playerViewModel.AvailableImageBufferPool.Take();
-
-                while (ReadFrame(pVideoPacket))
+                fixed (AVPacket* pVideoPacket = &this.videoPacket)
                 {
-                    if (IsVideoFrame(pVideoPacket) && DecodeVideoFrame(pVideoPacket))
+                    IntPtr imageFramePtr = this.playerViewModel.AvailableImageBufferPool.Take();
+
+                    while (ReadFrame(pVideoPacket))
                     {
-                        var pImageFrame = (AVFrame*)imageFramePtr.ToPointer();
-
-                        ConvertFrameToImage(pImageFrame);
-
-                        if (IS_FRAME_SAVE_TO_FILE && currentFrame % 20 == 0)
+                        if (IsVideoFrame(pVideoPacket) && DecodeVideoFrame(pVideoPacket))
                         {
-                            SaveBufferToFile();
-                        }
+                            var pImageFrame = (AVFrame*)imageFramePtr.ToPointer();
 
-                        this.playerViewModel.PendingVideoFrames.Add(imageFramePtr);
-                        imageFramePtr = this.playerViewModel.AvailableImageBufferPool.Take();
+                            ConvertFrameToImage(pImageFrame);
+
+                            if (IS_FRAME_SAVE_TO_FILE && currentFrame % 20 == 0)
+                            {
+                                SaveBufferToFile();
+                            }
+
+                            this.playerViewModel.PendingVideoFrames.Add(imageFramePtr);
+                            imageFramePtr = this.playerViewModel.AvailableImageBufferPool.Take();
+                        }
                     }
                 }
-            }
+            }).Start();
         }
 
-        public void UnLoad()
+        private void UnLoad()
         {
+            IntPtr imageFramePtr;
+            while (this.playerViewModel.AvailableImageBufferPool.TryTake(out imageFramePtr))
+            {
+                var pImageFrame = (AVFrame*)imageFramePtr.ToPointer();
+                ffmpeg.av_free(pImageFrame->data0);
+                ffmpeg.av_frame_free(&pImageFrame);
+            }
 
+            ffmpeg.avcodec_close(this.pVideoCodecContext);
+
+            fixed (AVFormatContext** ppFormatContext = &this.pFormatContext)
+            {
+                ffmpeg.avformat_close_input(ppFormatContext);
+            }
         }
 
         private void RetrieveFormatAndStreamInfo(string path)

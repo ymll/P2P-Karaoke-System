@@ -2,6 +2,7 @@
 using Kfstorm.LrcParser;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -11,18 +12,15 @@ namespace P2PKaraokeSystem.Model
 {
     public class VideoDatabase : AbstractNotifyPropertyChanged
     {
-        private List<Video> _videos;
-        public List<Video> Videos
-        {
-            get { return _videos; }
-        }
+        public ObservableCollection<Video> Videos { get; private set; }
 
         public VideoDatabase()
         {
-            _videos = new List<Video>();
+            Videos = new ObservableCollection<Video>();
+
             try
             {
-                LoadFromFile("db.csv");
+                LoadFromFile("Z:\\Code\\P2PKaraokeSystem\\VideoDatabase\\db.csv");
             }
             catch (Exception)
             {

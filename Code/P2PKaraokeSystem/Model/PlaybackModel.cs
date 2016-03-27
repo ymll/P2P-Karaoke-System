@@ -9,12 +9,11 @@ namespace P2PKaraokeSystem.Model
 {
     public class PlaybackModel : AbstractNotifyPropertyChanged
     {
-        private const String DEFAULT_FILE_PATH = "[File not loaded]";
-        private String _filePath = DEFAULT_FILE_PATH;
-        public String FilePath
+        private VideoDatabase.Video _currentVideo;
+        public VideoDatabase.Video CurrentVideo
         {
-            get { return _filePath; }
-            set { SetField(ref _filePath, value, "FilePath"); }
+            get { return _currentVideo; }
+            set { SetField(ref _currentVideo, value, "CurrentVideo"); }
         }
 
         private long _currentTime = 0;

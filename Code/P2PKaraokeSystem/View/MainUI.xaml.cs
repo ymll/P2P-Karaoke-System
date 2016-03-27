@@ -22,8 +22,9 @@ namespace P2PKaraokeSystem.View
     public partial class MainUI : Window
     {
         private KaraokeSystemModel _karaokeSystemModel;
+        private FFmpegDecoder decoder;
 
-        bool isStopping = true;
+        bool isPlaying;
         bool soundOn = true;
 
         public System.Diagnostics.Stopwatch musicTime;
@@ -32,9 +33,11 @@ namespace P2PKaraokeSystem.View
         public MainUI()
         {
             InitializeComponent();
-            _karaokeSystemModel = (KaraokeSystemModel)this.DataContext;
-            currentLyricFile = new P2PKaraokeSystem.Model.VideoDatabase.Lyric("Z:\\Code\\P2PKaraokeSystem\\VideoDatabase\\Lyrics\\Enya - Only Time.lrc");
             FFmpegLoader.LoadFFmpeg();
+
+            this._karaokeSystemModel = (KaraokeSystemModel)this.DataContext;
+            this.decoder = new FFmpegDecoder(this._karaokeSystemModel.View, this._karaokeSystemModel.Playback);
+            currentLyricFile = new P2PKaraokeSystem.Model.VideoDatabase.Lyric("Z:\\Code\\P2PKaraokeSystem\\VideoDatabase\\Lyrics\\Enya - Only Time.lrc");
         }
 
         //Set Image Source for an image throught Uri
@@ -49,57 +52,25 @@ namespace P2PKaraokeSystem.View
         //Play and Stop Button Enter
         private void playBtn_MouseEnter(object sender, EventArgs e)
         {
-            if (isStopping)
-                SetImage(playImg, "pack://application:,,,/View/UIMaterial/Image/play_blue.png");
-            else
+            if (isPlaying)
                 SetImage(playImg, "pack://application:,,,/View/UIMaterial/Image/stop_blue.png");
+            else
+                SetImage(playImg, "pack://application:,,,/View/UIMaterial/Image/play_blue.png");
         }
 
         //Play and Stop Mouse Leave
         private void playBtn_MouseLeave(object sender, EventArgs e)
         {
-            if (isStopping)
-                SetImage(playImg, "pack://application:,,,/View/UIMaterial/Image/play.png");
-            else
+            if (isPlaying)
                 SetImage(playImg, "pack://application:,,,/View/UIMaterial/Image/stop.png");
+            else
+                SetImage(playImg, "pack://application:,,,/View/UIMaterial/Image/play.png");
         }
 
         //Play and Stop Mouse Click
         private void playBtn_Click(object sender, EventArgs e)
         {
-            if (isStopping)
-            {
-                SetImage(playImg, "pack://application:,,,/View/UIMaterial/Image/stop_blue.png");
-                if (musicTime == null)
-                    musicTime = System.Diagnostics.Stopwatch.StartNew();
-                else
-                    musicTime.Start();
-                Thread test = new Thread(new ThreadStart(LyricThread));
-                test.Start();
-            }
-            else
-            {
-                SetImage(playImg, "pack://application:,,,/View/UIMaterial/Image/play_blue.png");
-                musicTime.Stop();
-            }
-
-            isStopping = !isStopping;
-
-            var aviHeaderParser = new P2PKaraokeSystem.PlaybackLogic.AviHeaderParser();
-            aviHeaderParser.LoadFile("Z:\\Code\\P2PKaraokeSystem\\VideoDatabase\\Video\\only_time.avi");
-
-            AudioFrameReader frameReader = new AudioFrameReader();
-            frameReader.Load(aviHeaderParser.AudioHeaderReader);
-            frameReader.ReadFrameFully(aviHeaderParser.AudioHeaderReader);
-
-            AudioPlayer audioPlayer = new AudioPlayer();
-
-            audioPlayer.OpenDevice(aviHeaderParser.AudioHeaderReader.FormatInfo, delegate { });
-            audioPlayer.WriteToStream(frameReader.FramePointer, frameReader.FrameSize);
-
-            FFmpegDecoder decoder = new FFmpegDecoder(this._karaokeSystemModel.View);
-            decoder.Load("Z:\\Code\\P2PKaraokeSystem\\VideoDatabase\\Video\\only_time.avi");
-            decoder.StartDecode();
+            UpdatePlayState(!isPlaying);
         }
 
         //Backward Button Enter
@@ -176,6 +147,45 @@ namespace P2PKaraokeSystem.View
                 Convert.ToInt32(musicTimeSpan.TotalSeconds), Convert.ToInt32(musicTimeSpan.TotalMilliseconds - Convert.ToInt32(musicTimeSpan.TotalSeconds) * 1000));
 
             lyricText.Text = Convert.ToInt32(musicTimeSpan.TotalHours) + ":" + Convert.ToInt32(musicTimeSpan.TotalMinutes) + ":" + Convert.ToInt32(musicTimeSpan.TotalSeconds) + "  " + currentLyric;
+        }
+
+        private void UpdatePlayState(bool isPlay)
+        {
+            isPlaying = isPlay;
+
+            if (isPlaying)
+            {
+                SetImage(playImg, "pack://application:,,,/View/UIMaterial/Image/stop_blue.png");
+                if (musicTime == null)
+                    musicTime = System.Diagnostics.Stopwatch.StartNew();
+                else
+                    musicTime.Start();
+                Thread test = new Thread(new ThreadStart(LyricThread));
+                test.Start();
+
+                var aviHeaderParser = new P2PKaraokeSystem.PlaybackLogic.AviHeaderParser();
+                aviHeaderParser.LoadFile("Z:\\Code\\P2PKaraokeSystem\\VideoDatabase\\Video\\only_time.avi");
+
+                AudioFrameReader frameReader = new AudioFrameReader();
+                frameReader.Load(aviHeaderParser.AudioHeaderReader);
+                frameReader.ReadFrameFully(aviHeaderParser.AudioHeaderReader);
+
+                AudioPlayer audioPlayer = new AudioPlayer();
+
+                audioPlayer.OpenDevice(aviHeaderParser.AudioHeaderReader.FormatInfo, delegate { });
+                audioPlayer.WriteToStream(frameReader.FramePointer, frameReader.FrameSize);
+            }
+            else
+            {
+                SetImage(playImg, "pack://application:,,,/View/UIMaterial/Image/play_blue.png");
+                musicTime.Stop();
+            }
+        }
+
+        private void ListView_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            this._karaokeSystemModel.Playback.CurrentVideo = ((sender as ListView).SelectedItem as Model.VideoDatabase.Video);
+            UpdatePlayState(true);
         }
     }
 }
