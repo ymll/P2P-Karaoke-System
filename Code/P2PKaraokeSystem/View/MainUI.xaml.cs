@@ -99,7 +99,7 @@ namespace P2PKaraokeSystem.View
 
             FFmpegDecoder decoder = new FFmpegDecoder(this._karaokeSystemModel.View);
             decoder.Load("Z:\\Code\\P2PKaraokeSystem\\VideoDatabase\\Video\\only_time.avi");
-            decoder.Play();
+            decoder.StartDecode();
         }
 
         //Backward Button Enter
