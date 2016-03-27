@@ -1,0 +1,13 @@
+﻿<Window x:Class="P2PKaraokeSystem.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local_model="clr-namespace:P2PKaraokeSystem.Model"
+        Title="MainWindow" Height="350" Width="525">
+    <Window.DataContext>
+        <local_model:KaraokeSystemModel />
+    </Window.DataContext>
+    <Grid>
+        <Label Content="{Binding Playback.FilePath}" HorizontalAlignment="Left" Margin="169,74,0,0" VerticalAlignment="Top" Height="43" Width="127"/>
+        <TextBox Text="{Binding Playback.FilePath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Height="23" Margin="169,122,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
+    </Grid>
+</Window>
