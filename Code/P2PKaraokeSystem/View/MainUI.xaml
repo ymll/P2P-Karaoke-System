@@ -18,7 +18,7 @@
         </Grid.RowDefinitions>
 
         <!-- Video -->
-        <MediaElement x:Name="videoEle"
+        <Image x:Name="videoScreen" Source="{Binding View.VideoScreenBitmap}"
             HorizontalAlignment="Left" VerticalAlignment="Top"
             Height="505" Width="960"
             Margin="-2,0,0,0"/>
