@@ -220,8 +220,9 @@ namespace P2PKaraokeSystem.PlaybackLogic
         private void PrepareImageFrameAndBuffer()
         {
             this.imageFrameBufferSize = ffmpeg.avpicture_get_size(DISPLAY_COLOR_FORMAT, width, height);
+            var numberOfBuffer = Math.Max(2, this.playerViewModel.MaxBufferSizeInMegabyte * 1024 * 1024 / this.imageFrameBufferSize);
 
-            for (int i = 0; i < this.playerViewModel.NumberOfBufferedImageFrame; i++)
+            for (int i = 0; i < numberOfBuffer; i++)
             {
                 var pImageFrame = ffmpeg.av_frame_alloc();
                 var pImageBuffer = (sbyte*)ffmpeg.av_malloc((ulong)this.imageFrameBufferSize);

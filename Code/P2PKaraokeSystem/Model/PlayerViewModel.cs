@@ -28,13 +28,13 @@ namespace P2PKaraokeSystem.Model
 
         public BlockingCollection<IntPtr> AvailableImageBufferPool { get; private set; }
 
-        private const int DEFAULT_NUMBER_OF_BUFFERED_IMAGE_FRAME = 100;
-        public int NumberOfBufferedImageFrame { get; private set; }
+        private const int DEFAULT_MAX_BUFFER_SIZE_IN_MEGABYTE = 200;
+        public int MaxBufferSizeInMegabyte { get; private set; }
 
         public PlayerViewModel()
         {
             this.PendingVideoFrames = new BlockingCollection<IntPtr>(new ConcurrentQueue<IntPtr>());
-            this.NumberOfBufferedImageFrame = DEFAULT_NUMBER_OF_BUFFERED_IMAGE_FRAME;
+            this.MaxBufferSizeInMegabyte = DEFAULT_MAX_BUFFER_SIZE_IN_MEGABYTE;
             this.AvailableImageBufferPool = new BlockingCollection<IntPtr>(new ConcurrentBag<IntPtr>());
         }
     }
