@@ -140,7 +140,8 @@ namespace P2PKaraokeSystem.PlaybackLogic
         private void UnLoad()
         {
             IntPtr imageFramePtr;
-            while (this.playerViewModel.AvailableImageBufferPool.TryTake(out imageFramePtr))
+            while (this.playerViewModel.PendingVideoFrames.TryTake(out imageFramePtr)
+                || this.playerViewModel.AvailableImageBufferPool.TryTake(out imageFramePtr))
             {
                 var pImageFrame = (AVFrame*)imageFramePtr.ToPointer();
                 ffmpeg.av_free(pImageFrame->data0);
