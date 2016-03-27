@@ -76,7 +76,7 @@
             Margin="958,0,0,0"
             HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Auto">
             <Border BorderBrush="DeepPink" BorderThickness="2">
-                <ListView ItemsSource="{Binding VideoDatabase.Videos}" SelectionMode="Single" Background="Black">
+                <ListView ItemsSource="{Binding VideoDatabase.Videos}" SelectionMode="Single" Background="Black" MouseDoubleClick="ListView_MouseDoubleClick">
                     <ListView.ItemTemplate>
                         <DataTemplate>
                             <DockPanel Height="40">
