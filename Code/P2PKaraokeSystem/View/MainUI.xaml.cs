@@ -37,7 +37,7 @@ namespace P2PKaraokeSystem.View
 
             this._karaokeSystemModel = (KaraokeSystemModel)this.DataContext;
             this.decoder = new FFmpegDecoder(this._karaokeSystemModel.View, this._karaokeSystemModel.Playback);
-            currentLyricFile = new P2PKaraokeSystem.Model.VideoDatabase.Lyric("Z:\\Code\\P2PKaraokeSystem\\VideoDatabase\\Lyrics\\Enya - Only Time.lrc");
+            currentLyricFile = new P2PKaraokeSystem.Model.VideoDatabase.Lyric("Z:\\Users\\sonia\\note\\year4\\sem2\\CSCI3280\\Project\\Code\\P2PKaraokeSystem\\VideoDatabase\\Lyrics\\Enya - Only Time.lrc");
         }
 
         //Set Image Source for an image throught Uri
@@ -164,7 +164,7 @@ namespace P2PKaraokeSystem.View
                 test.Start();
 
                 var aviHeaderParser = new P2PKaraokeSystem.PlaybackLogic.AviHeaderParser();
-                aviHeaderParser.LoadFile("Z:\\Code\\P2PKaraokeSystem\\VideoDatabase\\Video\\only_time.avi");
+                aviHeaderParser.LoadFile("Z:\\Users\\sonia\\note\\year4\\sem2\\CSCI3280\\Project\\Code\\P2PKaraokeSystem\\VideoDatabase\\Video\\only_time.avi");
 
                 AudioFrameReader frameReader = new AudioFrameReader();
                 frameReader.Load(aviHeaderParser.AudioHeaderReader);
