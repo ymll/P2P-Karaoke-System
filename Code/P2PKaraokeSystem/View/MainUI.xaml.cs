@@ -149,7 +149,7 @@ namespace P2PKaraokeSystem.View
                 frameReader.Load(aviHeaderParser.AudioHeaderReader);
                 frameReader.ReadFrameFully(aviHeaderParser.AudioHeaderReader);
 
-                AudioPlayer audioPlayer = new AudioPlayer();
+                AudioPlayer audioPlayer = new AudioPlayer(this._karaokeSystemModel.Playback);
 
                 audioPlayer.OpenDevice(aviHeaderParser.AudioHeaderReader.FormatInfo, delegate { });
                 audioPlayer.WriteToStream(frameReader.FramePointer, frameReader.FrameSize);

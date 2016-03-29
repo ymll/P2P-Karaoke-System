@@ -1,8 +1,10 @@
-﻿using System;
+﻿using P2PKaraokeSystem.Model;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using WinmmLib;
 
@@ -14,6 +16,35 @@ namespace P2PKaraokeSystem.PlaybackLogic
 
         private IntPtr audioOut = new IntPtr();
         private DelegateAudioFinished finishCallback;
+
+        private PlaybackModel playbackModel;
+        private ManualResetEventSlim isAudioPlayingEvent;
+
+        public AudioPlayer(PlaybackModel playbackModel)
+        {
+            this.playbackModel = playbackModel;
+            this.isAudioPlayingEvent = new ManualResetEventSlim(false);
+
+            this.playbackModel.PropertyChanged += playbackModel_PropertyChanged;
+        }
+
+        private void playbackModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            switch (e.PropertyName)
+            {
+                case "CurrentVideo":
+                case "Playing":
+                    if (playbackModel.CurrentVideo != null && playbackModel.Playing)
+                    {
+                        Winmm.waveOutRestart(audioOut);
+                    }
+                    else
+                    {
+                        Winmm.waveOutPause(audioOut);
+                    }
+                    break;
+            }
+        }
 
         public void OpenDevice(AviFile.Avi.PCMWAVEFORMAT audioFormatInfo, DelegateAudioFinished finishCallback)
         {
