@@ -28,6 +28,9 @@ namespace P2PKaraokeSystem.PlaybackLogic
         private PlaybackModel playbackModel;
         private int currentFrame;
 
+        private ManualResetEventSlim isVideoLoadedEvent;
+        private ManualResetEventSlim isVideoPlayingEvent;
+
         // Filled by RetrieveFormatAndStreamInfo()
         private AVFormatContext* pFormatContext;
 
@@ -54,6 +57,9 @@ namespace P2PKaraokeSystem.PlaybackLogic
         {
             this.playerViewModel = playerViewModel;
             this.playbackModel = playbackModel;
+            this.isVideoLoadedEvent = new ManualResetEventSlim(false);
+            this.isVideoPlayingEvent = new ManualResetEventSlim(false);
+
             pFormatContext = ffmpeg.avformat_alloc_context();
 
             playbackModel.PropertyChanged += playbackModel_PropertyChanged;
@@ -66,11 +72,24 @@ namespace P2PKaraokeSystem.PlaybackLogic
         {
             if ("CurrentVideo".Equals(e.PropertyName))
             {
+                this.isVideoLoadedEvent.Reset();
                 UnLoad();
 
                 if (this.playbackModel.CurrentVideo != null)
                 {
                     Load(this.playbackModel.CurrentVideo.FilePath);
+                    this.isVideoLoadedEvent.Set();
+                }
+            }
+            else if ("Playing".Equals(e.PropertyName))
+            {
+                if (this.playbackModel.Playing)
+                {
+                    this.isVideoPlayingEvent.Set();
+                }
+                else
+                {
+                    this.isVideoPlayingEvent.Reset();
                 }
             }
         }
@@ -96,6 +115,8 @@ namespace P2PKaraokeSystem.PlaybackLogic
             {
                 while (true)
                 {
+                    this.isVideoPlayingEvent.Wait();
+
                     IntPtr imageFramePtr = this.playerViewModel.PendingVideoFrames.Take();
                     var pImageFrame = (AVFrame*)imageFramePtr.ToPointer();
 
@@ -112,25 +133,30 @@ namespace P2PKaraokeSystem.PlaybackLogic
         {
             new Thread(() =>
             {
-                fixed (AVPacket* pVideoPacket = &this.videoPacket)
+                while (true)
                 {
-                    IntPtr imageFramePtr = this.playerViewModel.AvailableImageBufferPool.Take();
+                    this.isVideoLoadedEvent.Wait();
 
-                    while (ReadFrame(pVideoPacket))
+                    fixed (AVPacket* pVideoPacket = &this.videoPacket)
                     {
-                        if (IsVideoFrame(pVideoPacket) && DecodeVideoFrame(pVideoPacket))
+                        IntPtr imageFramePtr = this.playerViewModel.AvailableImageBufferPool.Take();
+
+                        while (ReadFrame(pVideoPacket))
                         {
-                            var pImageFrame = (AVFrame*)imageFramePtr.ToPointer();
-
-                            ConvertFrameToImage(pImageFrame);
-
-                            if (IS_FRAME_SAVE_TO_FILE && currentFrame % 20 == 0)
+                            if (IsVideoFrame(pVideoPacket) && DecodeVideoFrame(pVideoPacket))
                             {
-                                SaveBufferToFile();
-                            }
+                                var pImageFrame = (AVFrame*)imageFramePtr.ToPointer();
 
-                            this.playerViewModel.PendingVideoFrames.Add(imageFramePtr);
-                            imageFramePtr = this.playerViewModel.AvailableImageBufferPool.Take();
+                                ConvertFrameToImage(pImageFrame);
+
+                                if (IS_FRAME_SAVE_TO_FILE && currentFrame % 20 == 0)
+                                {
+                                    SaveBufferToFile();
+                                }
+
+                                this.playerViewModel.PendingVideoFrames.Add(imageFramePtr);
+                                imageFramePtr = this.playerViewModel.AvailableImageBufferPool.Take();
+                            }
                         }
                     }
                 }

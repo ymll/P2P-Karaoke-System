@@ -24,7 +24,6 @@ namespace P2PKaraokeSystem.View
         private KaraokeSystemModel _karaokeSystemModel;
         private FFmpegDecoder decoder;
 
-        bool isPlaying;
         bool soundOn = true;
 
         public System.Diagnostics.Stopwatch musicTime;
@@ -49,28 +48,9 @@ namespace P2PKaraokeSystem.View
 
         }
 
-        //Play and Stop Button Enter
-        private void playBtn_MouseEnter(object sender, EventArgs e)
+        private void playImg_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            if (isPlaying)
-                SetImage(playImg, "pack://application:,,,/View/UIMaterial/Image/stop_blue.png");
-            else
-                SetImage(playImg, "pack://application:,,,/View/UIMaterial/Image/play_blue.png");
-        }
-
-        //Play and Stop Mouse Leave
-        private void playBtn_MouseLeave(object sender, EventArgs e)
-        {
-            if (isPlaying)
-                SetImage(playImg, "pack://application:,,,/View/UIMaterial/Image/stop.png");
-            else
-                SetImage(playImg, "pack://application:,,,/View/UIMaterial/Image/play.png");
-        }
-
-        //Play and Stop Mouse Click
-        private void playBtn_Click(object sender, EventArgs e)
-        {
-            UpdatePlayState(!isPlaying);
+            this._karaokeSystemModel.Playback.Playing = !this._karaokeSystemModel.Playback.Playing;
         }
 
         //Backward Button Enter
@@ -151,11 +131,10 @@ namespace P2PKaraokeSystem.View
 
         private void UpdatePlayState(bool isPlay)
         {
-            isPlaying = isPlay;
+            this._karaokeSystemModel.Playback.Playing = !this._karaokeSystemModel.Playback.Playing;
 
-            if (isPlaying)
+            if (this._karaokeSystemModel.Playback.Playing)
             {
-                SetImage(playImg, "pack://application:,,,/View/UIMaterial/Image/stop_blue.png");
                 if (musicTime == null)
                     musicTime = System.Diagnostics.Stopwatch.StartNew();
                 else
@@ -177,7 +156,6 @@ namespace P2PKaraokeSystem.View
             }
             else
             {
-                SetImage(playImg, "pack://application:,,,/View/UIMaterial/Image/play_blue.png");
                 musicTime.Stop();
             }
         }
