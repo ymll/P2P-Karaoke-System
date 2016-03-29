@@ -37,42 +37,9 @@ namespace P2PKaraokeSystem.View
             currentLyricFile = new P2PKaraokeSystem.Model.VideoDatabase.Lyric("Z:\\Code\\P2PKaraokeSystem\\VideoDatabase\\Lyrics\\Enya - Only Time.lrc");
         }
 
-        //Set Image Source for an image throught Uri
-        private void SetImage(Image imageName, string path)
-        {
-            imageName.BeginInit();
-            imageName.Source = new BitmapImage(new Uri(path, UriKind.RelativeOrAbsolute));
-            imageName.EndInit();
-
-        }
-
         private void playImg_MouseDown(object sender, MouseButtonEventArgs e)
         {
             this._karaokeSystemModel.Playback.Playing = !this._karaokeSystemModel.Playback.Playing;
-        }
-
-        //Backward Button Enter
-        private void backwardBtn_MouseEnter(object sender, EventArgs e)
-        {
-            SetImage(backwardImg, "pack://application:,,,/View/UIMaterial/Image/backward_blue.png");
-        }
-
-        //Backward Button Mouse Leave
-        private void backwardBtn_MouseLeave(object sender, EventArgs e)
-        {
-            SetImage(backwardImg, "pack://application:,,,/View/UIMaterial/Image/backward.png");
-        }
-
-        //Forward Button Enter
-        private void fastforwardBtn_MouseEnter(object sender, EventArgs e)
-        {
-            SetImage(fastforwardImg, "pack://application:,,,/View/UIMaterial/Image/fastforward_blue.png");
-        }
-
-        //Forward Button Mouse Leave
-        private void fastforwardBtn_MouseLeave(object sender, EventArgs e)
-        {
-            SetImage(fastforwardImg, "pack://application:,,,/View/UIMaterial/Image/fastforward.png");
         }
 
         private void soundImg_MouseDown(object sender, MouseButtonEventArgs e)

@@ -67,20 +67,44 @@
         </Image>
 
         <!-- Backward Button -->
-        <Image x:Name="backwardImg" Source="..\View\UIMaterial\Image\backward.png"
+        <Image x:Name="backwardImg"
                Grid.Row="2"
                HorizontalAlignment="Left" VerticalAlignment="Top"
                Height="31" Width="65"
-               Margin="365,29,0,0"
-               MouseEnter="backwardBtn_MouseEnter" MouseLeave="backwardBtn_MouseLeave" />
+               Margin="365,29,0,0">
+            <Image.Style>
+                <Style TargetType="{x:Type Image}">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsMouseOver, ElementName=backwardImg}" Value="True">
+                            <Setter Property="Source" Value="..\View\UIMaterial\Image\backward_blue.png"/>
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding IsMouseOver, ElementName=backwardImg}" Value="False">
+                            <Setter Property="Source" Value="..\View\UIMaterial\Image\backward.png"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Image.Style>
+        </Image>
 
         <!-- Forward Button -->
-        <Image x:Name="fastforwardImg" Source="UIMaterial/Image/fastforward.png"
+        <Image x:Name="fastforwardImg"
                Grid.Row="2"
         	HorizontalAlignment="Left" VerticalAlignment="Top"
         	Height="31" Width="65"
-        	Margin="535,29,0,0"
-        	MouseEnter="fastforwardBtn_MouseEnter" MouseLeave="fastforwardBtn_MouseLeave" />
+        	Margin="535,29,0,0">
+            <Image.Style>
+                <Style TargetType="{x:Type Image}">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsMouseOver, ElementName=fastforwardImg}" Value="True">
+                            <Setter Property="Source" Value="..\View\UIMaterial\Image\fastforward_blue.png"/>
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding IsMouseOver, ElementName=fastforwardImg}" Value="False">
+                            <Setter Property="Source" Value="..\View\UIMaterial\Image\fastforward.png"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Image.Style>
+        </Image>
 
 
         <!-- Sound Button -->
