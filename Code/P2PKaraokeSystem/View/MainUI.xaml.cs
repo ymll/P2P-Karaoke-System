@@ -22,10 +22,6 @@ namespace P2PKaraokeSystem.View
     public partial class MainUI : Window
     {
         private KaraokeSystemModel _karaokeSystemModel;
-        private FFmpegDecoder decoder;
-
-        public System.Diagnostics.Stopwatch musicTime;
-        public P2PKaraokeSystem.Model.VideoDatabase.Lyric currentLyricFile;
 
         public MainUI()
         {
@@ -33,8 +29,8 @@ namespace P2PKaraokeSystem.View
             FFmpegLoader.LoadFFmpeg();
 
             this._karaokeSystemModel = (KaraokeSystemModel)this.DataContext;
-            this.decoder = new FFmpegDecoder(this._karaokeSystemModel.View, this._karaokeSystemModel.Playback);
-            currentLyricFile = new P2PKaraokeSystem.Model.VideoDatabase.Lyric("Z:\\Code\\P2PKaraokeSystem\\VideoDatabase\\Lyrics\\Enya - Only Time.lrc");
+            new LyricPlayer(this._karaokeSystemModel.Playback, this._karaokeSystemModel.View);
+            new FFmpegDecoder(this._karaokeSystemModel.View, this._karaokeSystemModel.Playback);
         }
 
         private void playImg_MouseDown(object sender, MouseButtonEventArgs e)
@@ -54,42 +50,12 @@ namespace P2PKaraokeSystem.View
             }
         }
 
-        //Thred for updating the lyric
-        public delegate void UpdateLyricCallback(string message);
-        private void LyricThread()
-        {
-            for (int i = 0; i <= 1000000000; i++)
-            {
-                Thread.Sleep(1000);
-                lyricText.Dispatcher.Invoke(
-                    new UpdateLyricCallback(this.UpdateText),
-                    new object[] { i.ToString() }
-                );
-            }
-        }
-
-        private void UpdateText(string message)
-        {
-            var musicTimeSpan = TimeSpan.FromMilliseconds(musicTime.Elapsed.TotalMilliseconds);
-            string currentLyric = currentLyricFile.GetCurrentLyric(Convert.ToInt32(musicTimeSpan.TotalHours), Convert.ToInt32(musicTimeSpan.TotalMinutes),
-                Convert.ToInt32(musicTimeSpan.TotalSeconds), Convert.ToInt32(musicTimeSpan.TotalMilliseconds - Convert.ToInt32(musicTimeSpan.TotalSeconds) * 1000));
-
-            lyricText.Text = Convert.ToInt32(musicTimeSpan.TotalHours) + ":" + Convert.ToInt32(musicTimeSpan.TotalMinutes) + ":" + Convert.ToInt32(musicTimeSpan.TotalSeconds) + "  " + currentLyric;
-        }
-
         private void UpdatePlayState(bool isPlay)
         {
-            this._karaokeSystemModel.Playback.Playing = !this._karaokeSystemModel.Playback.Playing;
+            this._karaokeSystemModel.Playback.Playing = isPlay;
 
             if (this._karaokeSystemModel.Playback.Playing)
             {
-                if (musicTime == null)
-                    musicTime = System.Diagnostics.Stopwatch.StartNew();
-                else
-                    musicTime.Start();
-                Thread test = new Thread(new ThreadStart(LyricThread));
-                test.Start();
-
                 var aviHeaderParser = new P2PKaraokeSystem.PlaybackLogic.AviHeaderParser();
                 aviHeaderParser.LoadFile("Z:\\Code\\P2PKaraokeSystem\\VideoDatabase\\Video\\only_time.avi");
 
@@ -101,10 +67,6 @@ namespace P2PKaraokeSystem.View
 
                 audioPlayer.OpenDevice(aviHeaderParser.AudioHeaderReader.FormatInfo, delegate { });
                 audioPlayer.WriteToStream(frameReader.FramePointer, frameReader.FrameSize);
-            }
-            else
-            {
-                musicTime.Stop();
             }
         }
 

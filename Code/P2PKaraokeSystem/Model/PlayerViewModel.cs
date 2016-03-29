@@ -17,6 +17,13 @@ namespace P2PKaraokeSystem.Model
             set { SetField(ref _videoScreenBitmap, value, "VideoScreenBitmap"); }
         }
 
+        private string _currentLyric = "";
+        public string CurrentLyric
+        {
+            get { return _currentLyric; }
+            set { SetField(ref _currentLyric, value, "CurrentLyric"); }
+        }
+
         public BlockingCollection<IntPtr> PendingVideoFrames { get; private set; }
 
         public BlockingCollection<IntPtr> AvailableImageBufferPool { get; private set; }
