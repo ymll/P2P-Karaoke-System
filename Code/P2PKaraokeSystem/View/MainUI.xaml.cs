@@ -24,8 +24,6 @@ namespace P2PKaraokeSystem.View
         private KaraokeSystemModel _karaokeSystemModel;
         private FFmpegDecoder decoder;
 
-        bool soundOn = true;
-
         public System.Diagnostics.Stopwatch musicTime;
         public P2PKaraokeSystem.Model.VideoDatabase.Lyric currentLyricFile;
 
@@ -77,33 +75,16 @@ namespace P2PKaraokeSystem.View
             SetImage(fastforwardImg, "pack://application:,,,/View/UIMaterial/Image/fastforward.png");
         }
 
-        //Sound Button Enter
-        private void soundBtn_MouseEnter(object sender, EventArgs e)
+        private void soundImg_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            if (soundOn)
-                SetImage(soundImg, "pack://application:,,,/View/UIMaterial/Image/volumeup_blue.png");
+            if (this._karaokeSystemModel.Playback.Volume == 0)
+            {
+                this._karaokeSystemModel.Playback.Volume = 255;
+            }
             else
-                SetImage(soundImg, "pack://application:,,,/View/UIMaterial/Image/volumeoff_blue.png");
-        }
-
-        //Sound Button Mouse Leave
-        private void soundBtn_MouseLeave(object sender, EventArgs e)
-        {
-            if (soundOn)
-                SetImage(soundImg, "pack://application:,,,/View/UIMaterial/Image/volumeup.png");
-            else
-                SetImage(soundImg, "pack://application:,,,/View/UIMaterial/Image/volumeoff.png");
-        }
-
-        //Sound Button Mouse Click
-        private void soundBtn_Click(object sender, EventArgs e)
-        {
-            if (soundOn)
-                SetImage(soundImg, "pack://application:,,,/View/UIMaterial/Image/volumeoff_blue.png");
-            else
-                SetImage(soundImg, "pack://application:,,,/View/UIMaterial/Image/volumeup_blue.png");
-
-            soundOn = !soundOn;
+            {
+                this._karaokeSystemModel.Playback.Volume = 0;
+            }
         }
 
         //Thred for updating the lyric

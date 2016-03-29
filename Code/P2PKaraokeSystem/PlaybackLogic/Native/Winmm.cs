@@ -27,6 +27,9 @@ namespace WinmmLib
         [DllImport("winmm.dll", SetLastError = true, CharSet = CharSet.Auto)]
         public static extern uint waveOutRestart(IntPtr hwo);
 
+        [DllImport("winmm.dll", SetLastError = true, CallingConvention = CallingConvention.Winapi)]
+        public static extern uint waveOutSetVolume(IntPtr uDeviceID, uint dwVolume);
+
         public delegate void DelegateWaveOutProc(IntPtr hWaveOut, WOM_Messages msg, IntPtr dwInstance, ref WAVEHDR wavehdr, IntPtr lParam);
 
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]

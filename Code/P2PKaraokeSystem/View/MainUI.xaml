@@ -84,12 +84,47 @@
 
 
         <!-- Sound Button -->
-        <Image x:Name="soundImg" Source="UIMaterial/Image/volumeup.png"
+        <Image x:Name="soundImg"
                 Grid.Row="2"
         	    HorizontalAlignment="Left" VerticalAlignment="Top"
         	    Height="31" Width="40"
         	    Margin="30,29,0,0"
-        	    MouseEnter="soundBtn_MouseEnter" MouseLeave="soundBtn_MouseLeave" MouseDown="soundBtn_Click"/>
+        	    MouseDown="soundImg_MouseDown">
+            <Image.Style>
+                <Style TargetType="{x:Type Image}">
+                    <Style.Triggers>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding Playback.Volume}" Value="255"/>
+                                <Condition Binding="{Binding IsMouseOver, ElementName=soundImg}" Value="True"/>
+                            </MultiDataTrigger.Conditions>
+                            <Setter Property="Source" Value="..\View\UIMaterial\Image\volumeup_blue.png"/>
+                        </MultiDataTrigger>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding Playback.Volume}" Value="255"/>
+                                <Condition Binding="{Binding IsMouseOver, ElementName=soundImg}" Value="False"/>
+                            </MultiDataTrigger.Conditions>
+                            <Setter Property="Source" Value="..\View\UIMaterial\Image\volumeup.png"/>
+                        </MultiDataTrigger>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding Playback.Volume}" Value="0"/>
+                                <Condition Binding="{Binding IsMouseOver, ElementName=soundImg}" Value="True"/>
+                            </MultiDataTrigger.Conditions>
+                            <Setter Property="Source" Value="..\View\UIMaterial\Image\volumeoff_blue.png"/>
+                        </MultiDataTrigger>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding Playback.Volume}" Value="0"/>
+                                <Condition Binding="{Binding IsMouseOver, ElementName=soundImg}" Value="False"/>
+                            </MultiDataTrigger.Conditions>
+                            <Setter Property="Source" Value="..\View\UIMaterial\Image\volumeoff.png"/>
+                        </MultiDataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Image.Style>
+        </Image>
 
         <!-- Lyric Box -->
         <Label x:Name="lyric"

@@ -43,6 +43,17 @@ namespace P2PKaraokeSystem.PlaybackLogic
                         Winmm.waveOutPause(audioOut);
                     }
                     break;
+
+                case "Volume":
+                    if (this.playbackModel.Volume == 0)
+                    {
+                        Winmm.waveOutSetVolume(audioOut, 0);
+                    }
+                    else
+                    {
+                        Winmm.waveOutSetVolume(audioOut, 0xFFFF);
+                    }
+                    break;
             }
         }
 
