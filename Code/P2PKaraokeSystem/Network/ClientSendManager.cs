@@ -12,21 +12,26 @@ namespace P2PKaraokeSystem.Network
 {
     public class ClientSendManager : AbstractSendManager
     {
-		private Int32 serverport = 12345;
+	private Int32 serverport = 12345;
         private String ServeripString = "127.0.0.1";
-		public void setInternetInfo(Int32 setport, String Serverip){
-			serverport = setport;
-			ServeripString = Serverip;
-		}
+        public ClientSendManager()
+        {
+        }
+        public ClientSendManager(String Serverip, Int32 setport)
+        {
+            this.serverport = setport;
+            this.ServeripString = Serverip;
+        }
         // TODO
         public override int SendTCP(byte[] sendBuffer, int from, int size)
         {  
             try
             {          
                 TcpClient client = new TcpClient();
-                client.Connect(ServeripString, serverport);           
-                Stream clientStream = client.GetStream();             
-                clientStream.Write(sendBuffer, 0, size);
+                client.Connect(ServeripString, serverport);
+                NetworkStream networkStream = client.GetStream();
+                networkStream.Write(sendBuffer, 0, sendBuffer.Length);
+                networkStream.Flush();
                 client.Close();
             }
             catch (Exception e)
