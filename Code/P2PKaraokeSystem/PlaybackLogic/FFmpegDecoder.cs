@@ -36,7 +36,7 @@ namespace P2PKaraokeSystem.PlaybackLogic
         private AVStream* pAudioStream;
 
         // Filled by RetrieveVideoCodecContextAndConvertContext()
-        private AVCodecID codecId;
+        private AVCodecID videoCodecId;
         private AVCodecContext* pVideoCodecContext;
         private SwsContext* pConvertContext;
         private int width;
@@ -84,7 +84,7 @@ namespace P2PKaraokeSystem.PlaybackLogic
 
             // For video stream
             RetrieveVideoCodecContextAndConvertContext();
-            FindAndOpenVideoDecoder();
+            FindAndOpenDecoder(this.videoCodecId);
             PrepareDecodedFrameAndPacket();
             PrepareImageFrameAndBuffer();
         }
@@ -213,7 +213,7 @@ namespace P2PKaraokeSystem.PlaybackLogic
             this.frameRate = this.pVideoCodecContext->framerate;
             var srcColorSpace = this.pVideoCodecContext->pix_fmt;
 
-            this.codecId = this.pVideoCodecContext->codec_id;
+            this.videoCodecId = this.pVideoCodecContext->codec_id;
             this.pConvertContext = ffmpeg.sws_getContext(width, height, srcColorSpace,
                 width, height, DISPLAY_COLOR_FORMAT, ffmpeg.SWS_FAST_BILINEAR, null, null, null);
 
@@ -221,9 +221,9 @@ namespace P2PKaraokeSystem.PlaybackLogic
                 this.pConvertContext != null);
         }
 
-        private void FindAndOpenVideoDecoder()
+        private void FindAndOpenDecoder(AVCodecID codeId)
         {
-            var pCodec = ffmpeg.avcodec_find_decoder(this.codecId);
+            var pCodec = ffmpeg.avcodec_find_decoder(codeId);
 
             Util.AssertTrue("FFmpeg: Cannot find decoder for video", pCodec != null);
 
