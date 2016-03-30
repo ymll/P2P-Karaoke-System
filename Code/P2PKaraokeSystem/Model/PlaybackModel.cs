@@ -29,5 +29,19 @@ namespace P2PKaraokeSystem.Model
             get { return _totalTime; }
             set { SetField(ref _totalTime, value, "TotalTime"); }
         }
+
+        private bool _playing = false;
+        public bool Playing
+        {
+            get { return _playing; }
+            set { SetField(ref _playing, value, "Playing"); }
+        }
+
+        private int _volume = 255;
+        public int Volume
+        {
+            get { return _volume; }
+            set { SetField(ref _volume, value, "Volume"); }
+        }
     }
 }

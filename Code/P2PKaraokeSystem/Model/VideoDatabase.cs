@@ -119,8 +119,8 @@ namespace P2PKaraokeSystem.Model
 
         public class Lyric
         {
-            public String FilePath { get; set; }
-            public ILrcFile _lyricFile;
+            public String FilePath { get; private set; }
+            private ILrcFile _lyricFile;
 
             public Lyric(String filePath)
             {
@@ -141,11 +141,11 @@ namespace P2PKaraokeSystem.Model
                 }
             }
 
-            public String GetCurrentLyric(int hours, int minutes, int seconds, int milliseconds)
+            public String GetCurrentLyric(int currentMillisecond)
             {
                 try
                 {
-                    TimeSpan timeSpan = new TimeSpan(0, hours, minutes, seconds, milliseconds);
+                    TimeSpan timeSpan = TimeSpan.FromMilliseconds(currentMillisecond);
                     IOneLineLyric oneLineLyric = _lyricFile.AfterOrAt(timeSpan);
                     return oneLineLyric.Content;
                 }

@@ -28,6 +28,9 @@ namespace P2PKaraokeSystem.PlaybackLogic
         private PlaybackModel playbackModel;
         private int currentFrame;
 
+        private ManualResetEventSlim isVideoLoadedEvent;
+        private ManualResetEventSlim isVideoPlayingEvent;
+
         // Filled by RetrieveFormatAndStreamInfo()
         private AVFormatContext* pFormatContext;
 
@@ -36,7 +39,7 @@ namespace P2PKaraokeSystem.PlaybackLogic
         private AVStream* pAudioStream;
 
         // Filled by RetrieveVideoCodecContextAndConvertContext()
-        private AVCodecID codecId;
+        private AVCodecID videoCodecId;
         private AVCodecContext* pVideoCodecContext;
         private SwsContext* pConvertContext;
         private int width;
@@ -54,6 +57,9 @@ namespace P2PKaraokeSystem.PlaybackLogic
         {
             this.playerViewModel = playerViewModel;
             this.playbackModel = playbackModel;
+            this.isVideoLoadedEvent = new ManualResetEventSlim(false);
+            this.isVideoPlayingEvent = new ManualResetEventSlim(false);
+
             pFormatContext = ffmpeg.avformat_alloc_context();
 
             playbackModel.PropertyChanged += playbackModel_PropertyChanged;
@@ -66,11 +72,24 @@ namespace P2PKaraokeSystem.PlaybackLogic
         {
             if ("CurrentVideo".Equals(e.PropertyName))
             {
+                this.isVideoLoadedEvent.Reset();
                 UnLoad();
 
                 if (this.playbackModel.CurrentVideo != null)
                 {
                     Load(this.playbackModel.CurrentVideo.FilePath);
+                    this.isVideoLoadedEvent.Set();
+                }
+            }
+            else if ("Playing".Equals(e.PropertyName))
+            {
+                if (this.playbackModel.Playing)
+                {
+                    this.isVideoPlayingEvent.Set();
+                }
+                else
+                {
+                    this.isVideoPlayingEvent.Reset();
                 }
             }
         }
@@ -84,7 +103,7 @@ namespace P2PKaraokeSystem.PlaybackLogic
 
             // For video stream
             RetrieveVideoCodecContextAndConvertContext();
-            FindAndOpenVideoDecoder();
+            FindAndOpenDecoder(this.videoCodecId);
             PrepareDecodedFrameAndPacket();
             PrepareImageFrameAndBuffer();
         }
@@ -96,6 +115,8 @@ namespace P2PKaraokeSystem.PlaybackLogic
             {
                 while (true)
                 {
+                    this.isVideoPlayingEvent.Wait();
+
                     IntPtr imageFramePtr = this.playerViewModel.PendingVideoFrames.Take();
                     var pImageFrame = (AVFrame*)imageFramePtr.ToPointer();
 
@@ -112,25 +133,30 @@ namespace P2PKaraokeSystem.PlaybackLogic
         {
             new Thread(() =>
             {
-                fixed (AVPacket* pVideoPacket = &this.videoPacket)
+                while (true)
                 {
-                    IntPtr imageFramePtr = this.playerViewModel.AvailableImageBufferPool.Take();
+                    this.isVideoLoadedEvent.Wait();
 
-                    while (ReadFrame(pVideoPacket))
+                    fixed (AVPacket* pVideoPacket = &this.videoPacket)
                     {
-                        if (IsVideoFrame(pVideoPacket) && DecodeVideoFrame(pVideoPacket))
+                        IntPtr imageFramePtr = this.playerViewModel.AvailableImageBufferPool.Take();
+
+                        while (ReadFrame(pVideoPacket))
                         {
-                            var pImageFrame = (AVFrame*)imageFramePtr.ToPointer();
-
-                            ConvertFrameToImage(pImageFrame);
-
-                            if (IS_FRAME_SAVE_TO_FILE && currentFrame % 20 == 0)
+                            if (IsVideoFrame(pVideoPacket) && DecodeVideoFrame(pVideoPacket))
                             {
-                                SaveBufferToFile();
-                            }
+                                var pImageFrame = (AVFrame*)imageFramePtr.ToPointer();
 
-                            this.playerViewModel.PendingVideoFrames.Add(imageFramePtr);
-                            imageFramePtr = this.playerViewModel.AvailableImageBufferPool.Take();
+                                ConvertFrameToImage(pImageFrame);
+
+                                if (IS_FRAME_SAVE_TO_FILE && currentFrame % 20 == 0)
+                                {
+                                    SaveBufferToFile();
+                                }
+
+                                this.playerViewModel.PendingVideoFrames.Add(imageFramePtr);
+                                imageFramePtr = this.playerViewModel.AvailableImageBufferPool.Take();
+                            }
                         }
                     }
                 }
@@ -213,7 +239,7 @@ namespace P2PKaraokeSystem.PlaybackLogic
             this.frameRate = this.pVideoCodecContext->framerate;
             var srcColorSpace = this.pVideoCodecContext->pix_fmt;
 
-            this.codecId = this.pVideoCodecContext->codec_id;
+            this.videoCodecId = this.pVideoCodecContext->codec_id;
             this.pConvertContext = ffmpeg.sws_getContext(width, height, srcColorSpace,
                 width, height, DISPLAY_COLOR_FORMAT, ffmpeg.SWS_FAST_BILINEAR, null, null, null);
 
@@ -221,9 +247,9 @@ namespace P2PKaraokeSystem.PlaybackLogic
                 this.pConvertContext != null);
         }
 
-        private void FindAndOpenVideoDecoder()
+        private void FindAndOpenDecoder(AVCodecID codeId)
         {
-            var pCodec = ffmpeg.avcodec_find_decoder(this.codecId);
+            var pCodec = ffmpeg.avcodec_find_decoder(codeId);
 
             Util.AssertTrue("FFmpeg: Cannot find decoder for video", pCodec != null);
 

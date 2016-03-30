@@ -24,37 +24,131 @@
             Margin="-2,0,0,0"/>
 
         <!-- Play Button -->
-        <Image x:Name="playImg" Source="..\View\UIMaterial\Image\play.png"
+        <Image x:Name="playImg"
                Grid.Row="2"
                HorizontalAlignment="Left" VerticalAlignment="Top" 
                Height="76" Width="80"
                Margin="435,0,0,0"
-               MouseEnter="playBtn_MouseEnter" MouseLeave="playBtn_MouseLeave" MouseDown="playBtn_Click"/>
+               MouseDown="playImg_MouseDown">
+            <Image.Style>
+                <Style TargetType="{x:Type Image}">
+                    <Style.Triggers>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding Playback.Playing}" Value="True"/>
+                                <Condition Binding="{Binding IsMouseOver, ElementName=playImg}" Value="True"/>
+                            </MultiDataTrigger.Conditions>
+                            <Setter Property="Source" Value="..\View\UIMaterial\Image\stop_blue.png"/>
+                        </MultiDataTrigger>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding Playback.Playing}" Value="True"/>
+                                <Condition Binding="{Binding IsMouseOver, ElementName=playImg}" Value="False"/>
+                            </MultiDataTrigger.Conditions>
+                            <Setter Property="Source" Value="..\View\UIMaterial\Image\stop.png"/>
+                        </MultiDataTrigger>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding Playback.Playing}" Value="False"/>
+                                <Condition Binding="{Binding IsMouseOver, ElementName=playImg}" Value="True"/>
+                            </MultiDataTrigger.Conditions>
+                            <Setter Property="Source" Value="..\View\UIMaterial\Image\play_blue.png"/>
+                        </MultiDataTrigger>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding Playback.Playing}" Value="False"/>
+                                <Condition Binding="{Binding IsMouseOver, ElementName=playImg}" Value="False"/>
+                            </MultiDataTrigger.Conditions>
+                            <Setter Property="Source" Value="..\View\UIMaterial\Image\play.png"/>
+                        </MultiDataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Image.Style>
+        </Image>
 
         <!-- Backward Button -->
-        <Image x:Name="backwardImg" Source="..\View\UIMaterial\Image\backward.png"
+        <Image x:Name="backwardImg"
                Grid.Row="2"
                HorizontalAlignment="Left" VerticalAlignment="Top"
                Height="31" Width="65"
-               Margin="365,29,0,0"
-               MouseEnter="backwardBtn_MouseEnter" MouseLeave="backwardBtn_MouseLeave" />
+               Margin="365,29,0,0">
+            <Image.Style>
+                <Style TargetType="{x:Type Image}">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsMouseOver, ElementName=backwardImg}" Value="True">
+                            <Setter Property="Source" Value="..\View\UIMaterial\Image\backward_blue.png"/>
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding IsMouseOver, ElementName=backwardImg}" Value="False">
+                            <Setter Property="Source" Value="..\View\UIMaterial\Image\backward.png"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Image.Style>
+        </Image>
 
         <!-- Forward Button -->
-        <Image x:Name="fastforwardImg" Source="UIMaterial/Image/fastforward.png"
+        <Image x:Name="fastforwardImg"
                Grid.Row="2"
         	HorizontalAlignment="Left" VerticalAlignment="Top"
         	Height="31" Width="65"
-        	Margin="535,29,0,0"
-        	MouseEnter="fastforwardBtn_MouseEnter" MouseLeave="fastforwardBtn_MouseLeave" />
+        	Margin="535,29,0,0">
+            <Image.Style>
+                <Style TargetType="{x:Type Image}">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsMouseOver, ElementName=fastforwardImg}" Value="True">
+                            <Setter Property="Source" Value="..\View\UIMaterial\Image\fastforward_blue.png"/>
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding IsMouseOver, ElementName=fastforwardImg}" Value="False">
+                            <Setter Property="Source" Value="..\View\UIMaterial\Image\fastforward.png"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Image.Style>
+        </Image>
 
 
         <!-- Sound Button -->
-        <Image x:Name="soundImg" Source="UIMaterial/Image/volumeup.png"
+        <Image x:Name="soundImg"
                 Grid.Row="2"
         	    HorizontalAlignment="Left" VerticalAlignment="Top"
         	    Height="31" Width="40"
         	    Margin="30,29,0,0"
-        	    MouseEnter="soundBtn_MouseEnter" MouseLeave="soundBtn_MouseLeave" MouseDown="soundBtn_Click"/>
+        	    MouseDown="soundImg_MouseDown">
+            <Image.Style>
+                <Style TargetType="{x:Type Image}">
+                    <Style.Triggers>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding Playback.Volume}" Value="255"/>
+                                <Condition Binding="{Binding IsMouseOver, ElementName=soundImg}" Value="True"/>
+                            </MultiDataTrigger.Conditions>
+                            <Setter Property="Source" Value="..\View\UIMaterial\Image\volumeup_blue.png"/>
+                        </MultiDataTrigger>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding Playback.Volume}" Value="255"/>
+                                <Condition Binding="{Binding IsMouseOver, ElementName=soundImg}" Value="False"/>
+                            </MultiDataTrigger.Conditions>
+                            <Setter Property="Source" Value="..\View\UIMaterial\Image\volumeup.png"/>
+                        </MultiDataTrigger>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding Playback.Volume}" Value="0"/>
+                                <Condition Binding="{Binding IsMouseOver, ElementName=soundImg}" Value="True"/>
+                            </MultiDataTrigger.Conditions>
+                            <Setter Property="Source" Value="..\View\UIMaterial\Image\volumeoff_blue.png"/>
+                        </MultiDataTrigger>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding Playback.Volume}" Value="0"/>
+                                <Condition Binding="{Binding IsMouseOver, ElementName=soundImg}" Value="False"/>
+                            </MultiDataTrigger.Conditions>
+                            <Setter Property="Source" Value="..\View\UIMaterial\Image\volumeoff.png"/>
+                        </MultiDataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Image.Style>
+        </Image>
 
         <!-- Lyric Box -->
         <Label x:Name="lyric"
@@ -65,7 +159,7 @@
                HorizontalContentAlignment="Stretch" VerticalContentAlignment="Center"
                Margin="0,5,328,0" Height="50" Width="960">
             <Label.Content>
-                <AccessText x:Name="lyricText" TextWrapping="Wrap" Text=""/>
+                <AccessText x:Name="lyricText" TextWrapping="Wrap" Text="{Binding View.CurrentLyric}"/>
             </Label.Content>
         </Label>
 

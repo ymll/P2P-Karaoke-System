@@ -10,18 +10,18 @@ namespace P2PKaraokeSystem.Model
 {
     public class PlayerViewModel : AbstractNotifyPropertyChanged
     {
-        private bool _isPlaying = false;
-        public bool IsPlaying
-        {
-            get { return _isPlaying; }
-            set { SetField(ref _isPlaying, value, "IsPlaying"); }
-        }
-
         private WriteableBitmap _videoScreenBitmap;
         public WriteableBitmap VideoScreenBitmap
         {
             get { return _videoScreenBitmap; }
             set { SetField(ref _videoScreenBitmap, value, "VideoScreenBitmap"); }
+        }
+
+        private string _currentLyric = "";
+        public string CurrentLyric
+        {
+            get { return _currentLyric; }
+            set { SetField(ref _currentLyric, value, "CurrentLyric"); }
         }
 
         public BlockingCollection<IntPtr> PendingVideoFrames { get; private set; }
