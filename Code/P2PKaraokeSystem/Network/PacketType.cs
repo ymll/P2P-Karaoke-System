@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -14,6 +14,7 @@ namespace P2PKaraokeSystem.Network
         MEDIA_INFO,
         VIDEO_STREAM,
         AUDIO_STREAM,
-        SUBTITLE
+        SUBTITLE,
+        UNDEFINED
     }
 }
