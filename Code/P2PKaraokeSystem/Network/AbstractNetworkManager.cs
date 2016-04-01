@@ -27,48 +27,27 @@ namespace P2PKaraokeSystem.Network
                 listeners[packetType].Add(listener);
             }
         }
-        private T FromByteArray<T>(byte[] rawValue)
-        {
-            GCHandle handle = GCHandle.Alloc(rawValue, GCHandleType.Pinned);
-            T structure = (T)Marshal.PtrToStructure(handle.AddrOfPinnedObject(), typeof(T));
-            handle.Free();
-            return structure;
-        }
 
-        private byte[] ToByteArray(object value, int maxLength)
-        {
-            int rawsize = Marshal.SizeOf(value);
-            byte[] rawdata = new byte[rawsize];
-            GCHandle handle =
-                GCHandle.Alloc(rawdata,
-                GCHandleType.Pinned);
-            Marshal.StructureToPtr(value,
-                handle.AddrOfPinnedObject(),
-                false);
-            handle.Free();
-            if (maxLength < rawdata.Length)
-            {
-                byte[] temp = new byte[maxLength];
-                Array.Copy(rawdata, temp, maxLength);
-                return temp;
-            }
-            else
-            {
-                return rawdata;
-            }
-        }
         /**
          * Add payload to data. Return false if any error.
          */
+        private int payloadSize = 2;
         public bool AddPayload(out byte[] sendBuffer, byte[] data, PacketType packetType)
         {
-            int payloadSize;
-
-            byte[] temtype = ToByteArray(packetType,payloadSize);
-            byte[] temret = new byte[temtype.Length + data.Length];
-            System.Buffer.BlockCopy(temtype, 0, temret, 0, temtype.Length);
-            System.Buffer.BlockCopy(data, 0, temret, temtype.Length, data.Length);
-            sendBuffer = temret;
+            
+            byte[] temtype;
+            try
+            {
+                temtype = BitConverter.GetBytes((Int32)packetType).Take(payloadSize).ToArray(); 
+                byte[] temret = new byte[temtype.Length + data.Length];
+                System.Buffer.BlockCopy(temtype, 0, temret, 0, temtype.Length);
+                System.Buffer.BlockCopy(data, 0, temret, temtype.Length, data.Length);
+                sendBuffer = temret;
+            }catch{
+                Console.WriteLine("ERROR: error when adding package type payload\n");
+                sendBuffer = data;
+                return false;
+            }   
             // TODO: Define packet format
             return true;
         }
@@ -76,11 +55,48 @@ namespace P2PKaraokeSystem.Network
         /**
          * Check the payload of packet. Return false if any error.
          */
-        public bool ParsePacket(byte[] recvBuffer, byte[] destData, out PacketType packetType)
+        public bool ParsePacket(byte[] recvBuffer, out byte[] destData, out PacketType packetType)
         {
             // TODO: Define packet format
-            packetType = PacketType.SEARCH_QUERY;
-            return true;
+            destData = recvBuffer;
+            try {                            
+                byte[] temtype = new byte[payloadSize];
+                System.Buffer.BlockCopy(recvBuffer, 0, temtype, 0, payloadSize);
+                PacketType[] pktArray = {
+                    PacketType.SEARCH_QUERY,
+                    PacketType.SEARCH_RESULT,
+                    PacketType.MEDIA_INFO,
+                    PacketType.VIDEO_STREAM,
+                    PacketType.AUDIO_STREAM,
+                    PacketType.SUBTITLE
+                };       
+                packetType = PacketType.UNDEFINED;     
+                for (int i = 0; i < pktArray.Length; i++)
+                {
+                    byte[] typecomp = BitConverter.GetBytes((Int32)(pktArray[i])).Take(payloadSize).ToArray();
+                    bool flag = true;
+                    for (int k = 0; k < payloadSize; k++)
+                    {
+                       
+                        if (temtype[k] != typecomp[k])
+                        {
+                            flag = false;
+                            break;
+                        }
+                    }             
+                    if (flag)
+                    {
+                        packetType = pktArray[i];
+                        return true;
+                    }
+                }
+            }
+            catch
+            {
+                Console.WriteLine("ERROR: error when parsing package type payload\n");
+            }        
+            packetType = PacketType.UNDEFINED;
+            return false;
         }
     }
 }
