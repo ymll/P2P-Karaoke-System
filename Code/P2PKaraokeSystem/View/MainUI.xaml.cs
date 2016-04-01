@@ -25,6 +25,27 @@ namespace P2PKaraokeSystem.View
 
         public MainUI()
         {
+            //testing code:
+            /*
+            new ClientReceiveManager().StartReceiveTcpPacket(); 
+            */
+            /*
+            string sendingString = "Testing string.......";
+            Byte[] data = Encoding.ASCII.GetBytes(sendingString);
+            Byte[] sendBytes;
+            */
+            /* 
+            ClientSendManager cl =  new ClientSendManager();
+            cl.AddPayload(out sendBytes, data, PacketType.AUDIO_STREAM);
+            cl.SendTCP(sendBytes,0,sendBytes.Length);      
+            */
+            /* 
+            ServerSendManager c2 = new ServerSendManager();
+            c2.AddPayload(out sendBytes, data, PacketType.SUBTITLE);
+            c2.SendTCP(sendBytes, 0, sendBytes.Length);
+            */
+            //end testing code
+        
             InitializeComponent();
             FFmpegLoader.LoadFFmpeg();
         }
