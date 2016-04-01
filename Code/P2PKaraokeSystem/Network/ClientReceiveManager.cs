@@ -63,20 +63,22 @@ namespace P2PKaraokeSystem.Network
                 TcpClient client = (TcpClient)userClient;
                 NetworkStream stream = client.GetStream();
                 int i;
-                byte[] destData = new byte[bufferSize];
+                byte[] destData ;//= new byte[bufferSize];
                 byte[] recvBuffer = new byte[bufferSize];
                 PacketType packetType;
                 while ((i = stream.Read(recvBuffer, 0, recvBuffer.Length)) != 0)
                 {
-                    Console.WriteLine("buff recv:\n");
+                 /*   Console.WriteLine("buff recv:\n");
                     for (int k = 0; k < i; k++)
-                        Console.Write(recvBuffer[k]);
+                        Console.Write(recvBuffer[k]);*/
 
                     if (this.ParsePacket(recvBuffer, out destData, out packetType))
                     {             
-                        Console.WriteLine("\npacketType = ");
+                    /*    Console.WriteLine("\npacketType = ");
                         Console.WriteLine(packetType);
-                        Console.WriteLine("\n");
+                        Console.WriteLine("\n");*/
+                      /*  for (int k = 0; k < i-payloadSize; k++)
+                            Console.Write(Convert.ToChar(destData[k]));*/
                         this.NotifyListeners(packetType, destData);
                     }
 
