@@ -31,7 +31,7 @@ namespace P2PKaraokeSystem.Network
         /**
          * Add payload to data. Return false if any error.
          */
-        private int payloadSize = 2;
+        protected int payloadSize = 2;
         public bool AddPayload(out byte[] sendBuffer, byte[] data, PacketType packetType)
         {
             
@@ -58,8 +58,9 @@ namespace P2PKaraokeSystem.Network
         public bool ParsePacket(byte[] recvBuffer, out byte[] destData, out PacketType packetType)
         {
             // TODO: Define packet format
-            destData = recvBuffer;
-            try {                            
+            destData = new byte[recvBuffer.Length - payloadSize];
+            try {
+                System.Buffer.BlockCopy(recvBuffer, payloadSize, destData, 0, recvBuffer.Length - payloadSize);
                 byte[] temtype = new byte[payloadSize];
                 System.Buffer.BlockCopy(recvBuffer, 0, temtype, 0, payloadSize);
                 PacketType[] pktArray = {
