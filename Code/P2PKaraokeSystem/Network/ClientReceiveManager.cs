@@ -70,11 +70,16 @@ namespace P2PKaraokeSystem.Network
                 {
                     Console.WriteLine("buff recv:\n");
                     for (int k = 0; k < i; k++)
-                        Console.Write(Convert.ToChar(recvBuffer[k]));
-                    if (this.ParsePacket(recvBuffer, destData, out packetType))
-                    {
+                        Console.Write(recvBuffer[k]);
+
+                    if (this.ParsePacket(recvBuffer, out destData, out packetType))
+                    {             
+                        Console.WriteLine("\npacketType = ");
+                        Console.WriteLine(packetType);
+                        Console.WriteLine("\n");
                         this.NotifyListeners(packetType, destData);
                     }
+
                 } 
                 client.Close();
             }            
