@@ -57,7 +57,7 @@ namespace P2PKaraokeSystem.View
             if (this._karaokeSystemModel.Playback.Playing)
             {
                 var aviHeaderParser = new P2PKaraokeSystem.PlaybackLogic.AviHeaderParser();
-                aviHeaderParser.LoadFile("Z:\\Code\\P2PKaraokeSystem\\VideoDatabase\\Video\\only_time.avi");
+                aviHeaderParser.LoadFile("Z:\\Users\\sonia\\note\\year4\\sem2\\CSCI3280\\Project\\Code\\P2PKaraokeSystem\\VideoDatabase\\Video\\only_time.avi");
 
                 AudioFrameReader frameReader = new AudioFrameReader();
                 frameReader.Load(aviHeaderParser.AudioHeaderReader);

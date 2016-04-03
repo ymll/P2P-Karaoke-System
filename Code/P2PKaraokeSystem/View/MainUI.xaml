@@ -4,8 +4,45 @@
         xmlns:local_model="clr-namespace:P2PKaraokeSystem.Model"
         Title="P2P Karaoke System" Height="677" Width="1289" Icon="..\View\UIMaterial\Image\icon.ico" WindowState="Maximized" WindowStartupLocation="CenterScreen">
     <Window.DataContext>
-        <local_model:KaraokeSystemModel />
+        <local_model:KaraokeSystemModel/>
     </Window.DataContext>
+    
+    <Window.Resources>
+        <Style TargetType="TextBox">
+            <Setter Property="Template">
+                <Setter.Value>
+                <ControlTemplate TargetType="TextBox">
+                    <Border BorderThickness="{TemplateBinding Border.BorderThickness}"
+                      BorderBrush="DeepPink"
+                      Background="{TemplateBinding Panel.Background}"
+                      Name="border"
+                      SnapsToDevicePixels="True">
+                            <ScrollViewer HorizontalScrollBarVisibility="Hidden"
+                               VerticalScrollBarVisibility="Hidden"
+                               Name="PART_ContentHost"
+                               Focusable="False" />
+                    </Border>
+                <ControlTemplate.Triggers>
+                        <Trigger Property="UIElement.IsEnabled" Value="False">
+                            <Setter Property="UIElement.Opacity" TargetName="border"
+                        Value="0.56"/>
+                        </Trigger>
+                        <Trigger Property="UIElement.IsMouseOver" Value="True">
+                            <Setter Property="Border.BorderBrush" TargetName="border" 
+                        Value="DeepPink"/>
+                        </Trigger>
+                        <Trigger Property="UIElement.IsKeyboardFocused" Value="True">
+                            <Setter Property="Border.BorderBrush" TargetName="border" 
+                       Value="DeepPink"/>
+                        </Trigger>
+                </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+        
+    </Window.Resources>
+
     <Grid Background="black" RenderTransformOrigin="0.874,0.372">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
@@ -162,12 +199,23 @@
                 <AccessText x:Name="lyricText" TextWrapping="Wrap" Text="{Binding View.CurrentLyric}"/>
             </Label.Content>
         </Label>
+        
+        <!-- Search Bar -->
+        <TextBox x:Name="searchBox"
+                   Margin="958,0,0,0" MinHeight="30"
+                   VerticalAlignment="Top"
+                   Background="Black" Foreground="DeepPink"
+                   Text="Please input keyword for search" TextAlignment="Justify" TextWrapping="Wrap" FontSize="16"
+                   AcceptsReturn="False"
+                   BorderBrush="DeepPink" BorderThickness="2"
+                   SelectionBrush="DeepPink" Opacity="0.75">
+        </TextBox>
 
         <!-- Music List-->
 
         <ScrollViewer x:Name="musicList"
             Grid.RowSpan="3" Grid.ColumnSpan="2"
-            Margin="958,0,0,0"
+            Margin="958,28,0,0"
             HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Auto">
             <Border BorderBrush="DeepPink" BorderThickness="2">
                 <ListView ItemsSource="{Binding VideoDatabase.Videos}" SelectionMode="Single" Background="Black" MouseDoubleClick="ListView_MouseDoubleClick">
