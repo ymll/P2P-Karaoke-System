@@ -53,6 +53,12 @@ namespace P2PKaraokeSystem.PlaybackLogic
         // Filled by PrepareImageFrameAndBuffer()
         private int imageFrameBufferSize;
 
+        // Filled by RetrieveAudioCodecContext()
+        private AVCodecID audioCodecId;
+        private AVCodecContext* pAudioCodecContext;
+        private int frequency;
+        private int numOfChannels;
+
         public FFmpegDecoder(PlayerViewModel playerViewModel, PlaybackModel playbackModel)
         {
             this.playerViewModel = playerViewModel;
@@ -106,6 +112,10 @@ namespace P2PKaraokeSystem.PlaybackLogic
             FindAndOpenDecoder(this.pVideoCodecContext, this.videoCodecId);
             PrepareDecodedFrameAndPacket();
             PrepareImageFrameAndBuffer();
+
+            // For audio stream
+            RetrieveAudioCodecContext();
+            FindAndOpenDecoder(this.pAudioCodecContext, this.audioCodecId);
         }
 
         private void StartPlaybackThread()
@@ -157,6 +167,10 @@ namespace P2PKaraokeSystem.PlaybackLogic
 
                                     this.playerViewModel.PendingVideoFrames.Add(imageFramePtr);
                                 }
+                            }
+                            else if (this.packet.stream_index == this.pAudioStream->index)
+                            {
+
                             }
                         }
                     }
@@ -246,6 +260,20 @@ namespace P2PKaraokeSystem.PlaybackLogic
 
             Util.AssertTrue("FFmpeg: Cannot initialize conversion context",
                 this.pConvertContext != null);
+        }
+
+        private void RetrieveAudioCodecContext()
+        {
+            if (this.pAudioStream == null)
+            {
+                return;
+            }
+
+            this.pAudioCodecContext = this.pAudioStream->codec;
+            this.frequency = this.pAudioCodecContext->sample_rate;
+            this.numOfChannels = this.pAudioCodecContext->channels;
+
+            this.audioCodecId = this.pAudioCodecContext->codec_id;
         }
 
         private void FindAndOpenDecoder(AVCodecContext* pCodecContext, AVCodecID codeId)
