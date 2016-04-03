@@ -208,7 +208,8 @@
                    Text="Please input keyword for search" TextAlignment="Justify" TextWrapping="Wrap" FontSize="16"
                    AcceptsReturn="False"
                    BorderBrush="DeepPink" BorderThickness="2"
-                   SelectionBrush="DeepPink" Opacity="0.75">
+                   SelectionBrush="DeepPink" Opacity="0.75"
+                   KeyDown="OnKeyDownHandler">
         </TextBox>
 
         <!-- Music List-->
@@ -222,7 +223,9 @@
                     <ListView.ItemTemplate>
                         <DataTemplate>
                             <DockPanel Height="40">
-                                <TextBlock Text="{Binding Title}" HorizontalAlignment="Stretch" Foreground="White" VerticalAlignment="Center" FontSize="24" FontWeight="Bold"></TextBlock>
+                                <TextBlock Text="{Binding Title}" HorizontalAlignment="Left" Foreground="White" VerticalAlignment="Center" FontSize="24" FontWeight="Bold"></TextBlock>
+                                <TextBlock Text="   ---    " HorizontalAlignment="Left" Foreground="White" VerticalAlignment="Center"></TextBlock>
+                                <TextBlock Text="{Binding Performer.Name}" HorizontalAlignment="Center" Foreground="LightGray" VerticalAlignment="Center" FontSize="16" FontWeight="Bold"></TextBlock>
                                 <TextBlock Text="[Time]" HorizontalAlignment="Right" Foreground="White" VerticalAlignment="Center"></TextBlock>
                             </DockPanel>
                         </DataTemplate>
