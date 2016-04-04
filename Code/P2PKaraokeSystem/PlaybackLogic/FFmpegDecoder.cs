@@ -48,10 +48,16 @@ namespace P2PKaraokeSystem.PlaybackLogic
 
         // Filled by PrepareDecodeFrameAndPacket()
         private AVFrame* pDecodedVideoFrame;
-        private AVPacket videoPacket;
+        private AVPacket packet;
 
         // Filled by PrepareImageFrameAndBuffer()
         private int imageFrameBufferSize;
+
+        // Filled by RetrieveAudioCodecContext()
+        private AVCodecID audioCodecId;
+        private AVCodecContext* pAudioCodecContext;
+        private int frequency;
+        private int numOfChannels;
 
         public FFmpegDecoder(PlayerViewModel playerViewModel, PlaybackModel playbackModel)
         {
@@ -103,9 +109,15 @@ namespace P2PKaraokeSystem.PlaybackLogic
 
             // For video stream
             RetrieveVideoCodecContextAndConvertContext();
-            FindAndOpenDecoder(this.videoCodecId);
+            FindAndOpenDecoder(this.pVideoCodecContext, this.videoCodecId);
             PrepareDecodedFrameAndPacket();
             PrepareImageFrameAndBuffer();
+
+            // For audio stream
+            RetrieveAudioCodecContext();
+            FindAndOpenDecoder(this.pAudioCodecContext, this.audioCodecId);
+
+            this.playbackModel.Loaded = true;
         }
 
         private void StartPlaybackThread()
@@ -137,25 +149,30 @@ namespace P2PKaraokeSystem.PlaybackLogic
                 {
                     this.isVideoLoadedEvent.Wait();
 
-                    fixed (AVPacket* pVideoPacket = &this.videoPacket)
+                    fixed (AVPacket* pPacket = &this.packet)
                     {
-                        IntPtr imageFramePtr = this.playerViewModel.AvailableImageBufferPool.Take();
-
-                        while (ReadFrame(pVideoPacket))
+                        if (ReadFrame(pPacket))
                         {
-                            if (IsVideoFrame(pVideoPacket) && DecodeVideoFrame(pVideoPacket))
+                            if (this.packet.stream_index == this.pVideoStream->index)
                             {
-                                var pImageFrame = (AVFrame*)imageFramePtr.ToPointer();
-
-                                ConvertFrameToImage(pImageFrame);
-
-                                if (IS_FRAME_SAVE_TO_FILE && currentFrame % 20 == 0)
+                                if (DecodeVideoFrame(pPacket))
                                 {
-                                    SaveBufferToFile();
-                                }
+                                    IntPtr imageFramePtr = this.playerViewModel.AvailableImageBufferPool.Take();
+                                    var pImageFrame = (AVFrame*)imageFramePtr.ToPointer();
 
-                                this.playerViewModel.PendingVideoFrames.Add(imageFramePtr);
-                                imageFramePtr = this.playerViewModel.AvailableImageBufferPool.Take();
+                                    ConvertFrameToImage(pImageFrame);
+
+                                    if (IS_FRAME_SAVE_TO_FILE && currentFrame % 20 == 0)
+                                    {
+                                        SaveBufferToFile();
+                                    }
+
+                                    this.playerViewModel.PendingVideoFrames.Add(imageFramePtr);
+                                }
+                            }
+                            else if (this.packet.stream_index == this.pAudioStream->index)
+                            {
+
                             }
                         }
                     }
@@ -180,6 +197,8 @@ namespace P2PKaraokeSystem.PlaybackLogic
             {
                 ffmpeg.avformat_close_input(ppFormatContext);
             }
+
+            this.playbackModel.Loaded = false;
         }
 
         private void RetrieveFormatAndStreamInfo(string path)
@@ -247,7 +266,21 @@ namespace P2PKaraokeSystem.PlaybackLogic
                 this.pConvertContext != null);
         }
 
-        private void FindAndOpenDecoder(AVCodecID codeId)
+        private void RetrieveAudioCodecContext()
+        {
+            if (this.pAudioStream == null)
+            {
+                return;
+            }
+
+            this.pAudioCodecContext = this.pAudioStream->codec;
+            this.frequency = this.pAudioCodecContext->sample_rate;
+            this.numOfChannels = this.pAudioCodecContext->channels;
+
+            this.audioCodecId = this.pAudioCodecContext->codec_id;
+        }
+
+        private void FindAndOpenDecoder(AVCodecContext* pCodecContext, AVCodecID codeId)
         {
             var pCodec = ffmpeg.avcodec_find_decoder(codeId);
 
@@ -255,21 +288,21 @@ namespace P2PKaraokeSystem.PlaybackLogic
 
             if ((pCodec->capabilities & ffmpeg.AV_CODEC_CAP_TRUNCATED) == ffmpeg.AV_CODEC_CAP_TRUNCATED)
             {
-                this.pVideoCodecContext->flags |= ffmpeg.AV_CODEC_CAP_TRUNCATED;
+                pCodecContext->flags |= ffmpeg.AV_CODEC_CAP_TRUNCATED;
             }
 
-            Util.AssertNonNegative("FFmpeg: Cannot open codec for video",
-                ffmpeg.avcodec_open2(pVideoCodecContext, pCodec, null));
+            Util.AssertNonNegative("FFmpeg: Cannot open codec for " + codeId,
+                ffmpeg.avcodec_open2(pCodecContext, pCodec, null));
         }
 
         private void PrepareDecodedFrameAndPacket()
         {
             this.pDecodedVideoFrame = ffmpeg.av_frame_alloc();
-            this.videoPacket = new AVPacket();
+            this.packet = new AVPacket();
 
-            fixed (AVPacket* pVideoPacket = &this.videoPacket)
+            fixed (AVPacket* pPacket = &this.packet)
             {
-                ffmpeg.av_init_packet(pVideoPacket);
+                ffmpeg.av_init_packet(pPacket);
             }
         }
 
@@ -291,15 +324,10 @@ namespace P2PKaraokeSystem.PlaybackLogic
             this.playerViewModel.VideoScreenBitmap = new WriteableBitmap(this.width, this.height, 72, 72, WRITEABLE_BITMAP_FORMAT, null);
         }
 
-        private bool ReadFrame(AVPacket* pVideoPacket)
+        private bool ReadFrame(AVPacket* pPacket)
         {
             currentFrame++;
-            return ffmpeg.av_read_frame(pFormatContext, pVideoPacket) >= 0;
-        }
-
-        private bool IsVideoFrame(AVPacket* pPacket)
-        {
-            return pPacket->stream_index == this.pVideoStream->index;
+            return ffmpeg.av_read_frame(pFormatContext, pPacket) >= 0;
         }
 
         private bool DecodeVideoFrame(AVPacket* pVideoPacket)

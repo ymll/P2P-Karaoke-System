@@ -31,6 +31,7 @@ namespace P2PKaraokeSystem.View
             this._karaokeSystemModel = (KaraokeSystemModel)this.DataContext;
             new LyricPlayer(this._karaokeSystemModel.Playback, this._karaokeSystemModel.View);
             new FFmpegDecoder(this._karaokeSystemModel.View, this._karaokeSystemModel.Playback);
+            new AudioPlayer(this._karaokeSystemModel.Playback, this._karaokeSystemModel.View);
         }
 
         private void playImg_MouseDown(object sender, MouseButtonEventArgs e)
@@ -53,21 +54,6 @@ namespace P2PKaraokeSystem.View
         private void UpdatePlayState(bool isPlay)
         {
             this._karaokeSystemModel.Playback.Playing = isPlay;
-
-            if (this._karaokeSystemModel.Playback.Playing)
-            {
-                var aviHeaderParser = new P2PKaraokeSystem.PlaybackLogic.AviHeaderParser();
-                aviHeaderParser.LoadFile("Z:\\Users\\sonia\\note\\year4\\sem2\\CSCI3280\\Project\\Code\\P2PKaraokeSystem\\VideoDatabase\\Video\\only_time.avi");
-
-                AudioFrameReader frameReader = new AudioFrameReader();
-                frameReader.Load(aviHeaderParser.AudioHeaderReader);
-                frameReader.ReadFrameFully(aviHeaderParser.AudioHeaderReader);
-
-                AudioPlayer audioPlayer = new AudioPlayer(this._karaokeSystemModel.Playback);
-
-                audioPlayer.OpenDevice(aviHeaderParser.AudioHeaderReader.FormatInfo, delegate { });
-                audioPlayer.WriteToStream(frameReader.FramePointer, frameReader.FrameSize);
-            }
         }
 
         private void ListView_MouseDoubleClick(object sender, MouseButtonEventArgs e)

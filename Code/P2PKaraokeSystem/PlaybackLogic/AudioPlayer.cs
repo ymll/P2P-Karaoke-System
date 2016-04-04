@@ -1,4 +1,5 @@
-﻿using P2PKaraokeSystem.Model;
+﻿using AviFile;
+using P2PKaraokeSystem.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,23 +16,40 @@ namespace P2PKaraokeSystem.PlaybackLogic
         public delegate void DelegateAudioFinished(Winmm.WOM_Messages msg);
 
         private IntPtr audioOut = new IntPtr();
-        private DelegateAudioFinished finishCallback;
 
         private PlaybackModel playbackModel;
+        private PlayerViewModel playViewModel;
         private ManualResetEventSlim isAudioPlayingEvent;
 
-        public AudioPlayer(PlaybackModel playbackModel)
+        public AudioPlayer(PlaybackModel playbackModel, PlayerViewModel playViewModel)
         {
             this.playbackModel = playbackModel;
+            this.playViewModel = playViewModel;
             this.isAudioPlayingEvent = new ManualResetEventSlim(false);
 
             this.playbackModel.PropertyChanged += playbackModel_PropertyChanged;
+            this.playViewModel.PropertyChanged += playViewModel_PropertyChanged;
         }
 
         private void playbackModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             switch (e.PropertyName)
             {
+                case "Loaded":
+                    if (this.playbackModel.Loaded)
+                    {
+                        var aviHeaderParser = new P2PKaraokeSystem.PlaybackLogic.AviHeaderParser();
+                        aviHeaderParser.LoadFile(this.playbackModel.CurrentVideo.FilePath);
+
+                        AudioFrameReader frameReader = new AudioFrameReader();
+                        frameReader.Load(aviHeaderParser.AudioHeaderReader);
+                        frameReader.ReadFrameFully(aviHeaderParser.AudioHeaderReader);
+
+                        OpenDevice(aviHeaderParser.AudioHeaderReader.FormatInfo);
+                        this.playViewModel.CurrentAudioFrame = new Tuple<IntPtr, int>(frameReader.FramePointer, frameReader.FrameSize);
+                    }
+                    break;
+
                 case "CurrentVideo":
                 case "Playing":
                     if (playbackModel.CurrentVideo != null && playbackModel.Playing)
@@ -57,9 +75,18 @@ namespace P2PKaraokeSystem.PlaybackLogic
             }
         }
 
-        public void OpenDevice(AviFile.Avi.PCMWAVEFORMAT audioFormatInfo, DelegateAudioFinished finishCallback)
+        private void playViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            this.finishCallback = finishCallback;
+            switch (e.PropertyName)
+            {
+                case "CurrentAudioFrame":
+                    WriteToStream(this.playViewModel.CurrentAudioFrame.Item1, this.playViewModel.CurrentAudioFrame.Item2);
+                    break;
+            }
+        }
+
+        private void OpenDevice(Avi.PCMWAVEFORMAT audioFormatInfo)
+        {
             uint err = Winmm.waveOutOpen(ref audioOut, new IntPtr(Winmm.WAVE_MAPPER), ref audioFormatInfo, this.WaveOutProc, IntPtr.Zero, Winmm.WaveInOpenFlags.CALLBACK_FUNCTION);
 
             if (err != 0)
@@ -69,7 +96,7 @@ namespace P2PKaraokeSystem.PlaybackLogic
             }
         }
 
-        public void WriteToStream(IntPtr buffer, int bufferSize)
+        private void WriteToStream(IntPtr buffer, int bufferSize)
         {
             Winmm.WAVEHDR hdr = new Winmm.WAVEHDR();
             hdr.lpData = buffer;
@@ -97,7 +124,7 @@ namespace P2PKaraokeSystem.PlaybackLogic
 
         private void WaveOutProc(IntPtr hWaveOut, Winmm.WOM_Messages msg, IntPtr dwInstance, ref Winmm.WAVEHDR wavehdr, IntPtr lParam)
         {
-            finishCallback(msg);
+
         }
     }
 }
