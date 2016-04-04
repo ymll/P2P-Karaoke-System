@@ -116,6 +116,8 @@ namespace P2PKaraokeSystem.PlaybackLogic
             // For audio stream
             RetrieveAudioCodecContext();
             FindAndOpenDecoder(this.pAudioCodecContext, this.audioCodecId);
+
+            this.playbackModel.Loaded = true;
         }
 
         private void StartPlaybackThread()
@@ -195,6 +197,8 @@ namespace P2PKaraokeSystem.PlaybackLogic
             {
                 ffmpeg.avformat_close_input(ppFormatContext);
             }
+
+            this.playbackModel.Loaded = false;
         }
 
         private void RetrieveFormatAndStreamInfo(string path)

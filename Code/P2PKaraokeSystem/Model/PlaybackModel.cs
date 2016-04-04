@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AviFile;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -30,6 +31,13 @@ namespace P2PKaraokeSystem.Model
             set { SetField(ref _totalTime, value, "TotalTime"); }
         }
 
+        private bool _loaded = false;
+        public bool Loaded
+        {
+            get { return _loaded; }
+            set { SetField(ref _loaded, value, "Loaded"); }
+        }
+
         private bool _playing = false;
         public bool Playing
         {
@@ -43,5 +51,7 @@ namespace P2PKaraokeSystem.Model
             get { return _volume; }
             set { SetField(ref _volume, value, "Volume"); }
         }
+
+        public Avi.PCMWAVEFORMAT AudioWaveFormat { get; set; }
     }
 }
