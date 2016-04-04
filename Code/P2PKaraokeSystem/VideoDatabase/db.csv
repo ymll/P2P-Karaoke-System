@@ -1,4 +1,4 @@
 PerformerName,LyricFilePath,VideoTitle,VideoFilePath
-SHE,,半糖主義,Z:/Code/P2PKaraokeSystem/VideoDatabase/Video/SHE.avi
-Enya,Z:/Code/P2PKaraokeSystem/VideoDatabase/Lyrics/Enya - Only Time.lrc,Only Time,Z:/Code/P2PKaraokeSystem/VideoDatabase/Video/only_time.avi
-,,Test,Z:/Code/P2PKaraokeSystem/VideoDatabase/Video/sample_video.avi
+SHE,,半糖主義,../../VideoDatabase/Video/SHE.avi
+Enya,../../VideoDatabase/Lyrics/Enya - Only Time.lrc,Only Time,../../VideoDatabase/Video/only_time.avi
+,,Test,../../VideoDatabase/Video/sample_video.avi

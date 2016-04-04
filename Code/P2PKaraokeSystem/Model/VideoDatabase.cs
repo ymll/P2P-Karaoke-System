@@ -20,7 +20,7 @@ namespace P2PKaraokeSystem.Model
 
             try
             {
-                LoadFromFile("Z:\\Code\\P2PKaraokeSystem\\VideoDatabase\\db.csv");
+                LoadFromFile("..\\..\\VideoDatabase\\db.csv");
             }
             catch (Exception)
             {
