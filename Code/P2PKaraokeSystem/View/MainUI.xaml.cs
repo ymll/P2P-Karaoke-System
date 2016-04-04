@@ -27,7 +27,9 @@ namespace P2PKaraokeSystem.View
         {
             //testing code:
             /*
-            new ClientReceiveManager().StartReceiveTcpPacket(); 
+            ClientReceiveManager clientRecv = new ClientReceiveManager();
+            clientRecv.RegisterListener(PacketType.MEDIA_INFO, new MediaInfoReceiveListener()); 
+            clientRecv.StartReceiveTcpPacket();
             */
             /*
             string sendingString = "Testing string.......";
