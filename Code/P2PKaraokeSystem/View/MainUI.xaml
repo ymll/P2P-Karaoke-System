@@ -6,13 +6,13 @@
     <Window.DataContext>
         <local_model:KaraokeSystemModel/>
     </Window.DataContext>
-    
+
     <Window.Resources>
         <Style TargetType="TextBox">
             <Setter Property="Template">
                 <Setter.Value>
-                <ControlTemplate TargetType="TextBox">
-                    <Border BorderThickness="{TemplateBinding Border.BorderThickness}"
+                    <ControlTemplate TargetType="TextBox">
+                        <Border BorderThickness="{TemplateBinding Border.BorderThickness}"
                       BorderBrush="DeepPink"
                       Background="{TemplateBinding Panel.Background}"
                       Name="border"
@@ -21,26 +21,26 @@
                                VerticalScrollBarVisibility="Hidden"
                                Name="PART_ContentHost"
                                Focusable="False" />
-                    </Border>
-                <ControlTemplate.Triggers>
-                        <Trigger Property="UIElement.IsEnabled" Value="False">
-                            <Setter Property="UIElement.Opacity" TargetName="border"
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="UIElement.IsEnabled" Value="False">
+                                <Setter Property="UIElement.Opacity" TargetName="border"
                         Value="0.56"/>
-                        </Trigger>
-                        <Trigger Property="UIElement.IsMouseOver" Value="True">
-                            <Setter Property="Border.BorderBrush" TargetName="border" 
+                            </Trigger>
+                            <Trigger Property="UIElement.IsMouseOver" Value="True">
+                                <Setter Property="Border.BorderBrush" TargetName="border" 
                         Value="DeepPink"/>
-                        </Trigger>
-                        <Trigger Property="UIElement.IsKeyboardFocused" Value="True">
-                            <Setter Property="Border.BorderBrush" TargetName="border" 
+                            </Trigger>
+                            <Trigger Property="UIElement.IsKeyboardFocused" Value="True">
+                                <Setter Property="Border.BorderBrush" TargetName="border" 
                        Value="DeepPink"/>
-                        </Trigger>
-                </ControlTemplate.Triggers>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
-    </Style>
-        
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
     </Window.Resources>
 
     <Grid Background="black" RenderTransformOrigin="0.874,0.372">
@@ -72,31 +72,29 @@
                     <Style.Triggers>
                         <MultiDataTrigger>
                             <MultiDataTrigger.Conditions>
-                                <Condition Binding="{Binding Playback.Playing}" Value="True"/>
-                                <Condition Binding="{Binding IsMouseOver, ElementName=playImg}" Value="True"/>
-                            </MultiDataTrigger.Conditions>
-                            <Setter Property="Source" Value="..\View\UIMaterial\Image\stop_blue.png"/>
-                        </MultiDataTrigger>
-                        <MultiDataTrigger>
-                            <MultiDataTrigger.Conditions>
-                                <Condition Binding="{Binding Playback.Playing}" Value="True"/>
-                                <Condition Binding="{Binding IsMouseOver, ElementName=playImg}" Value="False"/>
-                            </MultiDataTrigger.Conditions>
-                            <Setter Property="Source" Value="..\View\UIMaterial\Image\stop.png"/>
-                        </MultiDataTrigger>
-                        <MultiDataTrigger>
-                            <MultiDataTrigger.Conditions>
-                                <Condition Binding="{Binding Playback.Playing}" Value="False"/>
                                 <Condition Binding="{Binding IsMouseOver, ElementName=playImg}" Value="True"/>
                             </MultiDataTrigger.Conditions>
                             <Setter Property="Source" Value="..\View\UIMaterial\Image\play_blue.png"/>
                         </MultiDataTrigger>
                         <MultiDataTrigger>
                             <MultiDataTrigger.Conditions>
-                                <Condition Binding="{Binding Playback.Playing}" Value="False"/>
                                 <Condition Binding="{Binding IsMouseOver, ElementName=playImg}" Value="False"/>
                             </MultiDataTrigger.Conditions>
                             <Setter Property="Source" Value="..\View\UIMaterial\Image\play.png"/>
+                        </MultiDataTrigger>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding Playback.State}" Value="{x:Static local_model:PlayState.Playing}"/>
+                                <Condition Binding="{Binding IsMouseOver, ElementName=playImg}" Value="True"/>
+                            </MultiDataTrigger.Conditions>
+                            <Setter Property="Source" Value="..\View\UIMaterial\Image\stop_blue.png"/>
+                        </MultiDataTrigger>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding Playback.State}" Value="{x:Static local_model:PlayState.Playing}"/>
+                                <Condition Binding="{Binding IsMouseOver, ElementName=playImg}" Value="False"/>
+                            </MultiDataTrigger.Conditions>
+                            <Setter Property="Source" Value="..\View\UIMaterial\Image\stop.png"/>
                         </MultiDataTrigger>
                     </Style.Triggers>
                 </Style>
@@ -199,7 +197,7 @@
                 <AccessText x:Name="lyricText" TextWrapping="Wrap" Text="{Binding View.CurrentLyric}"/>
             </Label.Content>
         </Label>
-        
+
         <!-- Search Bar -->
         <TextBox x:Name="searchBox"
                    Margin="958,0,0,0" MinHeight="30"
