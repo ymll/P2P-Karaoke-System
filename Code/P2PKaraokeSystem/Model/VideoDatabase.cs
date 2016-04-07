@@ -2,6 +2,7 @@
 using Kfstorm.LrcParser;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -11,18 +12,17 @@ namespace P2PKaraokeSystem.Model
 {
     public class VideoDatabase : AbstractNotifyPropertyChanged
     {
-        private List<Video> _videos;
-        public List<Video> Videos
-        {
-            get { return _videos; }
-        }
+        public ObservableCollection<Video> Videos { get; private set; }
+        public ObservableCollection<Video> allVideos { get; private set; }
 
         public VideoDatabase()
         {
-            _videos = new List<Video>();
+            Videos = new ObservableCollection<Video>();
+            allVideos = new ObservableCollection<Video>();
+
             try
             {
-                LoadFromFile("db.csv");
+                LoadFromFile("..\\..\\VideoDatabase\\db.csv");
             }
             catch (Exception)
             {
@@ -40,6 +40,11 @@ namespace P2PKaraokeSystem.Model
             Load(new StringReader(text));
         }
 
+        public void LoadForSearch(string path, string keywords)
+        {
+            LoadSearch(keywords);
+        }
+
         private void Load(TextReader textReader)
         {
             using (CsvReader csv = new CsvReader(textReader))
@@ -51,6 +56,38 @@ namespace P2PKaraokeSystem.Model
                     Video video = new Video(csv.GetField<string>("VideoTitle"), csv.GetField<string>("VideoFilePath"), performer, lyric);
 
                     Videos.Add(video);
+                    allVideos.Add(video);
+                }
+            }
+        }
+
+        private void LoadSearch(string keywords)
+        {
+
+            Video[] tempVideoArr = new Video[allVideos.Count];
+            allVideos.CopyTo(tempVideoArr, 0);
+            int videoCount = allVideos.Count;
+
+            Videos.Clear();
+            string[] words = keywords.Split(' ');
+
+            for (int k = 0; k < words.Count(); k++)
+            {
+                for (int i = 0; i < videoCount; i++)
+                {
+                    if (tempVideoArr[i].Performer.Name == words[k] || tempVideoArr[i].Title == words[k])
+                    {
+                        Videos.Add(tempVideoArr[i]);
+                    }
+                }
+            }
+
+            if (keywords == "")
+            {
+                Videos.Clear();
+                for (int i = 0; i < videoCount; i++)
+                {
+                    Videos.Add(allVideos[i]);
                 }
             }
         }
@@ -121,8 +158,8 @@ namespace P2PKaraokeSystem.Model
 
         public class Lyric
         {
-            public String FilePath { get; set; }
-            public ILrcFile _lyricFile;
+            public String FilePath { get; private set; }
+            private ILrcFile _lyricFile;
 
             public Lyric(String filePath)
             {
@@ -143,11 +180,11 @@ namespace P2PKaraokeSystem.Model
                 }
             }
 
-            public String GetCurrentLyric(int hours, int minutes, int seconds, int milliseconds)
+            public String GetCurrentLyric(int currentMillisecond)
             {
                 try
                 {
-                    TimeSpan timeSpan = new TimeSpan(0, hours, minutes, seconds, milliseconds);
+                    TimeSpan timeSpan = TimeSpan.FromMilliseconds(currentMillisecond);
                     IOneLineLyric oneLineLyric = _lyricFile.AfterOrAt(timeSpan);
                     return oneLineLyric.Content;
                 }

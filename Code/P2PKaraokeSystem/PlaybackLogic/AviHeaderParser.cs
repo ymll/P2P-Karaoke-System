@@ -20,7 +20,7 @@ namespace P2PKaraokeSystem.PlaybackLogic
         {
             Avi.AVIFileInit();
 
-            Util.ThrowExceptionWhenResultNotZero("Cannot open the file as AVI video",
+            Util.AssertZero("Cannot open the file as AVI video",
                 Avi.AVIFileOpen(ref _aviFile, filePath, Avi.OF_READWRITE, 0));
 
             AudioHeaderReader = new AudioHeaderReader();

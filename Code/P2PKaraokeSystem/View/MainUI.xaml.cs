@@ -1,9 +1,11 @@
-﻿using P2PKaraokeSystem.PlaybackLogic;
+﻿using P2PKaraokeSystem.Model;
+using P2PKaraokeSystem.PlaybackLogic;
 using P2PKaraokeSystem.PlaybackLogic.Native.FFmpeg;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -19,9 +21,7 @@ namespace P2PKaraokeSystem.View
 
     public partial class MainUI : Window
     {
-
-        bool isStopping = true;
-        bool soundOn = true;
+        private KaraokeSystemModel _karaokeSystemModel;
 
         public MainUI()
         {
@@ -50,109 +50,52 @@ namespace P2PKaraokeSystem.View
         
             InitializeComponent();
             FFmpegLoader.LoadFFmpeg();
+
+            this._karaokeSystemModel = (KaraokeSystemModel)this.DataContext;
+            new LyricPlayer(this._karaokeSystemModel.Playback, this._karaokeSystemModel.View);
+            new FFmpegDecoder(this._karaokeSystemModel.View, this._karaokeSystemModel.Playback);
+            new AudioPlayer(this._karaokeSystemModel.Playback, this._karaokeSystemModel.View);
         }
 
-        //Set Image Source for an image throught Uri
-        private void SetImage(Image imageName, string path)
+        private void playImg_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            imageName.BeginInit();
-            imageName.Source = new BitmapImage(new Uri(path, UriKind.RelativeOrAbsolute));
-            imageName.EndInit();
-
+            switch (this._karaokeSystemModel.Playback.State)
+            {
+                case PlayState.NotPlaying:
+                    this._karaokeSystemModel.Playback.State = PlayState.Playing;
+                    break;
+                case PlayState.Playing:
+                    this._karaokeSystemModel.Playback.State = PlayState.NotPlaying;
+                    break;
+                default:
+                    break;
+            }
         }
 
-        //Play and Stop Button Enter
-        private void playBtn_MouseEnter(object sender, EventArgs e)
+        private void soundImg_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            if (isStopping)
-                SetImage(playImg, "pack://application:,,,/View/UIMaterial/Image/play_blue.png");
+            if (this._karaokeSystemModel.Playback.Volume == 0)
+            {
+                this._karaokeSystemModel.Playback.Volume = 255;
+            }
             else
-                SetImage(playImg, "pack://application:,,,/View/UIMaterial/Image/stop_blue.png");
+            {
+                this._karaokeSystemModel.Playback.Volume = 0;
+            }
         }
 
-        //Play and Stop Mouse Leave
-        private void playBtn_MouseLeave(object sender, EventArgs e)
+        private void ListView_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            if (isStopping)
-                SetImage(playImg, "pack://application:,,,/View/UIMaterial/Image/play.png");
-            else
-                SetImage(playImg, "pack://application:,,,/View/UIMaterial/Image/stop.png");
+            this._karaokeSystemModel.Playback.CurrentVideo = ((sender as ListView).SelectedItem as Model.VideoDatabase.Video);
+            this._karaokeSystemModel.Playback.State = PlayState.Playing;
         }
 
-        //Play and Stop Mouse Click
-        private void playBtn_Click(object sender, EventArgs e)
+        private void OnKeyDownHandler(object sender, KeyEventArgs e)
         {
-            if (isStopping)
-                SetImage(playImg, "pack://application:,,,/View/UIMaterial/Image/stop_blue.png");
-            else
-                SetImage(playImg, "pack://application:,,,/View/UIMaterial/Image/play_blue.png");
-
-            isStopping = !isStopping;
-
-            var aviHeaderParser = new P2PKaraokeSystem.PlaybackLogic.AviHeaderParser();
-            aviHeaderParser.LoadFile("Z:\\Code\\P2PKaraokeSystem\\VideoDatabase\\Video\\only_time.avi");
-
-            AudioFrameReader frameReader = new AudioFrameReader();
-            frameReader.Load(aviHeaderParser.AudioHeaderReader);
-            frameReader.ReadFrameFully(aviHeaderParser.AudioHeaderReader);
-
-            AudioPlayer audioPlayer = new AudioPlayer();
-
-            audioPlayer.OpenDevice(aviHeaderParser.AudioHeaderReader.FormatInfo, delegate { });
-            audioPlayer.WriteToStream(frameReader.FramePointer, frameReader.FrameSize);
-        }
-
-        //Backward Button Enter
-        private void backwardBtn_MouseEnter(object sender, EventArgs e)
-        {
-            SetImage(backwardImg, "pack://application:,,,/View/UIMaterial/Image/backward_blue.png");
-        }
-
-        //Backward Button Mouse Leave
-        private void backwardBtn_MouseLeave(object sender, EventArgs e)
-        {
-            SetImage(backwardImg, "pack://application:,,,/View/UIMaterial/Image/backward.png");
-        }
-
-        //Forward Button Enter
-        private void fastforwardBtn_MouseEnter(object sender, EventArgs e)
-        {
-            SetImage(fastforwardImg, "pack://application:,,,/View/UIMaterial/Image/fastforward_blue.png");
-        }
-
-        //Forward Button Mouse Leave
-        private void fastforwardBtn_MouseLeave(object sender, EventArgs e)
-        {
-            SetImage(fastforwardImg, "pack://application:,,,/View/UIMaterial/Image/fastforward.png");
-        }
-
-        //Sound Button Enter
-        private void soundBtn_MouseEnter(object sender, EventArgs e)
-        {
-            if (soundOn)
-                SetImage(soundImg, "pack://application:,,,/View/UIMaterial/Image/volumeup_blue.png");
-            else
-                SetImage(soundImg, "pack://application:,,,/View/UIMaterial/Image/volumeoff_blue.png");
-        }
-
-        //Sound Button Mouse Leave
-        private void soundBtn_MouseLeave(object sender, EventArgs e)
-        {
-            if (soundOn)
-                SetImage(soundImg, "pack://application:,,,/View/UIMaterial/Image/volumeup.png");
-            else
-                SetImage(soundImg, "pack://application:,,,/View/UIMaterial/Image/volumeoff.png");
-        }
-
-        //Sound Button Mouse Click
-        private void soundBtn_Click(object sender, EventArgs e)
-        {
-            if (soundOn)
-                SetImage(soundImg, "pack://application:,,,/View/UIMaterial/Image/volumeoff_blue.png");
-            else
-                SetImage(soundImg, "pack://application:,,,/View/UIMaterial/Image/volumeup_blue.png");
-
-            soundOn = !soundOn;
+            if (e.Key == Key.Return)
+            {
+                this._karaokeSystemModel.VideoDatabase.LoadForSearch("Z:\\Users\\sonia\\note\\year4\\sem2\\CSCI3280\\Project\\Code\\P2PKaraokeSystem\\VideoDatabase\\db.csv",searchBox.Text);
+            }
         }
     }
 }

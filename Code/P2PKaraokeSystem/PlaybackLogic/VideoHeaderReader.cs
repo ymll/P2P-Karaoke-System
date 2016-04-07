@@ -21,11 +21,11 @@ namespace P2PKaraokeSystem.PlaybackLogic
             IntPtr stream;
             Avi.AVISTREAMINFO videoStreamInfo = new Avi.AVISTREAMINFO();
 
-            Util.ThrowExceptionWhenResultNotZero("Cannot get video stream",
+            Util.AssertZero("Cannot get video stream",
                 Avi.AVIFileGetStream(aviFile, out stream, Avi.streamtypeVIDEO, 0));
 
             this.Stream = stream;
-            Util.ThrowExceptionWhenResultNotZero("Cannot get video stream info",
+            Util.AssertZero("Cannot get video stream info",
                 Avi.AVIStreamInfo(this.Stream, ref videoStreamInfo, Marshal.SizeOf(videoStreamInfo)));
 
             return videoStreamInfo;
@@ -36,7 +36,7 @@ namespace P2PKaraokeSystem.PlaybackLogic
             var bitmapInfo = new Avi.BITMAPINFO();
             int size = Marshal.SizeOf(bitmapInfo.bmiHeader);
 
-            Util.ThrowExceptionWhenResultNotZero("Cannot get video stream format",
+            Util.AssertZero("Cannot get video stream format",
                 Avi.AVIStreamReadFormat(aviStream, 0, ref bitmapInfo, ref size));
 
             return bitmapInfo;
