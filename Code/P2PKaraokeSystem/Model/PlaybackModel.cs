@@ -38,11 +38,11 @@ namespace P2PKaraokeSystem.Model
             set { SetField(ref _loaded, value, "Loaded"); }
         }
 
-        private bool _playing = false;
-        public bool Playing
+        private PlayState _state = PlayState.NotPlaying;
+        public PlayState State
         {
-            get { return _playing; }
-            set { SetField(ref _playing, value, "Playing"); }
+            get { return _state; }
+            set { SetField(ref _state, value, "State"); }
         }
 
         private int _volume = 255;
@@ -53,5 +53,10 @@ namespace P2PKaraokeSystem.Model
         }
 
         public Avi.PCMWAVEFORMAT AudioWaveFormat { get; set; }
+    }
+
+    public enum PlayState
+    {
+        Playing, NotPlaying
     }
 }

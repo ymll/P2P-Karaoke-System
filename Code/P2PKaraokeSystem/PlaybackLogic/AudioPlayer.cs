@@ -51,8 +51,8 @@ namespace P2PKaraokeSystem.PlaybackLogic
                     break;
 
                 case "CurrentVideo":
-                case "Playing":
-                    if (playbackModel.CurrentVideo != null && playbackModel.Playing)
+                case "State":
+                    if (playbackModel.CurrentVideo != null && playbackModel.State == PlayState.Playing)
                     {
                         Winmm.waveOutRestart(audioOut);
                     }

@@ -36,16 +36,17 @@ namespace P2PKaraokeSystem.PlaybackLogic
 
         void playbackModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            if ("Playing".Equals(e.PropertyName))
+            if ("State".Equals(e.PropertyName))
             {
-                if (this.playbackModel.Playing)
+                switch (this.playbackModel.State)
                 {
-                    this.timer.Change(0, interval);
-                }
-                else
-                {
-                    this.timer.Change(Timeout.Infinite, interval);
-                    this.playViewModel.CurrentLyric = "";
+                    case PlayState.Playing:
+                        this.timer.Change(0, interval);
+                        break;
+                    case PlayState.NotPlaying:
+                        this.timer.Change(Timeout.Infinite, interval);
+                        this.playViewModel.CurrentLyric = "";
+                        break;
                 }
             }
         }

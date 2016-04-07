@@ -36,7 +36,17 @@ namespace P2PKaraokeSystem.View
 
         private void playImg_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            this._karaokeSystemModel.Playback.Playing = !this._karaokeSystemModel.Playback.Playing;
+            switch (this._karaokeSystemModel.Playback.State)
+            {
+                case PlayState.NotPlaying:
+                    this._karaokeSystemModel.Playback.State = PlayState.Playing;
+                    break;
+                case PlayState.Playing:
+                    this._karaokeSystemModel.Playback.State = PlayState.NotPlaying;
+                    break;
+                default:
+                    break;
+            }
         }
 
         private void soundImg_MouseDown(object sender, MouseButtonEventArgs e)
@@ -51,15 +61,10 @@ namespace P2PKaraokeSystem.View
             }
         }
 
-        private void UpdatePlayState(bool isPlay)
-        {
-            this._karaokeSystemModel.Playback.Playing = isPlay;
-        }
-
         private void ListView_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             this._karaokeSystemModel.Playback.CurrentVideo = ((sender as ListView).SelectedItem as Model.VideoDatabase.Video);
-            UpdatePlayState(true);
+            this._karaokeSystemModel.Playback.State = PlayState.Playing;
         }
 
         private void OnKeyDownHandler(object sender, KeyEventArgs e)

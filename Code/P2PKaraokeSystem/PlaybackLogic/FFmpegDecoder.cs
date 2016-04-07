@@ -87,15 +87,16 @@ namespace P2PKaraokeSystem.PlaybackLogic
                     this.isVideoLoadedEvent.Set();
                 }
             }
-            else if ("Playing".Equals(e.PropertyName))
+            else if ("State".Equals(e.PropertyName))
             {
-                if (this.playbackModel.Playing)
+                switch (this.playbackModel.State)
                 {
-                    this.isVideoPlayingEvent.Set();
-                }
-                else
-                {
-                    this.isVideoPlayingEvent.Reset();
+                    case PlayState.Playing:
+                        this.isVideoPlayingEvent.Set();
+                        break;
+                    default:
+                        this.isVideoPlayingEvent.Reset();
+                        break;
                 }
             }
         }
