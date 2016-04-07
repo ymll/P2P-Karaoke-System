@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -55,18 +55,19 @@ namespace P2PKaraokeSystem.Network
         /**
          * Check the payload of packet. Return false if any error.
          */
-        public bool ParsePacket(byte[] recvBuffer, out byte[] destData, out PacketType packetType)
+        public bool ParsePacket(byte[] recvBuffer, out byte[] destData, out PacketType packetType, int dataSize)
         {
             // TODO: Define packet format
-            destData = new byte[recvBuffer.Length - payloadSize];
+            destData = new byte[dataSize];
             try {
-                System.Buffer.BlockCopy(recvBuffer, payloadSize, destData, 0, recvBuffer.Length - payloadSize);
+                System.Buffer.BlockCopy(recvBuffer, payloadSize, destData, 0, dataSize);
                 byte[] temtype = new byte[payloadSize];
                 System.Buffer.BlockCopy(recvBuffer, 0, temtype, 0, payloadSize);
                 PacketType[] pktArray = {
                     PacketType.SEARCH_QUERY,
                     PacketType.SEARCH_RESULT,
                     PacketType.MEDIA_INFO,
+                    PacketType.PLAY_REQUEST,
                     PacketType.VIDEO_STREAM,
                     PacketType.AUDIO_STREAM,
                     PacketType.SUBTITLE

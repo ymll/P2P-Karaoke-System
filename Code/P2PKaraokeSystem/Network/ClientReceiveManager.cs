@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -72,13 +72,13 @@ namespace P2PKaraokeSystem.Network
                     for (int k = 0; k < i; k++)
                         Console.Write(recvBuffer[k]);*/
 
-                    if (this.ParsePacket(recvBuffer, out destData, out packetType))
+                    if (this.ParsePacket(recvBuffer, out destData, out packetType, i - payloadSize))
                     {             
-                    /*    Console.WriteLine("\npacketType = ");
+                        Console.WriteLine("\npacketType = ");
                         Console.WriteLine(packetType);
-                        Console.WriteLine("\n");*/
-                      /*  for (int k = 0; k < i-payloadSize; k++)
-                            Console.Write(Convert.ToChar(destData[k]));*/
+                        Console.WriteLine("\n");
+                      for (int k = 0; k < i-payloadSize; k++)
+                            Console.Write(Convert.ToChar(destData[k]));
                         this.NotifyListeners(packetType, destData);
                     }
 
