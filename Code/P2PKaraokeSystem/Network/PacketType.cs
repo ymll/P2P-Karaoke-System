@@ -11,6 +11,7 @@ namespace P2PKaraokeSystem.Network
     {
         SEARCH_QUERY,
         SEARCH_RESULT,
+        PLAY_REQUEST,
         MEDIA_INFO,
         VIDEO_STREAM,
         AUDIO_STREAM,
