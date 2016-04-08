@@ -27,23 +27,25 @@ namespace P2PKaraokeSystem.View
         {
             //testing code:
             /*
-            ClientReceiveManager clientRecv = new ClientReceiveManager();
+            ClientReceiveManager clientRecv = new ClientReceiveManager("127.0.0.1",12345,500);
+            clientRecv.RegisterListener(PacketType.PLAY_REQUEST, new PlayRequestListener()); 
             clientRecv.RegisterListener(PacketType.MEDIA_INFO, new MediaInfoReceiveListener()); 
             clientRecv.StartReceiveTcpPacket();
-            */
-            /*
-            string sendingString = "Testing string.......";
+
+
+            string sendingString = "../../VideoDatabase/Video/only_time.avi";
             Byte[] data = Encoding.ASCII.GetBytes(sendingString);
             Byte[] sendBytes;
+
             */
             /* 
             ClientSendManager cl =  new ClientSendManager();
-            cl.AddPayload(out sendBytes, data, PacketType.AUDIO_STREAM);
+            cl.AddPayload(out sendBytes, data, PacketType.PLAY_REQUEST);
             cl.SendTCP(sendBytes,0,sendBytes.Length);      
             */
             /* 
             ServerSendManager c2 = new ServerSendManager();
-            c2.AddPayload(out sendBytes, data, PacketType.SUBTITLE);
+            c2.AddPayload(out sendBytes, data, PacketType.PLAY_REQUEST);
             c2.SendTCP(sendBytes, 0, sendBytes.Length);
             */
             //end testing code
