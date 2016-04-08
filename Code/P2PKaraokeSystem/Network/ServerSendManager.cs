@@ -31,6 +31,7 @@ namespace P2PKaraokeSystem.Network
                 networkStream.Write(sendBuffer, 0, size);
                 networkStream.Flush();
                 client.Close();
+                Console.WriteLine("return form send");
             }
             catch (Exception e)
             {

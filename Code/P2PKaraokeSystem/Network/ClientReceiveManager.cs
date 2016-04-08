@@ -77,8 +77,8 @@ namespace P2PKaraokeSystem.Network
                         Console.WriteLine("\npacketType = ");
                         Console.WriteLine(packetType);
                         Console.WriteLine("\n");
-                      for (int k = 0; k < i-payloadSize; k++)
-                            Console.Write(Convert.ToChar(destData[k]));
+                /*      for (int k = 0; k < i-payloadSize; k++)
+                            Console.Write(Convert.ToChar(destData[k]));*/
                         this.NotifyListeners(packetType, destData);
                     }
 
