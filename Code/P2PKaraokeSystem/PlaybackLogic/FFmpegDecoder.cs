@@ -1,5 +1,6 @@
 ﻿using FFmpeg.AutoGen;
 using P2PKaraokeSystem.Model;
+using P2PKaraokeSystem.PlaybackLogic.Decode;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -31,9 +32,6 @@ namespace P2PKaraokeSystem.PlaybackLogic
         private ManualResetEventSlim isVideoLoadedEvent;
         private ManualResetEventSlim isVideoPlayingEvent;
 
-        // Filled by RetrieveFormatAndStreamInfo()
-        private AVFormatContext* pFormatContext;
-
         // Filled by RetrieveVideoAndAudioStream()
         private AVStream* pVideoStream;
         private AVStream* pAudioStream;
@@ -59,6 +57,8 @@ namespace P2PKaraokeSystem.PlaybackLogic
         private int frequency;
         private int numOfChannels;
 
+        private MediaLoader mediaLoader;
+
         public FFmpegDecoder(PlayerViewModel playerViewModel, PlaybackModel playbackModel)
         {
             this.playerViewModel = playerViewModel;
@@ -66,7 +66,7 @@ namespace P2PKaraokeSystem.PlaybackLogic
             this.isVideoLoadedEvent = new ManualResetEventSlim(false);
             this.isVideoPlayingEvent = new ManualResetEventSlim(false);
 
-            pFormatContext = ffmpeg.avformat_alloc_context();
+            mediaLoader = new MediaLoader();
 
             playbackModel.PropertyChanged += playbackModel_PropertyChanged;
 
@@ -105,7 +105,7 @@ namespace P2PKaraokeSystem.PlaybackLogic
         {
             currentFrame = 0;
 
-            RetrieveFormatAndStreamInfo(path);
+            mediaLoader.RetrieveFormatAndStreamInfo(path);
             RetrieveVideoAndAudioStream();
 
             // For video stream
@@ -194,7 +194,7 @@ namespace P2PKaraokeSystem.PlaybackLogic
 
             ffmpeg.avcodec_close(this.pVideoCodecContext);
 
-            fixed (AVFormatContext** ppFormatContext = &this.pFormatContext)
+            fixed (AVFormatContext** ppFormatContext = &mediaLoader.DecodeInfo.pFormatContext)
             {
                 ffmpeg.avformat_close_input(ppFormatContext);
             }
@@ -202,23 +202,11 @@ namespace P2PKaraokeSystem.PlaybackLogic
             this.playbackModel.Loaded = false;
         }
 
-        private void RetrieveFormatAndStreamInfo(string path)
-        {
-            fixed (AVFormatContext** ppFormatContext = &this.pFormatContext)
-            {
-                Util.AssertZero("FFmpeg: Cannot open file",
-                    ffmpeg.avformat_open_input(ppFormatContext, path, null, null));
-            }
-
-            Util.AssertZero("FFmpeg: Cannot find stream info",
-                ffmpeg.avformat_find_stream_info(this.pFormatContext, null));
-        }
-
         private void RetrieveVideoAndAudioStream()
         {
-            for (var i = 0; i < this.pFormatContext->nb_streams; i++)
+            for (var i = 0; i < mediaLoader.DecodeInfo.pFormatContext->nb_streams; i++)
             {
-                var pStream = this.pFormatContext->streams[i];
+                var pStream = mediaLoader.DecodeInfo.pFormatContext->streams[i];
 
                 // TODO: Handle multiple video/audio stream
                 switch (pStream->codec->codec_type)
@@ -328,7 +316,7 @@ namespace P2PKaraokeSystem.PlaybackLogic
         private bool ReadFrame(AVPacket* pPacket)
         {
             currentFrame++;
-            return ffmpeg.av_read_frame(pFormatContext, pPacket) >= 0;
+            return ffmpeg.av_read_frame(mediaLoader.DecodeInfo.pFormatContext, pPacket) >= 0;
         }
 
         private bool DecodeVideoFrame(AVPacket* pVideoPacket)
