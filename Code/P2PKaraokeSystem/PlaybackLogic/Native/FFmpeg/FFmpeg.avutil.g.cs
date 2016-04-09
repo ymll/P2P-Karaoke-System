@@ -812,6 +812,9 @@ namespace FFmpeg.AutoGen
         
         [DllImport(libavutil, EntryPoint = "avutil_license", CallingConvention = CallingConvention.Cdecl)]
         public static extern string avutil_license();
+
+        [DllImport(libavutil, EntryPoint = "av_gettime", CallingConvention = CallingConvention.Cdecl)]
+        public static extern long av_gettime();
         
         [DllImport(libavutil, EntryPoint = "av_get_media_type_string", CallingConvention = CallingConvention.Cdecl)]
         public static extern string av_get_media_type_string(AVMediaType @media_type);
@@ -917,6 +920,9 @@ namespace FFmpeg.AutoGen
         
         [DllImport(libavutil, EntryPoint = "av_q2intfloat", CallingConvention = CallingConvention.Cdecl)]
         public static extern uint av_q2intfloat(AVRational @q);
+        
+        [DllImport(libavutil, EntryPoint = "av_q2d", CallingConvention = CallingConvention.Cdecl)]
+        public static extern double av_q2d(AVRational @q);
         
         [DllImport(libavutil, EntryPoint = "av_gcd", CallingConvention = CallingConvention.Cdecl)]
         public static extern long av_gcd(long @a, long @b);

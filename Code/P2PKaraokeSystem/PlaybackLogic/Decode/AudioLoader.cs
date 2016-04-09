@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FFmpeg.AutoGen;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace P2PKaraokeSystem.PlaybackLogic.Decode
 {
-    public class AudioLoader : StreamLoader
+    public unsafe class AudioLoader : StreamLoader
     {
         private AudioDecodeInfo audioDecodeInfo;
 
@@ -19,6 +20,15 @@ namespace P2PKaraokeSystem.PlaybackLogic.Decode
         public override void Load()
         {
             FindAndOpenDecoder();
+            PrepareResampleContext();
+        }
+
+        private void PrepareResampleContext()
+        {
+            audioDecodeInfo.pResampleContext = ffmpeg.swr_alloc();
+
+            Util.AssertTrue("FFmpeg: Cannot initialize conversion context",
+                audioDecodeInfo.pResampleContext != null);
         }
     }
 }

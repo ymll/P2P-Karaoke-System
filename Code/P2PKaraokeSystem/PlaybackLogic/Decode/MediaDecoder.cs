@@ -12,6 +12,7 @@ namespace P2PKaraokeSystem.PlaybackLogic.Decode
     public unsafe class MediaDecoder
     {
         private VideoDecoder videoDecoder;
+        private AudioDecoder audioDecoder;
 
         private MediaDecodeInfo mediaDecodeInfo;
         private ManualResetEventSlim isVideoLoadedEvent;
@@ -19,6 +20,7 @@ namespace P2PKaraokeSystem.PlaybackLogic.Decode
         public MediaDecoder(MediaDecodeInfo mediaDecodeInfo, PlayerViewModel playerViewModel, ManualResetEventSlim isVideoLoadedEvent)
         {
             this.videoDecoder = new VideoDecoder(mediaDecodeInfo.Video, playerViewModel);
+            this.audioDecoder = new AudioDecoder(mediaDecodeInfo.Audio, mediaDecodeInfo, playerViewModel);
 
             this.mediaDecodeInfo = mediaDecodeInfo;
             this.isVideoLoadedEvent = isVideoLoadedEvent;
@@ -51,7 +53,7 @@ namespace P2PKaraokeSystem.PlaybackLogic.Decode
                     }
                     else if (packet.stream_index == mediaDecodeInfo.Audio.pStream->index)
                     {
-
+                        this.audioDecoder.OnNewPacket(pPacket);
                     }
                 }
             }

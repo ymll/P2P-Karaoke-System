@@ -84,6 +84,7 @@
     <Compile Include="PlaybackLogic\AudioFrameReader.cs" />
     <Compile Include="PlaybackLogic\AudioHeaderReader.cs" />
     <Compile Include="PlaybackLogic\Decode\AudioDecodeInfo.cs" />
+    <Compile Include="PlaybackLogic\Decode\AudioDecoder.cs" />
     <Compile Include="PlaybackLogic\Decode\AudioLoader.cs" />
     <Compile Include="PlaybackLogic\Decode\AudioPlayer.cs" />
     <Compile Include="PlaybackLogic\Decode\MediaDecodeInfo.cs" />
