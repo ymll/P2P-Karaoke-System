@@ -36,6 +36,9 @@ namespace P2PKaraokeSystem.PlaybackLogic.Decode
 
         private void RetrieveStreams()
         {
+            decodeInfo.Video.pStream = null;
+            decodeInfo.Audio.pStream = null;
+
             for (var i = 0; i < decodeInfo.pFormatContext->nb_streams; i++)
             {
                 var pStream = decodeInfo.pFormatContext->streams[i];
@@ -68,8 +71,15 @@ namespace P2PKaraokeSystem.PlaybackLogic.Decode
 
         private void LoadStreams()
         {
-            Video.Load();
-            Audio.Load();
+            if (decodeInfo.Video.pStream != null)
+            {
+                Video.Load();
+            }
+
+            if (decodeInfo.Audio.pStream != null)
+            {
+                Audio.Load();
+            }
         }
 
         public void Load(string path)

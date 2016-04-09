@@ -41,7 +41,7 @@ namespace P2PKaraokeSystem.PlaybackLogic
             mediaDecodeInfo = new MediaDecodeInfo();
             mediaLoader = new MediaLoader(mediaDecodeInfo, playerViewModel);
             mediaDecoder = new MediaDecoder(mediaDecodeInfo, playerViewModel, isVideoLoadedEvent);
-            mediaPlayer = new MediaPlayer(mediaDecodeInfo, playerViewModel, isVideoPlayingEvent);
+            mediaPlayer = new MediaPlayer(mediaDecodeInfo, playerViewModel, playbackModel, isVideoPlayingEvent);
 
             playbackModel.PropertyChanged += playbackModel_PropertyChanged;
 

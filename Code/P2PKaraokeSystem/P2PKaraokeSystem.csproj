@@ -85,6 +85,7 @@
     <Compile Include="PlaybackLogic\AudioHeaderReader.cs" />
     <Compile Include="PlaybackLogic\Decode\AudioDecodeInfo.cs" />
     <Compile Include="PlaybackLogic\Decode\AudioLoader.cs" />
+    <Compile Include="PlaybackLogic\Decode\AudioPlayer.cs" />
     <Compile Include="PlaybackLogic\Decode\MediaDecodeInfo.cs" />
     <Compile Include="PlaybackLogic\Decode\MediaDecoder.cs" />
     <Compile Include="PlaybackLogic\Decode\MediaLoader.cs" />
@@ -111,7 +112,6 @@
     <Compile Include="PlaybackLogic\Native\FFmpeg\InteropHelper.cs" />
     <Compile Include="PlaybackLogic\Native\FFmpeg\Unresolved.cs" />
     <Compile Include="PlaybackLogic\Native\Winmm.cs" />
-    <Compile Include="PlaybackLogic\AudioPlayer.cs" />
     <Compile Include="PlaybackLogic\Util.cs" />
     <Compile Include="PlaybackLogic\VideoHeaderReader.cs" />
     <Compile Include="View\MainUI.xaml.cs">

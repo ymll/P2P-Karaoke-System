@@ -28,7 +28,12 @@ namespace P2PKaraokeSystem.PlaybackLogic.Decode
         public override void Load()
         {
             FindAndOpenDecoder();
+            PrepareConvertContext();
+            PrepareImageFrameAndBuffer();
+        }
 
+        private void PrepareConvertContext()
+        {
             videoDecodeInfo.pConvertContext = ffmpeg.sws_getContext(
                 videoDecodeInfo.Width,
                 videoDecodeInfo.Height,
@@ -41,8 +46,6 @@ namespace P2PKaraokeSystem.PlaybackLogic.Decode
 
             Util.AssertTrue("FFmpeg: Cannot initialize conversion context",
                 videoDecodeInfo.pConvertContext != null);
-
-            PrepareImageFrameAndBuffer();
         }
 
         private void PrepareImageFrameAndBuffer()

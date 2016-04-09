@@ -11,10 +11,12 @@ namespace P2PKaraokeSystem.PlaybackLogic.Decode
     public class MediaPlayer
     {
         private VideoPlayer videoPlayer;
+        private AudioPlayer audioPlayer;
 
-        public MediaPlayer(MediaDecodeInfo mediaDecodeInfo, PlayerViewModel playerViewModel, ManualResetEventSlim isVideoPlayingEvent)
+        public MediaPlayer(MediaDecodeInfo mediaDecodeInfo, PlayerViewModel playerViewModel, PlaybackModel playbackModel, ManualResetEventSlim isVideoPlayingEvent)
         {
             videoPlayer = new VideoPlayer(mediaDecodeInfo.Video, playerViewModel, isVideoPlayingEvent);
+            audioPlayer = new AudioPlayer(mediaDecodeInfo.Audio, playerViewModel, playbackModel);
         }
 
         public void StartAsync()
@@ -23,14 +25,9 @@ namespace P2PKaraokeSystem.PlaybackLogic.Decode
             {
                 while (true)
                 {
-                    Play();
+                    videoPlayer.Play();
                 }
             }).Start();
-        }
-
-        private void Play()
-        {
-            videoPlayer.Play();
         }
     }
 }
