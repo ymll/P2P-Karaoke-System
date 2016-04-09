@@ -13,7 +13,6 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 
@@ -27,12 +26,10 @@ namespace P2PKaraokeSystem.PlaybackLogic
         private ManualResetEventSlim isVideoLoadedEvent;
         private ManualResetEventSlim isVideoPlayingEvent;
 
-        // Filled by RetrieveVideoCodecContextAndConvertContext()
-        private AVRational frameRate;
-
         private MediaDecodeInfo mediaDecodeInfo;
         private MediaLoader mediaLoader;
         private MediaDecoder mediaDecoder;
+        private MediaPlayer mediaPlayer;
 
         public FFmpegDecoder(PlayerViewModel playerViewModel, PlaybackModel playbackModel)
         {
@@ -44,10 +41,11 @@ namespace P2PKaraokeSystem.PlaybackLogic
             mediaDecodeInfo = new MediaDecodeInfo();
             mediaLoader = new MediaLoader(mediaDecodeInfo, playerViewModel);
             mediaDecoder = new MediaDecoder(mediaDecodeInfo, playerViewModel, isVideoLoadedEvent);
+            mediaPlayer = new MediaPlayer(mediaDecodeInfo, playerViewModel, isVideoPlayingEvent);
 
             playbackModel.PropertyChanged += playbackModel_PropertyChanged;
 
-            this.StartPlaybackThread();
+            mediaPlayer.StartAsync();
             mediaDecoder.StartAsync();
         }
 
@@ -80,35 +78,8 @@ namespace P2PKaraokeSystem.PlaybackLogic
 
         private void Load(string path)
         {
-            mediaLoader.RetrieveFormatAndStreamInfo(path);
-            mediaLoader.RetrieveStreams();
-            mediaLoader.LoadStreams();
-
-            // For video stream
-            this.frameRate = mediaDecodeInfo.Video.pCodecContext->framerate;
-
+            mediaLoader.Load(path);
             this.playbackModel.Loaded = true;
-        }
-
-        private void StartPlaybackThread()
-        {
-            // Playback thread
-            new Thread(() =>
-            {
-                while (true)
-                {
-                    this.isVideoPlayingEvent.Wait();
-
-                    IntPtr imageFramePtr = this.playerViewModel.PendingVideoFrames.Take();
-                    var pImageFrame = (AVFrame*)imageFramePtr.ToPointer();
-
-                    WriteImageToBuffer(pImageFrame);
-                    this.playerViewModel.AvailableImageBufferPool.Add(imageFramePtr);
-
-                    int sleepTime = (int)(frameRate.den * 1000.0 / Math.Max(frameRate.num, 10));
-                    Thread.Sleep(sleepTime);
-                }
-            }).Start();
         }
 
         private void UnLoad()
@@ -131,37 +102,5 @@ namespace P2PKaraokeSystem.PlaybackLogic
 
             this.playbackModel.Loaded = false;
         }
-
-        private void WriteImageToBuffer(AVFrame* pImageFrame)
-        {
-            var pImageBuffer = pImageFrame->data0;
-            var imageBufferPtr = new IntPtr(pImageBuffer);
-            var linesize = pImageFrame->linesize[0];
-
-            this.playerViewModel.VideoScreenBitmap.Dispatcher.Invoke(() =>
-            {
-                this.playerViewModel.VideoScreenBitmap.Lock();
-                CopyMemory(this.playerViewModel.VideoScreenBitmap.BackBuffer, imageBufferPtr, mediaDecodeInfo.Video.ImageFrameBufferSize);
-                this.playerViewModel.VideoScreenBitmap.AddDirtyRect(new Int32Rect(0, 0, mediaDecodeInfo.Video.Width, mediaDecodeInfo.Video.Height));
-                this.playerViewModel.VideoScreenBitmap.Unlock();
-            });
-        }
-
-        private void SaveBufferToFile()
-        {
-            this.playerViewModel.VideoScreenBitmap.Dispatcher.Invoke(() =>
-            {
-                using (FileStream stream = new FileStream("images/Screenshot.jpg", FileMode.Create))
-                {
-                    JpegBitmapEncoder encoder = new JpegBitmapEncoder();
-
-                    encoder.Frames.Add(BitmapFrame.Create(this.playerViewModel.VideoScreenBitmap));
-                    encoder.Save(stream);
-                }
-            });
-        }
-
-        [DllImport("Kernel32.dll", EntryPoint = "RtlMoveMemory")]
-        public static extern void CopyMemory(IntPtr Destination, IntPtr Source, int Length);
     }
 }

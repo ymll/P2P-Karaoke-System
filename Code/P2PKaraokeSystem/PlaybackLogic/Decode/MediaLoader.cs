@@ -22,7 +22,7 @@ namespace P2PKaraokeSystem.PlaybackLogic.Decode
             this.Audio = new AudioLoader(decodeInfo.Audio);
         }
 
-        public void RetrieveFormatAndStreamInfo(string path)
+        private void RetrieveFormatAndStreamInfo(string path)
         {
             fixed (AVFormatContext** ppFormatContext = &decodeInfo.pFormatContext)
             {
@@ -34,7 +34,7 @@ namespace P2PKaraokeSystem.PlaybackLogic.Decode
                 ffmpeg.avformat_find_stream_info(decodeInfo.pFormatContext, null));
         }
 
-        public void RetrieveStreams()
+        private void RetrieveStreams()
         {
             for (var i = 0; i < decodeInfo.pFormatContext->nb_streams; i++)
             {
@@ -66,10 +66,17 @@ namespace P2PKaraokeSystem.PlaybackLogic.Decode
                 decodeInfo.Video.pStream != null || decodeInfo.Audio.pStream != null);
         }
 
-        public void LoadStreams()
+        private void LoadStreams()
         {
             Video.Load();
             Audio.Load();
+        }
+
+        public void Load(string path)
+        {
+            RetrieveFormatAndStreamInfo(path);
+            RetrieveStreams();
+            LoadStreams();
         }
     }
 }

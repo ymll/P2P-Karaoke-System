@@ -12,6 +12,7 @@ namespace P2PKaraokeSystem.PlaybackLogic.Decode
         public SwsContext* pConvertContext;
         public int Width { get { return pCodecContext->width; } }
         public int Height { get { return pCodecContext->height; } }
+        public AVRational FrameRate { get { return pCodecContext->framerate; } }
         public int ImageFrameBufferSize { get; set; }
     }
 }
