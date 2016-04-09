@@ -86,10 +86,12 @@
     <Compile Include="PlaybackLogic\Decode\AudioDecodeInfo.cs" />
     <Compile Include="PlaybackLogic\Decode\AudioLoader.cs" />
     <Compile Include="PlaybackLogic\Decode\MediaDecodeInfo.cs" />
+    <Compile Include="PlaybackLogic\Decode\MediaDecoder.cs" />
     <Compile Include="PlaybackLogic\Decode\MediaLoader.cs" />
     <Compile Include="PlaybackLogic\Decode\StreamDecodeInfo.cs" />
     <Compile Include="PlaybackLogic\Decode\StreamLoader.cs" />
     <Compile Include="PlaybackLogic\Decode\VideoDecodeInfo.cs" />
+    <Compile Include="PlaybackLogic\Decode\VideoDecoder.cs" />
     <Compile Include="PlaybackLogic\Decode\VideoLoader.cs" />
     <Compile Include="PlaybackLogic\FFmpegDecoder.cs" />
     <Compile Include="PlaybackLogic\LyricPlayer.cs" />
