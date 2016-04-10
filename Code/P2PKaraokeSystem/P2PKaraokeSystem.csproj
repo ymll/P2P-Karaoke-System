@@ -112,7 +112,8 @@
     <Compile Include="PlaybackLogic\Native\FFmpeg\FFmpegLoader.cs" />
     <Compile Include="PlaybackLogic\Native\FFmpeg\InteropHelper.cs" />
     <Compile Include="PlaybackLogic\Native\FFmpeg\Unresolved.cs" />
-    <Compile Include="PlaybackLogic\Native\Winmm.cs" />
+    <Compile Include="PlaybackLogic\Native\WaveNative.cs" />
+    <Compile Include="PlaybackLogic\Native\WaveOut.cs" />
     <Compile Include="PlaybackLogic\Util.cs" />
     <Compile Include="PlaybackLogic\VideoHeaderReader.cs" />
     <Compile Include="View\MainUI.xaml.cs">

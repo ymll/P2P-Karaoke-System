@@ -9,7 +9,6 @@ namespace P2PKaraokeSystem.PlaybackLogic.Decode
 {
     public unsafe class AudioDecodeInfo : StreamDecodeInfo
     {
-        public IntPtr AudioOut;
         public SwrContext* pResampleContext;
 
         public double Clock;
@@ -35,7 +34,6 @@ namespace P2PKaraokeSystem.PlaybackLogic.Decode
 
         public AudioDecodeInfo()
         {
-            this.AudioOut = new IntPtr();
             this.Buffer = new byte[(MAX_AUDIO_FRAME_SIZE * 3) / 2];
         }
 

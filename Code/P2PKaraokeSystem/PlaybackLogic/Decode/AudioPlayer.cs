@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using WinmmLib;
+using WaveLib;
 
 namespace P2PKaraokeSystem.PlaybackLogic.Decode
 {
@@ -17,6 +17,10 @@ namespace P2PKaraokeSystem.PlaybackLogic.Decode
         private PlayerViewModel playerViewModel;
         private PlaybackModel playbackModel;
 
+        private WaveOutPlayer player;
+        private bool hasBuffer;
+        private int current;
+
         public AudioPlayer(AudioDecodeInfo audioDecodeInfo, PlayerViewModel playerViewModel, PlaybackModel playbackModel)
         {
             this.audioDecodeInfo = audioDecodeInfo;
@@ -25,6 +29,19 @@ namespace P2PKaraokeSystem.PlaybackLogic.Decode
 
             this.playbackModel.PropertyChanged += playbackModel_PropertyChanged;
             this.playerViewModel.PropertyChanged += playerViewModel_PropertyChanged;
+
+            WaveFormat fmt = new WaveFormat(44100, 16, 2);
+            player = new WaveOutPlayer(-1, fmt, 109200, 2, Filler);
+        }
+
+        private void Filler(IntPtr data, int size)
+        {
+            if (hasBuffer)
+            {
+                IntPtr start = new IntPtr(this.playerViewModel.CurrentAudioFrame.Item1.ToInt32() + current);
+                CopyMemory(data, start, size);
+                current += size;
+            }
         }
 
         private void playbackModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -41,7 +58,6 @@ namespace P2PKaraokeSystem.PlaybackLogic.Decode
                         frameReader.Load(aviHeaderParser.AudioHeaderReader);
                         frameReader.ReadFrameFully(aviHeaderParser.AudioHeaderReader);
 
-                        OpenDevice(aviHeaderParser.AudioHeaderReader.FormatInfo);
                         this.playerViewModel.CurrentAudioFrame = new Tuple<IntPtr, int>(frameReader.FramePointer, frameReader.FrameSize);
                     }
                     break;
@@ -50,22 +66,22 @@ namespace P2PKaraokeSystem.PlaybackLogic.Decode
                 case "State":
                     if (playbackModel.CurrentVideo != null && playbackModel.State == PlayState.Playing)
                     {
-                        Winmm.waveOutRestart(audioDecodeInfo.AudioOut);
+                        WaveNative.waveOutRestart(player.m_WaveOut);
                     }
                     else
                     {
-                        Winmm.waveOutPause(audioDecodeInfo.AudioOut);
+                        WaveNative.waveOutPause(player.m_WaveOut);
                     }
                     break;
 
                 case "Volume":
                     if (this.playbackModel.Volume == 0)
                     {
-                        Winmm.waveOutSetVolume(audioDecodeInfo.AudioOut, 0);
+                        WaveNative.waveOutSetVolume(player.m_WaveOut, 0);
                     }
                     else
                     {
-                        Winmm.waveOutSetVolume(audioDecodeInfo.AudioOut, 0xFFFF);
+                        WaveNative.waveOutSetVolume(player.m_WaveOut, 0xFFFF);
                     }
                     break;
             }
@@ -76,51 +92,13 @@ namespace P2PKaraokeSystem.PlaybackLogic.Decode
             switch (e.PropertyName)
             {
                 case "CurrentAudioFrame":
-                    WriteToStream(this.playerViewModel.CurrentAudioFrame.Item1, this.playerViewModel.CurrentAudioFrame.Item2);
+                    this.hasBuffer = true;
+                    this.current = 0;
                     break;
             }
         }
 
-        private void OpenDevice(Avi.PCMWAVEFORMAT audioFormatInfo)
-        {
-            uint err = Winmm.waveOutOpen(ref audioDecodeInfo.AudioOut, new IntPtr(Winmm.WAVE_MAPPER), ref audioFormatInfo, this.WaveOutProc, IntPtr.Zero, Winmm.WaveInOpenFlags.CALLBACK_FUNCTION);
-
-            if (err != 0)
-            {
-                string errString = Winmm.waveOutGetErrorText(err);
-                System.Diagnostics.Trace.WriteLine(errString);
-            }
-        }
-
-        private void WriteToStream(IntPtr buffer, int bufferSize)
-        {
-            Winmm.WAVEHDR hdr = new Winmm.WAVEHDR();
-            hdr.lpData = buffer;
-            hdr.dwBufferLength = (uint)(bufferSize);
-            hdr.dwFlags = Winmm.WaveHdrFlags.WHDR_PREPARED;
-
-            var waveHdrPtr = Marshal.AllocHGlobal(Marshal.SizeOf(hdr));
-            Marshal.StructureToPtr(hdr, waveHdrPtr, true);
-
-            uint err = Winmm.waveOutPrepareHeader(audioDecodeInfo.AudioOut, waveHdrPtr, Marshal.SizeOf(hdr));
-            if (err != 0)
-            {
-                string errString = Winmm.waveOutGetErrorText(err);
-                System.Diagnostics.Trace.WriteLine(errString);
-            }
-
-            err = Winmm.waveOutWrite(audioDecodeInfo.AudioOut, ref hdr, (uint)Marshal.SizeOf(hdr));
-            if (err != 0)
-            {
-                string errString = Winmm.waveOutGetErrorText(err);
-                System.Diagnostics.Trace.WriteLine(errString);
-            }
-            System.Threading.Thread.Sleep(5);
-        }
-
-        private void WaveOutProc(IntPtr hWaveOut, Winmm.WOM_Messages msg, IntPtr dwInstance, ref Winmm.WAVEHDR wavehdr, IntPtr lParam)
-        {
-
-        }
+        [System.Runtime.InteropServices.DllImport("Kernel32.dll", EntryPoint = "RtlMoveMemory")]
+        public static extern void CopyMemory(IntPtr Destination, IntPtr Source, int Length);
     }
 }
