@@ -18,8 +18,7 @@ namespace P2PKaraokeSystem.PlaybackLogic.Decode
         private PlaybackModel playbackModel;
 
         private WaveOutPlayer player;
-        private bool hasBuffer;
-        private int current;
+        private AudioWaveData latestWaveData;
 
         public AudioPlayer(AudioDecodeInfo audioDecodeInfo, PlayerViewModel playerViewModel, PlaybackModel playbackModel)
         {
@@ -28,7 +27,6 @@ namespace P2PKaraokeSystem.PlaybackLogic.Decode
             this.playbackModel = playbackModel;
 
             this.playbackModel.PropertyChanged += playbackModel_PropertyChanged;
-            this.playerViewModel.PropertyChanged += playerViewModel_PropertyChanged;
 
             WaveFormat fmt = new WaveFormat(44100, 16, 2);
             player = new WaveOutPlayer(-1, fmt, 109200, 2, Filler);
@@ -36,11 +34,29 @@ namespace P2PKaraokeSystem.PlaybackLogic.Decode
 
         private void Filler(IntPtr data, int size)
         {
-            if (hasBuffer)
+            while (size > 0)
             {
-                IntPtr start = new IntPtr(this.playerViewModel.CurrentAudioFrame.Item1.ToInt32() + current);
-                CopyMemory(data, start, size);
-                current += size;
+                if (latestWaveData.size <= 0)
+                {
+                    latestWaveData = this.playerViewModel.PendingAudioWaveData.Take();
+                }
+
+                int bufferAvailable = latestWaveData.size - latestWaveData.start;
+                int copySize = Math.Min(size, bufferAvailable);
+
+                if (copySize > 0)
+                {
+                    IntPtr bufferPtr = new IntPtr(latestWaveData.data.ToInt32() + latestWaveData.start);
+                    CopyMemory(data, bufferPtr, copySize);
+                    latestWaveData.start += copySize;
+                }
+
+                if (latestWaveData.start >= latestWaveData.size)
+                {
+                    latestWaveData.size = latestWaveData.start = 0;
+                }
+
+                size -= copySize;
             }
         }
 
@@ -58,7 +74,11 @@ namespace P2PKaraokeSystem.PlaybackLogic.Decode
                         frameReader.Load(aviHeaderParser.AudioHeaderReader);
                         frameReader.ReadFrameFully(aviHeaderParser.AudioHeaderReader);
 
-                        this.playerViewModel.CurrentAudioFrame = new Tuple<IntPtr, int>(frameReader.FramePointer, frameReader.FrameSize);
+                        AudioWaveData audioWaveData = new AudioWaveData();
+                        audioWaveData.data = frameReader.FramePointer;
+                        audioWaveData.start = 0;
+                        audioWaveData.size = frameReader.FrameSize;
+                        this.playerViewModel.PendingAudioWaveData.Add(audioWaveData);
                     }
                     break;
 
@@ -83,17 +103,6 @@ namespace P2PKaraokeSystem.PlaybackLogic.Decode
                     {
                         WaveNative.waveOutSetVolume(player.m_WaveOut, 0xFFFF);
                     }
-                    break;
-            }
-        }
-
-        private void playerViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
-        {
-            switch (e.PropertyName)
-            {
-                case "CurrentAudioFrame":
-                    this.hasBuffer = true;
-                    this.current = 0;
                     break;
             }
         }

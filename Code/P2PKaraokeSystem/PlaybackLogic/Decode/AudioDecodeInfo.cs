@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using WaveLib;
 
 namespace P2PKaraokeSystem.PlaybackLogic.Decode
 {
@@ -19,18 +20,19 @@ namespace P2PKaraokeSystem.PlaybackLogic.Decode
         public const int AUDIO_DIFF_AVG_NB = 20;
         public const int SAMPLE_CORRECTION_PERCENT_MAX = 10;
 
-        public AVPacket* pPacket;
         public sbyte* PacketData;
         public int PacketSize;
 
         public byte[] Buffer;
         public int BufferCurrentIndex { get; set; }
         public int BufferSize { get; set; }
-        public const int MAX_BUFFER_SIZE = 1024;
+        public const int MAX_BUFFER_SIZE = 192000;
         public const int MAX_AUDIO_FRAME_SIZE = 192000;
 
         public int Frequency { get { return pCodecContext->sample_rate; } }
         public int NumOfChannels { get { return pCodecContext->channels; } }
+
+        public BufferFillEventHandler FillHandler;
 
         public AudioDecodeInfo()
         {

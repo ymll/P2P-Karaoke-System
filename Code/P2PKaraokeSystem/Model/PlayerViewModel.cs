@@ -34,14 +34,9 @@ namespace P2PKaraokeSystem.Model
         private const int DEFAULT_MAX_BUFFER_SIZE_IN_MEGABYTE = 200;
         public int MaxBufferSizeInMegabyte { get; private set; }
 
-        private Tuple<IntPtr, int> _currentAudioFrame;
-        public Tuple<IntPtr, int> CurrentAudioFrame
-        {
-            get { return _currentAudioFrame; }
-            set { SetField(ref _currentAudioFrame, value, "CurrentAudioFrame"); }
-        }
-
         public BlockingCollection<AVPacket> PendingAudioFrames { get; private set; }
+
+        public BlockingCollection<AudioWaveData> PendingAudioWaveData { get; private set; }
 
         public PlayerViewModel()
         {
@@ -50,6 +45,14 @@ namespace P2PKaraokeSystem.Model
             this.AvailableImageBufferPool = new BlockingCollection<IntPtr>(new ConcurrentBag<IntPtr>());
 
             this.PendingAudioFrames = new BlockingCollection<AVPacket>(new ConcurrentQueue<AVPacket>());
+            this.PendingAudioWaveData = new BlockingCollection<AudioWaveData>();
         }
+    }
+
+    public struct AudioWaveData
+    {
+        public IntPtr data;
+        public int start;
+        public int size;
     }
 }
