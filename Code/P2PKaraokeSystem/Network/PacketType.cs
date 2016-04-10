@@ -15,6 +15,7 @@ namespace P2PKaraokeSystem.Network
         MEDIA_INFO,
         VIDEO_STREAM,
         AUDIO_STREAM,
+        LYRIC_REQUEST,
         SUBTITLE,
         UNDEFINED
     }

@@ -69,6 +69,7 @@ namespace P2PKaraokeSystem.Network
                     PacketType.MEDIA_INFO,
                     PacketType.PLAY_REQUEST,
                     PacketType.VIDEO_STREAM,
+                    PacketType.LYRIC_REQUEST,
                     PacketType.AUDIO_STREAM,
                     PacketType.SUBTITLE
                 };       
