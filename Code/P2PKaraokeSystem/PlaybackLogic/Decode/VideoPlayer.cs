@@ -18,6 +18,7 @@ namespace P2PKaraokeSystem.PlaybackLogic.Decode
         private VideoDecodeInfo videoDecodeInfo;
         private PlayerViewModel playerViewModel;
         private ManualResetEventSlim isVideoPlayingEvent;
+        private double lastPts = 0;
 
         public VideoPlayer(VideoDecodeInfo videoDecodeInfo, PlayerViewModel playerViewModel, ManualResetEventSlim isVideoPlayingEvent)
         {
@@ -30,14 +31,19 @@ namespace P2PKaraokeSystem.PlaybackLogic.Decode
         {
             this.isVideoPlayingEvent.Wait();
 
-            IntPtr imageFramePtr = this.playerViewModel.PendingVideoFrames.Take();
-            var pImageFrame = (AVFrame*)imageFramePtr.ToPointer();
+            Tuple<IntPtr, double> imageFramePtr = this.playerViewModel.PendingVideoFrames.Take();
+            var pImageFrame = (AVFrame*)imageFramePtr.Item1.ToPointer();
 
             WriteImageToBuffer(pImageFrame);
-            this.playerViewModel.AvailableImageBufferPool.Add(imageFramePtr);
+            this.playerViewModel.AvailableImageBufferPool.Add(imageFramePtr.Item1);
 
-            int sleepTime = (int)(videoDecodeInfo.FrameRate.den * 1000.0 / Math.Max(videoDecodeInfo.FrameRate.num, 10));
-            Thread.Sleep(sleepTime);
+            double pts = imageFramePtr.Item2;
+            if (pts < lastPts)
+            {
+                lastPts = 0;
+            }
+            Thread.Sleep(TimeSpan.FromSeconds(pts - lastPts));
+            this.lastPts = pts;
         }
 
         private void WriteImageToBuffer(AVFrame* pImageFrame)

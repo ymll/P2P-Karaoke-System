@@ -43,6 +43,7 @@ namespace P2PKaraokeSystem.PlaybackLogic.Decode
         {
             AVPacket packet = new AVPacket();
             AVPacket* pPacket = &packet;
+            double pts = 0;
 
             ffmpeg.av_init_packet(pPacket);
 
@@ -54,7 +55,7 @@ namespace P2PKaraokeSystem.PlaybackLogic.Decode
                 {
                     if (packet.stream_index == mediaDecodeInfo.Video.pStream->index)
                     {
-                        this.videoDecoder.Decode(pPacket);
+                        pts = this.videoDecoder.Decode(pPacket, pts);
                     }
                     else if (packet.stream_index == mediaDecodeInfo.Audio.pStream->index)
                     {

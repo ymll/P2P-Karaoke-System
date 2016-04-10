@@ -84,9 +84,16 @@ namespace P2PKaraokeSystem.PlaybackLogic
 
         private void UnLoad()
         {
+            Tuple<IntPtr, double> imageFramePtrWithTime;
             IntPtr imageFramePtr;
-            while (this.playerViewModel.PendingVideoFrames.TryTake(out imageFramePtr)
-                || this.playerViewModel.AvailableImageBufferPool.TryTake(out imageFramePtr))
+            while (this.playerViewModel.PendingVideoFrames.TryTake(out imageFramePtrWithTime))
+            {
+                var pImageFrame = (AVFrame*)imageFramePtrWithTime.Item1.ToPointer();
+                ffmpeg.av_free(pImageFrame->data0);
+                ffmpeg.av_frame_free(&pImageFrame);
+            }
+
+            while (this.playerViewModel.AvailableImageBufferPool.TryTake(out imageFramePtr))
             {
                 var pImageFrame = (AVFrame*)imageFramePtr.ToPointer();
                 ffmpeg.av_free(pImageFrame->data0);

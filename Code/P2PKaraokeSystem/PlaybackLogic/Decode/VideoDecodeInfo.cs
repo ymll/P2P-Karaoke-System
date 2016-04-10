@@ -10,7 +10,7 @@ namespace P2PKaraokeSystem.PlaybackLogic.Decode
     public unsafe class VideoDecodeInfo : StreamDecodeInfo
     {
         public SwsContext* pConvertContext;
-        public double CurrentPtsTime;
+        public double Clock;
         public int Width { get { return pCodecContext->width; } }
         public int Height { get { return pCodecContext->height; } }
         public AVRational FrameRate { get { return pCodecContext->framerate; } }
@@ -18,8 +18,8 @@ namespace P2PKaraokeSystem.PlaybackLogic.Decode
 
         public double GetClock()
         {
-            double delta = (ffmpeg.av_gettime() - CurrentPtsTime) / 1000000.0;
-            return CurrentPtsTime + delta;
+            double delta = (ffmpeg.av_gettime() - Clock) / 1000000.0;
+            return Clock + delta;
         }
     }
 }

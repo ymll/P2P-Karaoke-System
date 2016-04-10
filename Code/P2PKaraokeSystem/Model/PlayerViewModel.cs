@@ -27,7 +27,7 @@ namespace P2PKaraokeSystem.Model
 
         public bool IsQuit { get; set; }
 
-        public BlockingCollection<IntPtr> PendingVideoFrames { get; private set; }
+        public BlockingCollection<Tuple<IntPtr, double>> PendingVideoFrames { get; private set; }
 
         public BlockingCollection<IntPtr> AvailableImageBufferPool { get; private set; }
 
@@ -40,7 +40,7 @@ namespace P2PKaraokeSystem.Model
 
         public PlayerViewModel()
         {
-            this.PendingVideoFrames = new BlockingCollection<IntPtr>(new ConcurrentQueue<IntPtr>());
+            this.PendingVideoFrames = new BlockingCollection<Tuple<IntPtr, double>>(new ConcurrentQueue<Tuple<IntPtr, double>>());
             this.MaxBufferSizeInMegabyte = DEFAULT_MAX_BUFFER_SIZE_IN_MEGABYTE;
             this.AvailableImageBufferPool = new BlockingCollection<IntPtr>(new ConcurrentBag<IntPtr>());
 

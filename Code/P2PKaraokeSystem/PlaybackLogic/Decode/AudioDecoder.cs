@@ -114,17 +114,7 @@ namespace P2PKaraokeSystem.PlaybackLogic.Decode
 
                 audioDecodeInfo.PacketData = packet.data;
                 audioDecodeInfo.PacketSize = packet.size;
-
-                if ((ulong)packet.pts != ffmpeg.AV_NOPTS_VALUE)
-                {
-                    audioDecodeInfo.Clock = q2d(audioDecodeInfo.pStream->time_base) * packet.pts;
-                }
             }
-        }
-
-        private double q2d(AVRational a)
-        {
-            return a.num / (double)a.den;
         }
 
         private AudioWaveData DecodeFrameFromPacket()

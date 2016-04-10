@@ -624,7 +624,7 @@ namespace FFmpeg.AutoGen
         public const int FF_QP2LAMBDA = 118;
         public const int FF_LAMBDA_MAX = (256*128-1);
         public const int FF_QUALITY_SCALE = FF_LAMBDA_SCALE;
-        public const ulong AV_NOPTS_VALUE = 0x8000000000000000;
+        public const long AV_NOPTS_VALUE = -9223372036854775808;
         public const int AV_TIME_BASE = 1000000;
         public const int LIBAVUTIL_VERSION_MAJOR = 55;
         public const int LIBAVUTIL_VERSION_MINOR = 17;
@@ -920,9 +920,6 @@ namespace FFmpeg.AutoGen
         
         [DllImport(libavutil, EntryPoint = "av_q2intfloat", CallingConvention = CallingConvention.Cdecl)]
         public static extern uint av_q2intfloat(AVRational @q);
-        
-        [DllImport(libavutil, EntryPoint = "av_q2d", CallingConvention = CallingConvention.Cdecl)]
-        public static extern double av_q2d(AVRational @q);
         
         [DllImport(libavutil, EntryPoint = "av_gcd", CallingConvention = CallingConvention.Cdecl)]
         public static extern long av_gcd(long @a, long @b);
