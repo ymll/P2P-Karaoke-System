@@ -143,25 +143,52 @@
 
 
         <!-- Sound Button -->
+
+        <Image x:Name="soundMinImg"
+                Grid.Row="2"
+        	    HorizontalAlignment="Left" VerticalAlignment="Top"
+        	    Height="31" Width="40"
+        	    Margin="50,29,0,0"
+                MouseDown="soundMinImg_MouseDown">
+            <Image.Style>
+                <Style TargetType="{x:Type Image}">
+                    <Style.Triggers>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding IsMouseOver, ElementName=soundMinImg}" Value="True"/>
+                            </MultiDataTrigger.Conditions>
+                            <Setter Property="Source" Value="..\View\UIMaterial\Image\minus_blue.png"/>
+                        </MultiDataTrigger>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding IsMouseOver, ElementName=soundMinImg}" Value="False"/>
+                            </MultiDataTrigger.Conditions>
+                            <Setter Property="Source" Value="..\View\UIMaterial\Image\minus.png"/>
+                        </MultiDataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Image.Style>
+        </Image>
+
         <Image x:Name="soundImg"
                 Grid.Row="2"
         	    HorizontalAlignment="Left" VerticalAlignment="Top"
         	    Height="31" Width="40"
-        	    Margin="30,29,0,0"
+        	    Margin="100,29,0,0"
         	    MouseDown="soundImg_MouseDown">
             <Image.Style>
                 <Style TargetType="{x:Type Image}">
                     <Style.Triggers>
                         <MultiDataTrigger>
                             <MultiDataTrigger.Conditions>
-                                <Condition Binding="{Binding Playback.Volume}" Value="255"/>
+                                <!--<Condition Binding="{Binding Playback.Volume}" Value="255"/>-->
                                 <Condition Binding="{Binding IsMouseOver, ElementName=soundImg}" Value="True"/>
                             </MultiDataTrigger.Conditions>
                             <Setter Property="Source" Value="..\View\UIMaterial\Image\volumeup_blue.png"/>
                         </MultiDataTrigger>
                         <MultiDataTrigger>
                             <MultiDataTrigger.Conditions>
-                                <Condition Binding="{Binding Playback.Volume}" Value="255"/>
+                                <!--<Condition Binding="{Binding Playback.Volume}" Value="255"/>-->
                                 <Condition Binding="{Binding IsMouseOver, ElementName=soundImg}" Value="False"/>
                             </MultiDataTrigger.Conditions>
                             <Setter Property="Source" Value="..\View\UIMaterial\Image\volumeup.png"/>
@@ -184,6 +211,61 @@
                 </Style>
             </Image.Style>
         </Image>
+
+        <Image x:Name="soundPlusImg"
+                Grid.Row="2"
+        	    HorizontalAlignment="Left" VerticalAlignment="Top"
+        	    Height="31" Width="40"
+        	    Margin="150,29,0,0"
+                MouseDown="soundPlusImg_MouseDown">
+            <Image.Style>
+                <Style TargetType="{x:Type Image}">
+                    <Style.Triggers>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding IsMouseOver, ElementName=soundPlusImg}" Value="True"/>
+                            </MultiDataTrigger.Conditions>
+                            <Setter Property="Source" Value="..\View\UIMaterial\Image\plus_blue.png"/>
+                        </MultiDataTrigger>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding IsMouseOver, ElementName=soundPlusImg}" Value="False"/>
+                            </MultiDataTrigger.Conditions>
+                            <Setter Property="Source" Value="..\View\UIMaterial\Image\plus.png"/>
+                        </MultiDataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Image.Style>
+        </Image>
+
+        <!-- Screen Capture-->
+        <Image x:Name="screenCapImg"
+                Grid.Row="2"
+        	    HorizontalAlignment="Left" VerticalAlignment="Top"
+        	    Height="31" Width="40"
+        	    Margin="850,29,0,0">
+            <!--MouseDown="soundImg_MouseDown"-->
+            <Image.Style>
+                <Style TargetType="{x:Type Image}">
+                    <Style.Triggers>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding IsMouseOver, ElementName=screenCapImg}" Value="True"/>
+                            </MultiDataTrigger.Conditions>
+                            <Setter Property="Source" Value="..\View\UIMaterial\Image\screen_blue.png"/>
+                        </MultiDataTrigger>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding IsMouseOver, ElementName=screenCapImg}" Value="False"/>
+                            </MultiDataTrigger.Conditions>
+                            <Setter Property="Source" Value="..\View\UIMaterial\Image\screen.png"/>
+                        </MultiDataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Image.Style>
+        </Image>
+
+
 
         <!-- Lyric Box -->
         <Label x:Name="lyric"

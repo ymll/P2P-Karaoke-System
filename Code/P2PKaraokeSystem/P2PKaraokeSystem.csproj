@@ -232,6 +232,12 @@
     <Content Include="lib\x86\swscale-4.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Resource Include="View\UIMaterial\Image\minus.png" />
+    <Resource Include="View\UIMaterial\Image\minus_blue.png" />
+    <Resource Include="View\UIMaterial\Image\plus.png" />
+    <Resource Include="View\UIMaterial\Image\plus_blue.png" />
+    <Resource Include="View\UIMaterial\Image\screen.png" />
+    <Resource Include="View\UIMaterial\Image\screen_blue.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
