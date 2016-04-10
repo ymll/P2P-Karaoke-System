@@ -32,6 +32,11 @@ namespace P2PKaraokeSystem.PlaybackLogic.Decode
             {
                 Start();
             }).Start();
+
+            new Thread(() =>
+            {
+                audioDecoder.Start();
+            }).Start();
         }
 
         private void Start()

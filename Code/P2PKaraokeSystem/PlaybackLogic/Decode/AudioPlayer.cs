@@ -29,11 +29,13 @@ namespace P2PKaraokeSystem.PlaybackLogic.Decode
             this.playbackModel.PropertyChanged += playbackModel_PropertyChanged;
 
             WaveFormat fmt = new WaveFormat(44100, 16, 2);
-            player = new WaveOutPlayer(-1, fmt, 109200, 2, Filler);
+            player = new WaveOutPlayer(-1, fmt, 109200, 10, Filler);
         }
 
         private void Filler(IntPtr data, int size)
         {
+            int bufferCurrentIndex = 0;
+
             while (size > 0)
             {
                 if (latestWaveData.size <= 0)
@@ -46,8 +48,10 @@ namespace P2PKaraokeSystem.PlaybackLogic.Decode
 
                 if (copySize > 0)
                 {
-                    IntPtr bufferPtr = new IntPtr(latestWaveData.data.ToInt32() + latestWaveData.start);
-                    CopyMemory(data, bufferPtr, copySize);
+                    IntPtr srcPtr = new IntPtr(latestWaveData.data.ToInt32() + latestWaveData.start);
+                    IntPtr dstPtr = new IntPtr(data.ToInt32() + bufferCurrentIndex);
+                    CopyMemory(dstPtr, srcPtr, copySize);
+                    bufferCurrentIndex += copySize;
                     latestWaveData.start += copySize;
                 }
 
@@ -64,24 +68,6 @@ namespace P2PKaraokeSystem.PlaybackLogic.Decode
         {
             switch (e.PropertyName)
             {
-                case "Loaded":
-                    if (this.playbackModel.Loaded)
-                    {
-                        var aviHeaderParser = new P2PKaraokeSystem.PlaybackLogic.AviHeaderParser();
-                        aviHeaderParser.LoadFile(this.playbackModel.CurrentVideo.FilePath);
-
-                        AudioFrameReader frameReader = new AudioFrameReader();
-                        frameReader.Load(aviHeaderParser.AudioHeaderReader);
-                        frameReader.ReadFrameFully(aviHeaderParser.AudioHeaderReader);
-
-                        AudioWaveData audioWaveData = new AudioWaveData();
-                        audioWaveData.data = frameReader.FramePointer;
-                        audioWaveData.start = 0;
-                        audioWaveData.size = frameReader.FrameSize;
-                        this.playerViewModel.PendingAudioWaveData.Add(audioWaveData);
-                    }
-                    break;
-
                 case "CurrentVideo":
                 case "State":
                     if (playbackModel.CurrentVideo != null && playbackModel.State == PlayState.Playing)

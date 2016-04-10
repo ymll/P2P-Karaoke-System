@@ -19,7 +19,6 @@ namespace P2PKaraokeSystem.PlaybackLogic.Decode
             this.audioDecodeInfo = audioDecodeInfo;
             this.mediaDecodeInfo = mediaDecodeInfo;
             this.playerViewModel = playerViewModel;
-            audioDecodeInfo.FillHandler = AudioCallback;
         }
 
         public void OnNewPacket(AVPacket* pAudioPacket)
@@ -32,8 +31,9 @@ namespace P2PKaraokeSystem.PlaybackLogic.Decode
             playerViewModel.PendingAudioFrames.Add(audioPacketCopy);
         }
 
-        private int Decode(out double pts)
+        private AudioWaveData? Decode(out double pts)
         {
+            AudioWaveData audioWaveData = new AudioWaveData();
             AVPacket* pPacket = null;
             int dataSize = 0;
             int n;
@@ -57,7 +57,7 @@ namespace P2PKaraokeSystem.PlaybackLogic.Decode
                     {
                         if (audioDecodeInfo.pFrame->format != (int)AVSampleFormat.AV_SAMPLE_FMT_S16)
                         {
-                            dataSize = DecodeFrameFromPacket();
+                            return DecodeFrameFromPacket();
                         }
                         else
                         {
@@ -67,9 +67,12 @@ namespace P2PKaraokeSystem.PlaybackLogic.Decode
                                 audioDecodeInfo.pFrame->nb_samples,
                                 audioDecodeInfo.pCodecContext->sample_fmt,
                                 1);
-                            fixed (byte* bufferPtr = audioDecodeInfo.Buffer)
+
+                            byte[] buffer = new byte[dataSize];
+                            fixed (byte* bufferPtr = buffer)
                             {
                                 CopyMemory((IntPtr)bufferPtr, (IntPtr)audioDecodeInfo.pFrame->data0, dataSize);
+                                audioWaveData.data = (IntPtr)bufferPtr;
                             }
                         }
                     }
@@ -86,7 +89,9 @@ namespace P2PKaraokeSystem.PlaybackLogic.Decode
                     n = 2 * audioDecodeInfo.NumOfChannels;
                     audioDecodeInfo.Clock += (dataSize / (double)(n * audioDecodeInfo.pCodecContext->sample_rate));
 
-                    return dataSize;
+                    audioWaveData.start = 0;
+                    audioWaveData.size = dataSize;
+                    return audioWaveData;
                 }
 
                 if (pPacket != null && pPacket->data != null)
@@ -96,7 +101,7 @@ namespace P2PKaraokeSystem.PlaybackLogic.Decode
 
                 if (playerViewModel.IsQuit)
                 {
-                    return -1;
+                    return null;
                 }
 
                 AVPacket packet = playerViewModel.PendingAudioFrames.Take();
@@ -122,8 +127,10 @@ namespace P2PKaraokeSystem.PlaybackLogic.Decode
             return a.num / (double)a.den;
         }
 
-        private int DecodeFrameFromPacket()
+        private AudioWaveData DecodeFrameFromPacket()
         {
+            AudioWaveData audioWaveData = new AudioWaveData();
+
             long src_ch_layout, dst_ch_layout;
             long src_rate, dst_rate;
             sbyte** src_data = null;
@@ -177,9 +184,13 @@ namespace P2PKaraokeSystem.PlaybackLogic.Decode
             dst_bufsize = ffmpeg.av_samples_get_buffer_size(&dst_linesize, dst_nb_channels, (int)dst_nb_samples, dst_sample_fmt, 1);
             Util.AssertNonNegative("Cannot get sample buffer size", dst_bufsize);
 
-            fixed (byte* pBuffer = audioDecodeInfo.Buffer)
+            byte[] buffer = new byte[dst_bufsize];
+            fixed (byte* pBuffer = buffer)
             {
                 CopyMemory((IntPtr)pBuffer, (IntPtr)dst_data[0], dst_bufsize);
+                audioWaveData.data = (IntPtr)pBuffer;
+                audioWaveData.start = 0;
+                audioWaveData.size = dst_bufsize;
             }
 
             if (src_data != null)
@@ -194,50 +205,20 @@ namespace P2PKaraokeSystem.PlaybackLogic.Decode
             }
             ffmpeg.av_freep(&dst_data);
 
-            return dst_bufsize;
+            return audioWaveData;
         }
 
-        private void AudioCallback(IntPtr buffer, int audioDeviceBufferSize)
+        public void Start()
         {
-            double pts;
-            int writeLen;
-
-            while (audioDeviceBufferSize > 0)
+            for (; ; )
             {
-                bool isDataInBufferAllSent = audioDecodeInfo.BufferCurrentIndex >= audioDecodeInfo.BufferSize;
+                double pts = 0;
+                AudioWaveData? audioWaveData = Decode(out pts);
 
-                // Get new audio data if data all sent
-                if (isDataInBufferAllSent)
+                if (audioWaveData.HasValue)
                 {
-                    int audioSize = Decode(out pts);
-                    if (audioSize < 0)
-                    {
-                        audioDecodeInfo.BufferSize = AudioDecodeInfo.MAX_BUFFER_SIZE;
-                    }
-                    else
-                    {
-                        fixed (byte* bufferPtr = audioDecodeInfo.Buffer)
-                        {
-                            audioSize = SyncAudio((short*)bufferPtr, audioSize, pts);
-                        }
-                        audioDecodeInfo.BufferSize = audioSize;
-                    }
-                    audioDecodeInfo.BufferCurrentIndex = 0;
+                    playerViewModel.PendingAudioWaveData.Add(audioWaveData.Value);
                 }
-
-                writeLen = audioDecodeInfo.BufferSize - audioDecodeInfo.BufferCurrentIndex;
-                if (writeLen > audioDeviceBufferSize)
-                {
-                    writeLen = audioDeviceBufferSize;
-                }
-
-                fixed (byte* audioBuffer = audioDecodeInfo.Buffer)
-                {
-                    CopyMemory(buffer, (IntPtr)audioBuffer, writeLen);
-                }
-                audioDecodeInfo.BufferSize -= writeLen;
-                audioDecodeInfo.BufferCurrentIndex += writeLen;
-                buffer += writeLen;
             }
         }
 

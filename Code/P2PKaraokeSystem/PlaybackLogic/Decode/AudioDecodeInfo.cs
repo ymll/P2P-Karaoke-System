@@ -23,21 +23,11 @@ namespace P2PKaraokeSystem.PlaybackLogic.Decode
         public sbyte* PacketData;
         public int PacketSize;
 
-        public byte[] Buffer;
-        public int BufferCurrentIndex { get; set; }
-        public int BufferSize { get; set; }
-        public const int MAX_BUFFER_SIZE = 192000;
-        public const int MAX_AUDIO_FRAME_SIZE = 192000;
+        public const int MAX_BUFFER_SIZE = 409600;
+        public const int MAX_AUDIO_FRAME_SIZE = 409600;
 
         public int Frequency { get { return pCodecContext->sample_rate; } }
         public int NumOfChannels { get { return pCodecContext->channels; } }
-
-        public BufferFillEventHandler FillHandler;
-
-        public AudioDecodeInfo()
-        {
-            this.Buffer = new byte[(MAX_AUDIO_FRAME_SIZE * 3) / 2];
-        }
 
         public double GetClock()
         {
@@ -45,14 +35,14 @@ namespace P2PKaraokeSystem.PlaybackLogic.Decode
             int hw_buf_size, bytes_per_sec, n;
 
             pts = Clock;
-            hw_buf_size = BufferSize - BufferCurrentIndex;
+            //hw_buf_size = BufferSize - BufferCurrentIndex;
             bytes_per_sec = 0;
             n = pCodecContext->channels * 2;
             bytes_per_sec = pCodecContext->sample_rate * n;
 
             if (bytes_per_sec != 0)
             {
-                pts -= (double)hw_buf_size / bytes_per_sec;
+                //pts -= (double)hw_buf_size / bytes_per_sec;
             }
             return pts;
         }
