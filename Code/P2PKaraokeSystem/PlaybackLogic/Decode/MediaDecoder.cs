@@ -12,17 +12,17 @@ namespace P2PKaraokeSystem.PlaybackLogic.Decode
     public unsafe class MediaDecoder
     {
         private VideoDecoder videoDecoder;
-        private AudioDecoder audioDecoder;
 
         private MediaDecodeInfo mediaDecodeInfo;
+        private PlayerViewModel playerViewModel;
         private ManualResetEventSlim isVideoLoadedEvent;
 
         public MediaDecoder(MediaDecodeInfo mediaDecodeInfo, PlayerViewModel playerViewModel, ManualResetEventSlim isVideoLoadedEvent)
         {
             this.videoDecoder = new VideoDecoder(mediaDecodeInfo.Video, playerViewModel);
-            this.audioDecoder = new AudioDecoder(mediaDecodeInfo.Audio, mediaDecodeInfo, playerViewModel);
 
             this.mediaDecodeInfo = mediaDecodeInfo;
+            this.playerViewModel = playerViewModel;
             this.isVideoLoadedEvent = isVideoLoadedEvent;
         }
 
@@ -31,11 +31,6 @@ namespace P2PKaraokeSystem.PlaybackLogic.Decode
             new Thread(() =>
             {
                 Start();
-            }).Start();
-
-            new Thread(() =>
-            {
-                audioDecoder.Start();
             }).Start();
         }
 
@@ -59,7 +54,12 @@ namespace P2PKaraokeSystem.PlaybackLogic.Decode
                     }
                     else if (packet.stream_index == mediaDecodeInfo.Audio.pStream->index)
                     {
-                        this.audioDecoder.OnNewPacket(pPacket);
+                        AVPacket audioPacketCopy = new AVPacket();
+
+                        Util.AssertZero("Cannot setup new packet",
+                            ffmpeg.av_packet_ref(&audioPacketCopy, pPacket));
+
+                        playerViewModel.PendingAudioPackets.Add(audioPacketCopy);
                     }
                 }
             }

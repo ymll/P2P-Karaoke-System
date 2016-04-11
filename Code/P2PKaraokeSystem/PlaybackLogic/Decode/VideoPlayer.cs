@@ -13,7 +13,7 @@ using System.Windows.Media.Imaging;
 
 namespace P2PKaraokeSystem.PlaybackLogic.Decode
 {
-    public unsafe class VideoPlayer
+    public unsafe class VideoPlayer : Job
     {
         private VideoDecodeInfo videoDecodeInfo;
         private PlayerViewModel playerViewModel;
@@ -27,10 +27,8 @@ namespace P2PKaraokeSystem.PlaybackLogic.Decode
             this.isVideoPlayingEvent = isVideoPlayingEvent;
         }
 
-        public void Play()
+        public void RunRepeatly(ManualResetEventSlim stopSignal, ManualResetEventSlim continueSignal)
         {
-            this.isVideoPlayingEvent.Wait();
-
             Tuple<IntPtr, double> imageFramePtr = this.playerViewModel.PendingVideoFrames.Take();
             var pImageFrame = (AVFrame*)imageFramePtr.Item1.ToPointer();
 
@@ -44,6 +42,11 @@ namespace P2PKaraokeSystem.PlaybackLogic.Decode
             }
             Thread.Sleep(TimeSpan.FromSeconds(pts - lastPts));
             this.lastPts = pts;
+        }
+
+        public void CleanUp()
+        {
+
         }
 
         private void WriteImageToBuffer(AVFrame* pImageFrame)

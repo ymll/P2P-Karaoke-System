@@ -64,7 +64,7 @@ namespace P2PKaraokeSystem.View
 
             this._karaokeSystemModel = (KaraokeSystemModel)this.DataContext;
             new LyricPlayer(this._karaokeSystemModel.Playback, this._karaokeSystemModel.View);
-            new FFmpegDecoder(this._karaokeSystemModel.View, this._karaokeSystemModel.Playback);
+            new FFmpegDecoder(this._karaokeSystemModel.View, this._karaokeSystemModel.Playback).StartAsync();
         }
 
         private void playImg_MouseDown(object sender, MouseButtonEventArgs e)

@@ -29,7 +29,9 @@ namespace P2PKaraokeSystem.PlaybackLogic
         private MediaDecodeInfo mediaDecodeInfo;
         private MediaLoader mediaLoader;
         private MediaDecoder mediaDecoder;
-        private MediaPlayer mediaPlayer;
+
+        private JobThread audioDecoderThread;
+        private JobThread videoPlayerThread;
 
         public FFmpegDecoder(PlayerViewModel playerViewModel, PlaybackModel playbackModel)
         {
@@ -41,12 +43,16 @@ namespace P2PKaraokeSystem.PlaybackLogic
             mediaDecodeInfo = new MediaDecodeInfo();
             mediaLoader = new MediaLoader(mediaDecodeInfo, playerViewModel);
             mediaDecoder = new MediaDecoder(mediaDecodeInfo, playerViewModel, isVideoLoadedEvent);
-            mediaPlayer = new MediaPlayer(mediaDecodeInfo, playerViewModel, playbackModel, isVideoPlayingEvent);
+
+            var audioDecoder = new AudioDecoder(mediaDecodeInfo.Audio, mediaDecodeInfo, playerViewModel);
+
+            var videoPlayer = new VideoPlayer(mediaDecodeInfo.Video, playerViewModel, isVideoPlayingEvent);
+            var audioPlayer = new AudioPlayer(mediaDecodeInfo.Audio, playerViewModel, playbackModel);
+
+            audioDecoderThread = new JobThread("Audio Decoder", audioDecoder, null, null);
+            videoPlayerThread = new JobThread("Video Player", videoPlayer, null, isVideoPlayingEvent);
 
             playbackModel.PropertyChanged += playbackModel_PropertyChanged;
-
-            mediaPlayer.StartAsync();
-            mediaDecoder.StartAsync();
         }
 
         void playbackModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -80,6 +86,13 @@ namespace P2PKaraokeSystem.PlaybackLogic
         {
             mediaLoader.Load(path);
             this.playbackModel.Loaded = true;
+        }
+
+        public void StartAsync()
+        {
+            videoPlayerThread.Start();
+            audioDecoderThread.Start();
+            mediaDecoder.StartAsync();
         }
 
         private void UnLoad()

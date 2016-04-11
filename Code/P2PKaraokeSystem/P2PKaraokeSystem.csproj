@@ -90,7 +90,6 @@
     <Compile Include="PlaybackLogic\Decode\MediaDecodeInfo.cs" />
     <Compile Include="PlaybackLogic\Decode\MediaDecoder.cs" />
     <Compile Include="PlaybackLogic\Decode\MediaLoader.cs" />
-    <Compile Include="PlaybackLogic\Decode\MediaPlayer.cs" />
     <Compile Include="PlaybackLogic\Decode\StreamDecodeInfo.cs" />
     <Compile Include="PlaybackLogic\Decode\StreamLoader.cs" />
     <Compile Include="PlaybackLogic\Decode\VideoDecodeInfo.cs" />
