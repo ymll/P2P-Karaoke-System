@@ -28,8 +28,8 @@ namespace P2PKaraokeSystem.PlaybackLogic
 
         private MediaDecodeInfo mediaDecodeInfo;
         private MediaLoader mediaLoader;
-        private MediaDecoder mediaDecoder;
 
+        private JobThread frameReaderThread;
         private JobThread audioDecoderThread;
         private JobThread videoPlayerThread;
 
@@ -42,13 +42,14 @@ namespace P2PKaraokeSystem.PlaybackLogic
 
             mediaDecodeInfo = new MediaDecodeInfo();
             mediaLoader = new MediaLoader(mediaDecodeInfo, playerViewModel);
-            mediaDecoder = new MediaDecoder(mediaDecodeInfo, playerViewModel, isVideoLoadedEvent);
 
+            var frameReader = new MediaDecoder(mediaDecodeInfo, playerViewModel);
             var audioDecoder = new AudioDecoder(mediaDecodeInfo.Audio, mediaDecodeInfo, playerViewModel);
 
             var videoPlayer = new VideoPlayer(mediaDecodeInfo.Video, playerViewModel, isVideoPlayingEvent);
             var audioPlayer = new AudioPlayer(mediaDecodeInfo.Audio, playerViewModel, playbackModel);
 
+            frameReaderThread = new JobThread("Frame Reader", frameReader, null, isVideoLoadedEvent);
             audioDecoderThread = new JobThread("Audio Decoder", audioDecoder, null, null);
             videoPlayerThread = new JobThread("Video Player", videoPlayer, null, isVideoPlayingEvent);
 
@@ -92,7 +93,7 @@ namespace P2PKaraokeSystem.PlaybackLogic
         {
             videoPlayerThread.Start();
             audioDecoderThread.Start();
-            mediaDecoder.StartAsync();
+            frameReaderThread.Start();
         }
 
         private void UnLoad()
