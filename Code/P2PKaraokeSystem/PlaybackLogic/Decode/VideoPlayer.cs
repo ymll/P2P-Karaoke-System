@@ -58,7 +58,7 @@ namespace P2PKaraokeSystem.PlaybackLogic.Decode
             this.playerViewModel.VideoScreenBitmap.Dispatcher.Invoke(() =>
             {
                 this.playerViewModel.VideoScreenBitmap.Lock();
-                CopyMemory(this.playerViewModel.VideoScreenBitmap.BackBuffer, imageBufferPtr, videoDecodeInfo.ImageFrameBufferSize);
+                Util.CopyMemory(this.playerViewModel.VideoScreenBitmap.BackBuffer, imageBufferPtr, videoDecodeInfo.ImageFrameBufferSize);
                 this.playerViewModel.VideoScreenBitmap.AddDirtyRect(new Int32Rect(0, 0, videoDecodeInfo.Width, videoDecodeInfo.Height));
                 this.playerViewModel.VideoScreenBitmap.Unlock();
             });
@@ -77,8 +77,5 @@ namespace P2PKaraokeSystem.PlaybackLogic.Decode
                 }
             });
         }
-
-        [DllImport("Kernel32.dll", EntryPoint = "RtlMoveMemory")]
-        public static extern void CopyMemory(IntPtr Destination, IntPtr Source, int Length);
     }
 }

@@ -50,7 +50,7 @@ namespace P2PKaraokeSystem.PlaybackLogic.Decode
                 {
                     IntPtr srcPtr = new IntPtr(latestWaveData.data.ToInt32() + latestWaveData.start);
                     IntPtr dstPtr = new IntPtr(data.ToInt32() + bufferCurrentIndex);
-                    CopyMemory(dstPtr, srcPtr, copySize);
+                    Util.CopyMemory(dstPtr, srcPtr, copySize);
                     bufferCurrentIndex += copySize;
                     latestWaveData.start += copySize;
                 }
@@ -92,8 +92,5 @@ namespace P2PKaraokeSystem.PlaybackLogic.Decode
                     break;
             }
         }
-
-        [System.Runtime.InteropServices.DllImport("Kernel32.dll", EntryPoint = "RtlMoveMemory")]
-        public static extern void CopyMemory(IntPtr Destination, IntPtr Source, int Length);
     }
 }

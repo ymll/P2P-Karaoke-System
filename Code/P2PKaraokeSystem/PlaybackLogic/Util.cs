@@ -8,6 +8,9 @@ namespace P2PKaraokeSystem.PlaybackLogic
 {
     class Util
     {
+        [System.Runtime.InteropServices.DllImport("Kernel32.dll", EntryPoint = "RtlMoveMemory")]
+        public static extern void CopyMemory(IntPtr Destination, IntPtr Source, int Length);
+
         public static void AssertZero(string errorMessage, int result)
         {
             AssertTrue(errorMessage, result == 0);
