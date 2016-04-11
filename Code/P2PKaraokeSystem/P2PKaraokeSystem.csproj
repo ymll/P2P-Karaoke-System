@@ -78,6 +78,7 @@
     <Compile Include="Network\ClientSendManager.cs" />
     <Compile Include="Network\DataReceiveListener.cs" />
     <Compile Include="Network\DataSendListener.cs" />
+    <Compile Include="Network\ServerStruct.cs" />
     <Compile Include="Network\PacketType.cs" />
     <Compile Include="Network\ServerReceiveManager.cs" />
     <Compile Include="Network\ServerSendManager.cs" />
