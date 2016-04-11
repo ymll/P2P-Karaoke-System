@@ -10,28 +10,34 @@ namespace P2PKaraokeSystem.Network
 {
     public class ServerSendManager : AbstractSendManager
     {
-        private Int32 serverport = 12345;
-        private String ServeripString = "127.0.0.1";
+        public static List<String> receiverAddressList;
+        public static List<Int32> receiverPortList;
+
         public ServerSendManager()
         {
+            receiverAddressList = new List<String>();
+            receiverPortList = new List<Int32>();
         }
-        public ServerSendManager(String Serverip, Int32 setport)
+        public void NewReceiver(string ipAddress, Int32 portNum)
         {
-            this.serverport = setport;
-            this.ServeripString = Serverip;
+            receiverAddressList.Add(ipAddress);
+            receiverPortList.Add(portNum);
         }
         // TODO
         public override int SendTCP(byte[] sendBuffer, int from, int size)
         {
             try
-            {
-                TcpClient client = new TcpClient();
-                client.Connect(ServeripString, serverport);
-                NetworkStream networkStream = client.GetStream();
-                networkStream.Write(sendBuffer, 0, size);
-                networkStream.Flush();
-                client.Close();
-                Console.WriteLine("return form send");
+            {          
+                for (int i = 0; i < receiverAddressList.Count; i++)
+                {
+                    TcpClient client = new TcpClient();
+                    client.Connect(receiverAddressList[i], receiverPortList[i]);
+                    NetworkStream networkStream = client.GetStream();
+                    networkStream.Write(sendBuffer, from, size);
+                    networkStream.Flush();
+                    client.Close();
+                    Console.WriteLine("return form send");
+                }
             }
             catch (Exception e)
             {
