@@ -145,5 +145,15 @@ namespace P2PKaraokeSystem.View
                 this._karaokeSystemModel.VideoDatabase.LoadForSearch("Z:\\Users\\sonia\\note\\year4\\sem2\\CSCI3280\\Project\\Code\\P2PKaraokeSystem\\VideoDatabase\\db.csv", searchBox.Text);
             }
         }
+
+        private void screenImg_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            popUp.IsOpen = true;
+        }
+
+        private void PopUp_OK_Click(object sender, RoutedEventArgs e)
+        {
+            popUp.IsOpen = false;
+        }
     }
 }

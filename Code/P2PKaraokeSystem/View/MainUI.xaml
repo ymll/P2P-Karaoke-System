@@ -238,13 +238,13 @@
             </Image.Style>
         </Image>
 
-        <!-- Screen Capture-->
+        <!-- Connection Form -->
         <Image x:Name="screenCapImg"
                 Grid.Row="2"
         	    HorizontalAlignment="Left" VerticalAlignment="Top"
         	    Height="31" Width="40"
-        	    Margin="850,29,0,0">
-            <!--MouseDown="soundImg_MouseDown"-->
+        	    Margin="850,29,0,0"
+                MouseDown="screenImg_MouseDown">
             <Image.Style>
                 <Style TargetType="{x:Type Image}">
                     <Style.Triggers>
@@ -265,7 +265,28 @@
             </Image.Style>
         </Image>
 
-
+        <Popup Name="popUp" IsOpen="False" Placement="Center" Height="300" Width="400">
+            <Border BorderBrush="DeepPink" BorderThickness="3">
+                <StackPanel Orientation="Horizontal" Background="Gray">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="100"/>
+                            <RowDefinition Height="100" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="100" />
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="IP Address" Grid.Row="0" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        <TextBox Name="ipAdd" Grid.Row="0" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center" Height="50" Width="200" FontSize="16" TextAlignment="Center"/>
+                        <TextBlock Text="Port Number" Grid.Row="1" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        <TextBox Name="portNum" Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center" Height="50" Width="200" FontSize="16" TextAlignment="Center"/>
+                        <Button Content="OK" Grid.Row="2" Grid.Column="1" Click="PopUp_OK_Click" VerticalAlignment="Center" HorizontalAlignment="Center" Width="175"/>
+                    </Grid>
+                </StackPanel>
+            </Border>
+        </Popup>
 
         <!-- Lyric Box -->
         <Label x:Name="lyric"
@@ -319,7 +340,7 @@
             </Border>
         </ScrollViewer>
 
-
-
     </Grid>
+    
+    
 </Window>
