@@ -22,6 +22,8 @@ namespace P2PKaraokeSystem.View
     public partial class MainUI : Window
     {
         private KaraokeSystemModel _karaokeSystemModel;
+        int preVol = 127;
+
 
         public MainUI()
         {
@@ -85,7 +87,15 @@ namespace P2PKaraokeSystem.View
         {
             if (this._karaokeSystemModel.Playback.Volume == 0)
             {
-                this._karaokeSystemModel.Playback.Volume = 255;
+                if (preVol != 0)
+                {
+                    this._karaokeSystemModel.Playback.Volume = preVol;
+                }
+                else
+                {
+                    preVol = 255;
+                    this._karaokeSystemModel.Playback.Volume = preVol;
+                }
             }
             else
             {
@@ -93,10 +103,40 @@ namespace P2PKaraokeSystem.View
             }
         }
 
+        private void soundMinImg_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (this._karaokeSystemModel.Playback.Volume != 0)
+            {
+                if (preVol >= 25)
+                {
+                    preVol -= 25;
+                }
+                else
+                {
+                    preVol = 0;
+                }
+
+                this._karaokeSystemModel.Playback.Volume = preVol;
+            }
+        }
+
+        private void soundPlusImg_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (this._karaokeSystemModel.Playback.Volume != 255)
+            {
+                preVol += 25;
+                this._karaokeSystemModel.Playback.Volume = preVol;
+            }
+        }
+
+
         private void ListView_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             this._karaokeSystemModel.Playback.CurrentVideo = ((sender as ListView).SelectedItem as Model.VideoDatabase.Video);
             this._karaokeSystemModel.Playback.State = PlayState.Playing;
+            this._karaokeSystemModel.Playback.Volume = 270;
+            preVol = 270;
+
         }
 
         private void OnKeyDownHandler(object sender, KeyEventArgs e)
