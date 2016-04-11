@@ -71,6 +71,16 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Model\VideoDatabase.cs" />
+    <Compile Include="Network\AbstractNetworkManager.cs" />
+    <Compile Include="Network\ClientReceiveManager.cs" />
+    <Compile Include="Network\AbstractReceiveManager.cs" />
+    <Compile Include="Network\AbstractSendManager.cs" />
+    <Compile Include="Network\ClientSendManager.cs" />
+    <Compile Include="Network\DataReceiveListener.cs" />
+    <Compile Include="Network\DataSendListener.cs" />
+    <Compile Include="Network\PacketType.cs" />
+    <Compile Include="Network\ServerReceiveManager.cs" />
+    <Compile Include="Network\ServerSendManager.cs" />
     <Compile Include="PlaybackLogic\AudioFrameReader.cs" />
     <Compile Include="PlaybackLogic\AudioHeaderReader.cs" />
     <Compile Include="PlaybackLogic\FFmpegDecoder.cs" />

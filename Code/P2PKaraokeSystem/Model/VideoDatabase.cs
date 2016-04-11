@@ -1,5 +1,6 @@
-﻿using CsvHelper;
+using CsvHelper;
 using Kfstorm.LrcParser;
+using P2PKaraokeSystem.Network;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -163,6 +164,14 @@ namespace P2PKaraokeSystem.Model
 
             public Lyric(String filePath)
             {
+                if (!File.Exists(filePath))
+                {
+                    Byte[] data = Encoding.ASCII.GetBytes(filePath);
+                    Byte[] sendBytes;
+                    ServerSendManager cl = new ServerSendManager();
+                    cl.AddPayload(out sendBytes, data, PacketType.LYRIC_REQUEST);
+                    cl.SendTCP(sendBytes, 0, sendBytes.Length);
+                }
                 Load(filePath);
             }
 

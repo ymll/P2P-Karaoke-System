@@ -27,6 +27,38 @@ namespace P2PKaraokeSystem.View
 
         public MainUI()
         {
+            //testing code:
+            /*
+            ClientReceiveManager clientRecv = new ClientReceiveManager("127.0.0.1",12345,1024*32);
+            clientRecv.RegisterListener(PacketType.PLAY_REQUEST, new PlayRequestListener());
+            clientRecv.RegisterListener(PacketType.MEDIA_INFO, new MediaInfoReceiveListener());
+            clientRecv.RegisterListener(PacketType.VIDEO_STREAM, new VideoStreamReceiveListener());
+            clientRecv.RegisterListener(PacketType.SUBTITLE, new SubtitleReceiveListener());
+            clientRecv.RegisterListener(PacketType.LYRIC_REQUEST, new LyricRequestListener());
+            clientRecv.StartReceiveTcpPacket();
+
+
+            string sendingString = "../../VideoDatabase/Video/only_time.avi";
+            Byte[] data = Encoding.ASCII.GetBytes(sendingString);
+            Byte[] sendBytes;
+
+            */
+            /* 
+            ClientSendManager cl =  new ClientSendManager();
+            cl.AddPayload(out sendBytes, data, PacketType.PLAY_REQUEST);
+            cl.SendTCP(sendBytes,0,sendBytes.Length);      
+            sendingString = "../../VideoDatabase/Lyrics/Enya - Only Time.lrc";
+            data = Encoding.ASCII.GetBytes(sendingString);         
+            c1.AddPayload(out sendBytes, data, PacketType.LYRIC_REQUEST);
+            c1.SendTCP(sendBytes, 0, sendBytes.Length);
+            */
+            /* 
+            ServerSendManager c2 = new ServerSendManager();
+            c2.AddPayload(out sendBytes, data, PacketType.PLAY_REQUEST);
+            c2.SendTCP(sendBytes, 0, sendBytes.Length);
+            */
+            //end testing code
+        
             InitializeComponent();
             FFmpegLoader.LoadFFmpeg();
 
