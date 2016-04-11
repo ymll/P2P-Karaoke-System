@@ -4,11 +4,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace P2PKaraokeSystem.PlaybackLogic.Decode
 {
-    public unsafe class AudioDecoder
+    public unsafe class AudioDecoder : Job
     {
         private AudioDecodeInfo audioDecodeInfo;
         private MediaDecodeInfo mediaDecodeInfo;
@@ -21,14 +22,20 @@ namespace P2PKaraokeSystem.PlaybackLogic.Decode
             this.playerViewModel = playerViewModel;
         }
 
-        public void OnNewPacket(AVPacket* pAudioPacket)
+        public void RunRepeatly(ManualResetEventSlim stopSignal, ManualResetEventSlim continueSignal)
         {
-            AVPacket audioPacketCopy = new AVPacket();
+            double pts = 0;
+            AudioWaveData? audioWaveData = Decode(out pts);
 
-            Util.AssertZero("Cannot setup new packet",
-                ffmpeg.av_packet_ref(&audioPacketCopy, pAudioPacket));
+            if (audioWaveData.HasValue)
+            {
+                playerViewModel.PendingAudioWaveData.Add(audioWaveData.Value);
+            }
+        }
 
-            playerViewModel.PendingAudioFrames.Add(audioPacketCopy);
+        public void CleanUp()
+        {
+
         }
 
         private AudioWaveData? Decode(out double pts)
@@ -71,7 +78,7 @@ namespace P2PKaraokeSystem.PlaybackLogic.Decode
                             byte[] buffer = new byte[dataSize];
                             fixed (byte* bufferPtr = buffer)
                             {
-                                CopyMemory((IntPtr)bufferPtr, (IntPtr)audioDecodeInfo.pFrame->data0, dataSize);
+                                Util.CopyMemory((IntPtr)bufferPtr, (IntPtr)audioDecodeInfo.pFrame->data0, dataSize);
                                 audioWaveData.data = (IntPtr)bufferPtr;
                             }
                         }
@@ -104,7 +111,12 @@ namespace P2PKaraokeSystem.PlaybackLogic.Decode
                     return null;
                 }
 
-                AVPacket packet = playerViewModel.PendingAudioFrames.Take();
+                AVPacket packet = playerViewModel.PendingAudioPackets.Take();
+                if (packet.size == 0)
+                {
+                    return null;
+                }
+
                 pPacket = &packet;
                 if (packet.data == MediaDecodeInfo.FlushPacket.data)
                 {
@@ -177,7 +189,7 @@ namespace P2PKaraokeSystem.PlaybackLogic.Decode
             byte[] buffer = new byte[dst_bufsize];
             fixed (byte* pBuffer = buffer)
             {
-                CopyMemory((IntPtr)pBuffer, (IntPtr)dst_data[0], dst_bufsize);
+                Util.CopyMemory((IntPtr)pBuffer, (IntPtr)dst_data[0], dst_bufsize);
                 audioWaveData.data = (IntPtr)pBuffer;
                 audioWaveData.start = 0;
                 audioWaveData.size = dst_bufsize;
@@ -196,20 +208,6 @@ namespace P2PKaraokeSystem.PlaybackLogic.Decode
             ffmpeg.av_freep(&dst_data);
 
             return audioWaveData;
-        }
-
-        public void Start()
-        {
-            for (; ; )
-            {
-                double pts = 0;
-                AudioWaveData? audioWaveData = Decode(out pts);
-
-                if (audioWaveData.HasValue)
-                {
-                    playerViewModel.PendingAudioWaveData.Add(audioWaveData.Value);
-                }
-            }
         }
 
         private int SyncAudio(short* samples, int samplesSize, double pts)
@@ -265,7 +263,7 @@ namespace P2PKaraokeSystem.PlaybackLogic.Decode
                                 q = samples_end + n;
                                 while (nb > 0)
                                 {
-                                    CopyMemory((IntPtr)q, (IntPtr)samples_end, n);
+                                    Util.CopyMemory((IntPtr)q, (IntPtr)samples_end, n);
                                     q += n;
                                     nb -= n;
                                 }
@@ -283,8 +281,5 @@ namespace P2PKaraokeSystem.PlaybackLogic.Decode
 
             return samplesSize;
         }
-
-        [System.Runtime.InteropServices.DllImport("Kernel32.dll", EntryPoint = "RtlMoveMemory")]
-        public static extern void CopyMemory(IntPtr Destination, IntPtr Source, int Length);
     }
 }

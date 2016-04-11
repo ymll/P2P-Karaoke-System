@@ -90,7 +90,6 @@
     <Compile Include="PlaybackLogic\Decode\MediaDecodeInfo.cs" />
     <Compile Include="PlaybackLogic\Decode\MediaDecoder.cs" />
     <Compile Include="PlaybackLogic\Decode\MediaLoader.cs" />
-    <Compile Include="PlaybackLogic\Decode\MediaPlayer.cs" />
     <Compile Include="PlaybackLogic\Decode\StreamDecodeInfo.cs" />
     <Compile Include="PlaybackLogic\Decode\StreamLoader.cs" />
     <Compile Include="PlaybackLogic\Decode\VideoDecodeInfo.cs" />
@@ -98,6 +97,8 @@
     <Compile Include="PlaybackLogic\Decode\VideoLoader.cs" />
     <Compile Include="PlaybackLogic\Decode\VideoPlayer.cs" />
     <Compile Include="PlaybackLogic\FFmpegDecoder.cs" />
+    <Compile Include="PlaybackLogic\Job.cs" />
+    <Compile Include="PlaybackLogic\JobThread.cs" />
     <Compile Include="PlaybackLogic\LyricPlayer.cs" />
     <Compile Include="PlaybackLogic\MediaHeaderReader.cs" />
     <Compile Include="PlaybackLogic\Native\Avi.cs" />
