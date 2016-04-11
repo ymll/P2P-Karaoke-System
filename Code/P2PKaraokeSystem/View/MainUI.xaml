@@ -279,9 +279,9 @@
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
                         <TextBlock Text="IP Address" Grid.Row="0" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        <TextBox Name="ipAdd" Grid.Row="0" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center" Height="50" Width="200" FontSize="16" TextAlignment="Center"/>
+                        <TextBox Name="ipAdd" Grid.Row="0" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center" Height="25" Width="200" FontSize="16" TextAlignment="Center" />
                         <TextBlock Text="Port Number" Grid.Row="1" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        <TextBox Name="portNum" Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center" Height="50" Width="200" FontSize="16" TextAlignment="Center"/>
+                        <TextBox Name="portNum" Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center" Height="25" Width="200" FontSize="16" TextAlignment="Justify" />
                         <Button Content="OK" Grid.Row="2" Grid.Column="1" Click="PopUp_OK_Click" VerticalAlignment="Center" HorizontalAlignment="Center" Width="175"/>
                     </Grid>
                 </StackPanel>
