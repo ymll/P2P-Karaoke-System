@@ -112,6 +112,11 @@ namespace P2PKaraokeSystem.PlaybackLogic.Decode
                 }
 
                 AVPacket packet = playerViewModel.PendingAudioPackets.Take();
+                if (packet.size == 0)
+                {
+                    return null;
+                }
+
                 pPacket = &packet;
                 if (packet.data == MediaDecodeInfo.FlushPacket.data)
                 {

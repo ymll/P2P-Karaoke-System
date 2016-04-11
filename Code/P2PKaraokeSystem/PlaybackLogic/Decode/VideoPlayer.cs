@@ -30,18 +30,21 @@ namespace P2PKaraokeSystem.PlaybackLogic.Decode
         public void RunRepeatly(ManualResetEventSlim stopSignal, ManualResetEventSlim continueSignal)
         {
             Tuple<IntPtr, double> imageFramePtr = this.playerViewModel.PendingVideoFrames.Take();
-            var pImageFrame = (AVFrame*)imageFramePtr.Item1.ToPointer();
-
-            WriteImageToBuffer(pImageFrame);
-            this.playerViewModel.AvailableImageBufferPool.Add(imageFramePtr.Item1);
-
-            double pts = imageFramePtr.Item2;
-            if (pts < lastPts)
+            if (imageFramePtr != null)
             {
-                lastPts = 0;
+                var pImageFrame = (AVFrame*)imageFramePtr.Item1.ToPointer();
+
+                WriteImageToBuffer(pImageFrame);
+                this.playerViewModel.AvailableImageBufferPool.Add(imageFramePtr.Item1);
+
+                double pts = imageFramePtr.Item2;
+                if (pts < lastPts)
+                {
+                    lastPts = 0;
+                }
+                Thread.Sleep(TimeSpan.FromSeconds(pts - lastPts));
+                this.lastPts = pts;
             }
-            Thread.Sleep(TimeSpan.FromSeconds(pts - lastPts));
-            this.lastPts = pts;
         }
 
         public void CleanUp()

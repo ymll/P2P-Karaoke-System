@@ -47,10 +47,10 @@ namespace P2PKaraokeSystem.PlaybackLogic
             var audioDecoder = new AudioDecoder(mediaDecodeInfo.Audio, mediaDecodeInfo, playerViewModel);
 
             var videoPlayer = new VideoPlayer(mediaDecodeInfo.Video, playerViewModel, isVideoPlayingEvent);
-            var audioPlayer = new AudioPlayer(mediaDecodeInfo.Audio, playerViewModel, playbackModel);
+            var audioPlayer = new AudioPlayer(mediaDecodeInfo.Audio, playerViewModel, playbackModel, isVideoPlayingEvent);
 
             frameReaderThread = new JobThread("Frame Reader", frameReader, null, isVideoLoadedEvent);
-            audioDecoderThread = new JobThread("Audio Decoder", audioDecoder, null, null);
+            audioDecoderThread = new JobThread("Audio Decoder", audioDecoder, null, isVideoLoadedEvent);
             videoPlayerThread = new JobThread("Video Player", videoPlayer, null, isVideoPlayingEvent);
 
             playbackModel.PropertyChanged += playbackModel_PropertyChanged;
@@ -61,12 +61,14 @@ namespace P2PKaraokeSystem.PlaybackLogic
             if ("CurrentVideo".Equals(e.PropertyName))
             {
                 this.isVideoLoadedEvent.Reset();
+                this.isVideoPlayingEvent.Reset();
                 UnLoad();
 
                 if (this.playbackModel.CurrentVideo != null)
                 {
                     Load(this.playbackModel.CurrentVideo.FilePath);
                     this.isVideoLoadedEvent.Set();
+                    this.isVideoPlayingEvent.Set();
                 }
             }
             else if ("State".Equals(e.PropertyName))
@@ -100,12 +102,16 @@ namespace P2PKaraokeSystem.PlaybackLogic
         {
             Tuple<IntPtr, double> imageFramePtrWithTime;
             IntPtr imageFramePtr;
+            AVPacket packet;
+            AudioWaveData waveData;
+
             while (this.playerViewModel.PendingVideoFrames.TryTake(out imageFramePtrWithTime))
             {
                 var pImageFrame = (AVFrame*)imageFramePtrWithTime.Item1.ToPointer();
                 ffmpeg.av_free(pImageFrame->data0);
                 ffmpeg.av_frame_free(&pImageFrame);
             }
+            this.playerViewModel.PendingVideoFrames.Add(null);
 
             while (this.playerViewModel.AvailableImageBufferPool.TryTake(out imageFramePtr))
             {
@@ -113,6 +119,21 @@ namespace P2PKaraokeSystem.PlaybackLogic
                 ffmpeg.av_free(pImageFrame->data0);
                 ffmpeg.av_frame_free(&pImageFrame);
             }
+            this.playerViewModel.AvailableImageBufferPool.Add(IntPtr.Zero);
+
+            while (this.playerViewModel.PendingAudioPackets.TryTake(out packet))
+            {
+                ffmpeg.av_free_packet(&packet);
+            }
+            packet.size = 0;
+            this.playerViewModel.PendingAudioPackets.Add(packet);
+
+            while (this.playerViewModel.PendingAudioWaveData.TryTake(out waveData))
+            {
+
+            }
+            waveData.size = 0;
+            this.playerViewModel.PendingAudioWaveData.Add(waveData);
 
             ffmpeg.avcodec_close(mediaDecodeInfo.Video.pCodecContext);
 

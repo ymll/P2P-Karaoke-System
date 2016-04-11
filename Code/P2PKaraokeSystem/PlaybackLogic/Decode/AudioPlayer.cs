@@ -16,31 +16,44 @@ namespace P2PKaraokeSystem.PlaybackLogic.Decode
         private AudioDecodeInfo audioDecodeInfo;
         private PlayerViewModel playerViewModel;
         private PlaybackModel playbackModel;
+        private ManualResetEventSlim isVideoPlayingEvent;
 
         private WaveOutPlayer player;
         private AudioWaveData latestWaveData;
 
-        public AudioPlayer(AudioDecodeInfo audioDecodeInfo, PlayerViewModel playerViewModel, PlaybackModel playbackModel)
+        public AudioPlayer(AudioDecodeInfo audioDecodeInfo, PlayerViewModel playerViewModel, PlaybackModel playbackModel, ManualResetEventSlim isVideoPlayingEvent)
         {
             this.audioDecodeInfo = audioDecodeInfo;
             this.playerViewModel = playerViewModel;
             this.playbackModel = playbackModel;
+            this.isVideoPlayingEvent = isVideoPlayingEvent;
 
             this.playbackModel.PropertyChanged += playbackModel_PropertyChanged;
 
             WaveFormat fmt = new WaveFormat(44100, 16, 2);
-            player = new WaveOutPlayer(-1, fmt, 109200, 10, Filler);
+            player = new WaveOutPlayer(-1, fmt, 40960, 100, Filler);
         }
 
         private void Filler(IntPtr data, int size)
         {
             int bufferCurrentIndex = 0;
 
+            isVideoPlayingEvent.Wait();
+
             while (size > 0)
             {
+                if (!isVideoPlayingEvent.IsSet)
+                {
+                    return;
+                }
+
                 if (latestWaveData.size <= 0)
                 {
                     latestWaveData = this.playerViewModel.PendingAudioWaveData.Take();
+                    if (latestWaveData.size == 0)
+                    {
+                        return;
+                    }
                 }
 
                 int bufferAvailable = latestWaveData.size - latestWaveData.start;
