@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -9,6 +9,7 @@ namespace P2PKaraokeSystem.Network
 {
     public class VideoStreamReceiveListener : DataReceiveListener
     {
+        private static long upto = 0;
         public void OnDataReceived(PacketType packetType, byte[] data)
         {
             Console.WriteLine(packetType);
@@ -17,12 +18,17 @@ namespace P2PKaraokeSystem.Network
             {
                 Console.Write(data[i]);
             }*/
-            FileStream fileStream = File.Open("../../VideoDatabase/Video/save.avi", FileMode.Append,FileAccess.Write,FileShare.ReadWrite);    
-            fileStream.Write(data, 0, data.Length);    
-            fileStream.Close();
-          //        fileStream.Flush();
-         //  fileStream.Dispose();
+   
+            FileStream fileStream = File.Open("../../VideoDatabase/Video/save.avi", FileMode.OpenOrCreate, FileAccess.Write, FileShare.ReadWrite);
+            fileStream.Seek(upto, SeekOrigin.Begin);
+            fileStream.Write(data, 0, data.Length);
+            upto += data.Length;
+            Console.Write(upto);
+            Console.WriteLine("");
 
+            fileStream.Flush();
+            fileStream.Dispose();
+            fileStream.Close();
         }
     }
 }

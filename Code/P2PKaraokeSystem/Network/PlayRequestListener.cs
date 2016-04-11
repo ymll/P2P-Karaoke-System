@@ -1,5 +1,6 @@
 ﻿using AviFile;
 using P2PKaraokeSystem.PlaybackLogic;
+using P2PKaraokeSystem.View;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -72,8 +73,7 @@ namespace P2PKaraokeSystem.Network
 
             Byte[] senddata;
             Console.WriteLine("Sending {0} to the host.", fileName);
-            ServerSendManager c3 = new ServerSendManager();
-            c3.NewReceiver("127.0.0.1",12345);
+            ClientSendManager c3 = new ClientSendManager("127.0.0.1",12345);
             FileInfo file = new FileInfo(fileName);
             Console.WriteLine("Length {0}", file.Length);
 
@@ -81,18 +81,19 @@ namespace P2PKaraokeSystem.Network
 
             int read;
             int totalWritten = 0;
-            byte[] buffer = new byte[1024*32-2];
+            byte[] buffer = new byte[1024*32-4];
             while (((read = fileStream.Read(buffer, 0, buffer.Length))) > 0 || (file.Length - totalWritten > 0))
             {
 
                 Console.WriteLine(file.Length - totalWritten);
                 c3.AddPayload(out senddata, buffer, PacketType.VIDEO_STREAM);
-        /*        for (int i = 0; i <(senddata.Length); i++)
+            /* for (int i = 0; i <(senddata.Length); i++)
             {
                 Console.Write(senddata[i]);
             }*/
-                c3.SendTCP(senddata, 0, read+2);
+                c3.SendTCP(senddata, 0, read+4);
                 totalWritten += read;
+                Thread.Sleep(150);
             }
             Console.WriteLine("Return form sending ...");
         }
