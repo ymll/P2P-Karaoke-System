@@ -58,14 +58,13 @@ namespace P2PKaraokeSystem.View
             c2.SendTCP(sendBytes, 0, sendBytes.Length);
             */
             //end testing code
-        
+
             InitializeComponent();
             FFmpegLoader.LoadFFmpeg();
 
             this._karaokeSystemModel = (KaraokeSystemModel)this.DataContext;
             new LyricPlayer(this._karaokeSystemModel.Playback, this._karaokeSystemModel.View);
             new FFmpegDecoder(this._karaokeSystemModel.View, this._karaokeSystemModel.Playback);
-            new AudioPlayer(this._karaokeSystemModel.Playback, this._karaokeSystemModel.View);
         }
 
         private void playImg_MouseDown(object sender, MouseButtonEventArgs e)
@@ -143,7 +142,7 @@ namespace P2PKaraokeSystem.View
         {
             if (e.Key == Key.Return)
             {
-                this._karaokeSystemModel.VideoDatabase.LoadForSearch("Z:\\Users\\sonia\\note\\year4\\sem2\\CSCI3280\\Project\\Code\\P2PKaraokeSystem\\VideoDatabase\\db.csv",searchBox.Text);
+                this._karaokeSystemModel.VideoDatabase.LoadForSearch("Z:\\Users\\sonia\\note\\year4\\sem2\\CSCI3280\\Project\\Code\\P2PKaraokeSystem\\VideoDatabase\\db.csv", searchBox.Text);
             }
         }
     }

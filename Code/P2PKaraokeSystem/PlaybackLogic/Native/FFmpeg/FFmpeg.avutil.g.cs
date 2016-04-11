@@ -624,7 +624,7 @@ namespace FFmpeg.AutoGen
         public const int FF_QP2LAMBDA = 118;
         public const int FF_LAMBDA_MAX = (256*128-1);
         public const int FF_QUALITY_SCALE = FF_LAMBDA_SCALE;
-        public const ulong AV_NOPTS_VALUE = 0x8000000000000000;
+        public const long AV_NOPTS_VALUE = -9223372036854775808;
         public const int AV_TIME_BASE = 1000000;
         public const int LIBAVUTIL_VERSION_MAJOR = 55;
         public const int LIBAVUTIL_VERSION_MINOR = 17;
@@ -812,6 +812,9 @@ namespace FFmpeg.AutoGen
         
         [DllImport(libavutil, EntryPoint = "avutil_license", CallingConvention = CallingConvention.Cdecl)]
         public static extern string avutil_license();
+
+        [DllImport(libavutil, EntryPoint = "av_gettime", CallingConvention = CallingConvention.Cdecl)]
+        public static extern long av_gettime();
         
         [DllImport(libavutil, EntryPoint = "av_get_media_type_string", CallingConvention = CallingConvention.Cdecl)]
         public static extern string av_get_media_type_string(AVMediaType @media_type);
