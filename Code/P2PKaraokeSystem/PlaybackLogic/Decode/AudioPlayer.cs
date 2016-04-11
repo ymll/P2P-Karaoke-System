@@ -82,6 +82,8 @@ namespace P2PKaraokeSystem.PlaybackLogic.Decode
             switch (e.PropertyName)
             {
                 case "CurrentVideo":
+                    WaveNative.waveOutReset(player.m_WaveOut);
+                    break;
                 case "State":
                     if (playbackModel.CurrentVideo != null && playbackModel.State == PlayState.Playing)
                     {
