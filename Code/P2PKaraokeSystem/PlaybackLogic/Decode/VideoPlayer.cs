@@ -42,6 +42,11 @@ namespace P2PKaraokeSystem.PlaybackLogic.Decode
                 {
                     lastPts = 0;
                 }
+                else if (pts - lastPts > 0.5)
+                {
+                    pts = 0;
+                    lastPts = 0;
+                }
                 Thread.Sleep(TimeSpan.FromSeconds(pts - lastPts));
                 this.lastPts = pts;
             }
