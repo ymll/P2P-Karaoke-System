@@ -1,9 +1,9 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
+using System.Threading;
 
 namespace P2PKaraokeSystem.Network
 {
@@ -13,10 +13,15 @@ namespace P2PKaraokeSystem.Network
         {
             Console.WriteLine(packetType);
             Console.WriteLine("VideoStreamReceiveListener OnDataReceived\n");
-            
-            FileStream fileStream = File.Open("../../VideoDatabase/Video/save.avi", FileMode.Append);
-            fileStream.Write(data, 0, data.Length);
-            fileStream.Dispose();
+         /*   for (int i = 0; i < (data.Length); i++)
+            {
+                Console.Write(data[i]);
+            }*/
+            FileStream fileStream = File.Open("../../VideoDatabase/Video/save.avi", FileMode.Append,FileAccess.Write,FileShare.ReadWrite);    
+            fileStream.Write(data, 0, data.Length);    
+            fileStream.Close();
+          //        fileStream.Flush();
+         //  fileStream.Dispose();
 
         }
     }
