@@ -31,7 +31,7 @@ namespace P2PKaraokeSystem.PlaybackLogic.Decode
             this.playbackModel.PropertyChanged += playbackModel_PropertyChanged;
 
             WaveFormat fmt = new WaveFormat(44100, 16, 2);
-            player = new WaveOutPlayer(-1, fmt, 40960, 100, Filler);
+            player = new WaveOutPlayer(-1, fmt, 8192, 100, Filler);
         }
 
         private void Filler(IntPtr data, int size)
