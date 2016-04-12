@@ -8,6 +8,8 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Collections;
+
 
 namespace P2PKaraokeSystem.Model
 {
@@ -15,6 +17,8 @@ namespace P2PKaraokeSystem.Model
     {
         public ObservableCollection<Video> Videos { get; private set; }
         public ObservableCollection<Video> allVideos { get; private set; }
+        public ObservableCollection<Video> VideosFromPeer { get; set; }
+        public static List<ServerStruct> clientList = new List<ServerStruct>();
 
         public VideoDatabase()
         {
@@ -44,6 +48,15 @@ namespace P2PKaraokeSystem.Model
         public void LoadForSearch(string path, string keywords)
         {
             LoadSearch(keywords);
+            //send to peer for query
+            clientList.ForEach(delegate (ServerStruct serverstruce)
+            {
+                ClientSendManager manager = new ClientSendManager(serverstruce.serveripString, serverstruce.serverport);
+                byte[] sendKeywords = Encoding.ASCII.GetBytes(keywords);
+                byte[] sendbuff;
+                manager.AddPayload(out sendbuff, sendKeywords, PacketType.SEARCH_QUERY);
+                manager.SendTCP(sendbuff, 0, sendbuff.Length);
+            });
         }
 
         private void Load(TextReader textReader)
@@ -91,6 +104,40 @@ namespace P2PKaraokeSystem.Model
                     Videos.Add(allVideos[i]);
                 }
             }
+        }
+
+        public ObservableCollection<Video> LoadSearchToPeer(string keywords)
+        {
+            String[] words = keywords.Split(' ');
+            ObservableCollection<Video> VideosPeer = new ObservableCollection<Video>();
+            
+            Video[] tempVideoArr = new Video[allVideos.Count];
+            allVideos.CopyTo(tempVideoArr, 0);
+            int videoCount = allVideos.Count;
+            bool contain = false;
+
+            //var index = allVideos.Where(vid => (words.Any(word => vid.Title.Contains(word)) || words.Any(word => vid.Performer.Name.Contains(word))));
+            for (int i = 0; i < videoCount; i++)
+            {
+                contain = false;
+                for (int k = 0; i< words.Count(); k++)
+                {
+                    //if (tempVideoArr[i].Performer.Name.Contains(words[k])) contain = true;
+                    //if (tempVideoArr[i].Title.Contains(words[k])) contain = true;
+                    if (tempVideoArr[i].Performer.Name == words[k] || tempVideoArr[i].Title == words[k]) contain = true;
+                }
+                if (contain) VideosPeer.Add(tempVideoArr[i]);
+            }
+            if (VideosPeer.Count == 0) return null;
+            else return VideosPeer;
+            
+        }
+
+        public void SaveIpPort(string ipAddress, string port)
+        {
+            Int32 int32_port = Int32.Parse(port);
+            ServerStruct serverstruct = new ServerStruct(ipAddress, int32_port);
+            if (!clientList.Contains(serverstruct)) clientList.Add(serverstruct);
         }
 
         public void SaveToFile(string path)
@@ -194,13 +241,14 @@ namespace P2PKaraokeSystem.Model
                 try
                 {
                     TimeSpan timeSpan = TimeSpan.FromMilliseconds(currentMillisecond);
-                    IOneLineLyric oneLineLyric = _lyricFile.AfterOrAt(timeSpan);
-                    return oneLineLyric.Content;
+                    if (_lyricFile != null)
+                    {
+                        IOneLineLyric oneLineLyric = _lyricFile.AfterOrAt(timeSpan);
+                        return oneLineLyric.Content;
+                    }
                 }
-                catch (Exception)
-                {
-                    return "";
-                }
+                catch (Exception) { }
+                return "";
             }
         }
     }

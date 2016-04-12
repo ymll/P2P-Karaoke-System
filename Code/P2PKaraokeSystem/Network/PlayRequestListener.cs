@@ -1,4 +1,4 @@
-﻿using AviFile;
+using AviFile;
 using P2PKaraokeSystem.PlaybackLogic;
 using P2PKaraokeSystem.View;
 using System;

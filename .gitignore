@@ -236,6 +236,9 @@ _Pvt_Extensions
 # MAC
 .DS_Store
 
+# Windows
+Thumbs.db
+
 # Project music file
 **/VideoDatabase/Video/
 
