@@ -31,7 +31,11 @@ namespace P2PKaraokeSystem.PlaybackLogic
         private void TimerCallback(object state)
         {
             currentTime += interval;
-            this.playViewModel.CurrentLyric = playbackModel.CurrentVideo.Lyric.GetCurrentLyric(currentTime);
+            try
+            {
+                this.playViewModel.CurrentLyric = playbackModel.CurrentVideo.Lyric.GetCurrentLyric(currentTime);
+            }
+            catch (NullReferenceException e) { }
         }
 
         void playbackModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
