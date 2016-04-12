@@ -122,8 +122,9 @@ namespace P2PKaraokeSystem.Model
                 contain = false;
                 for (int k = 0; i< words.Count(); k++)
                 {
-                    if (tempVideoArr[i].Performer.Name.Contains(words[k])) contain = true;
-                    if (tempVideoArr[i].Title.Contains(words[k])) contain = true;
+                    //if (tempVideoArr[i].Performer.Name.Contains(words[k])) contain = true;
+                    //if (tempVideoArr[i].Title.Contains(words[k])) contain = true;
+                    if (tempVideoArr[i].Performer.Name == words[k] || tempVideoArr[i].Title == words[k]) contain = true;
                 }
                 if (contain) VideosPeer.Add(tempVideoArr[i]);
             }
