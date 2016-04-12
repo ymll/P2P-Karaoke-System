@@ -161,6 +161,7 @@ namespace P2PKaraokeSystem.View
         private void connectionImg_MouseDown(object sender, MouseButtonEventArgs e)
         {
             popUp.IsOpen = true;
+            this._karaokeSystemModel.VideoDatabase.SaveIpPort(ipAdd.Text, portNum.Text);
         }
 
         private void PopUp_OK_Click(object sender, RoutedEventArgs e)

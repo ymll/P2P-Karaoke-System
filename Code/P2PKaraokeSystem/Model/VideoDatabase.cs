@@ -8,6 +8,8 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Collections;
+
 
 namespace P2PKaraokeSystem.Model
 {
@@ -15,6 +17,7 @@ namespace P2PKaraokeSystem.Model
     {
         public ObservableCollection<Video> Videos { get; private set; }
         public ObservableCollection<Video> allVideos { get; private set; }
+        public static List<ServerStruct> clientList = new List<ServerStruct>();
 
         public VideoDatabase()
         {
@@ -55,6 +58,13 @@ namespace P2PKaraokeSystem.Model
                     allVideos.Add(video);
                 }
             }
+        }
+
+        public void SaveIpPort(string ipAddress, string port)
+        {
+            Int32 int32_port = Int32.Parse(port);
+            ServerStruct serverstruct = new ServerStruct(ipAddress, int32_port);
+            if (!clientList.Contains(serverstruct)) clientList.Add(serverstruct);
         }
 
         public void SaveToFile(string path)
