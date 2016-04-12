@@ -180,6 +180,34 @@ namespace P2PKaraokeSystem.View
             }
         }
 
+        private void EditMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            popUpEdit.IsOpen = true;
+            int selectedIndex = Playlist.SelectedIndex;
+            VideoDatabase.Video tempVideo = Playlist.SelectedItem as VideoDatabase.Video;
+            saveVideoIndex(selectedIndex);
+            EditTitle.Text = tempVideo.Title;
+            EditSinger.Text = tempVideo.Performer.Name;
+        }
+
+        int videoIndex;
+        private void saveVideoIndex(int selectedIndex)
+        {
+            videoIndex = selectedIndex;
+        }
+
+        private void PopUpEdit_OK_Click(object sender, RoutedEventArgs e)
+        {
+            int selectedIndex = videoIndex;
+            VideoDatabase.Video tempvideo = this._karaokeSystemModel.VideoDatabase.Videos[selectedIndex];
+            tempvideo.Title = EditTitle.Text;
+            tempvideo.Performer.Name = EditSinger.Text;
+            this._karaokeSystemModel.VideoDatabase.Videos.RemoveAt(selectedIndex);
+            this._karaokeSystemModel.VideoDatabase.Videos.Insert(selectedIndex,tempvideo);
+            Playlist.Items.Refresh();
+            popUpEdit.IsOpen = false;
+        }
+
         private void searchEnterDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Return)

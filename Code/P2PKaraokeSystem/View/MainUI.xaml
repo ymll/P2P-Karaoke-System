@@ -351,14 +351,14 @@
                 <ListView Name="Playlist" ItemsSource="{Binding VideoDatabase.Videos}" SelectionMode="Single" Background="Black" MouseDoubleClick="ListView_MouseDoubleClick">
                     <ListView.ItemTemplate>
                         <DataTemplate>
-                            <DockPanel Height="40" Background="Transparent">
+                            <DockPanel Name="DockPan" Height="40" Background="Transparent">
                                 <DockPanel.Visibility>
                                     <MultiBinding Converter="{StaticResource PlaylistVisiblityConverter}">
                                         <Binding />
                                         <Binding Path="Text" ElementName="searchBox" />
                                     </MultiBinding>
                                 </DockPanel.Visibility>
-                                <TextBlock HorizontalAlignment="Left" Foreground="White" VerticalAlignment="Center" FontSize="24" FontWeight="Bold">
+                                <TextBlock Name ="songTitle" HorizontalAlignment="Left" Foreground="White" VerticalAlignment="Center" FontSize="24" FontWeight="Bold">
                                     <TextBlock.Style>
                                         <Style TargetType="{x:Type TextBlock}">
                                             <Setter Property="Text" Value="{Binding Title}" />
@@ -371,7 +371,7 @@
                                     </TextBlock.Style>
                                 </TextBlock>
                                 <TextBlock Text="   ---    " HorizontalAlignment="Left" Foreground="White" VerticalAlignment="Center"></TextBlock>
-                                <TextBlock HorizontalAlignment="Center" Foreground="LightGray" VerticalAlignment="Center" FontSize="16" FontWeight="Bold">
+                                <TextBlock Name ="songSinger" HorizontalAlignment="Center" Foreground="LightGray" VerticalAlignment="Center" FontSize="16" FontWeight="Bold">
                                     <TextBlock.Style>
                                         <Style TargetType="{x:Type TextBlock}">
                                             <Setter Property="Text" Value="{Binding Performer.Name}" />
@@ -386,7 +386,7 @@
                                 <TextBlock Text="[Time]" HorizontalAlignment="Right" Foreground="White" VerticalAlignment="Center"></TextBlock>
                                 <DockPanel.ContextMenu>
                                     <ContextMenu>
-                                        <MenuItem Header="Edit" />
+                                        <MenuItem Header="Edit" Click="EditMenuItem_Click"/>
                                         <MenuItem Header="Remove Item" Click="RemoveMenuItem_Click" />
                                     </ContextMenu>
                                 </DockPanel.ContextMenu>
@@ -401,5 +401,29 @@
                 </ListView>
             </Border>
         </ScrollViewer>
+
+        <Popup Name="popUpEdit" IsOpen="False" Placement="Center" Height="300" Width="400">
+            <Border BorderBrush="DeepPink" BorderThickness="3">
+                <StackPanel Orientation="Horizontal" Background="Gray">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="100"/>
+                            <RowDefinition Height="100" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="100" />
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Title" Grid.Row="0" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        <TextBox Name="EditTitle" Grid.Row="0" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center" Height="25" Width="200" FontSize="16" TextAlignment="Justify" />
+                        <TextBlock Text="Singer" Grid.Row="1" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        <TextBox Name="EditSinger" Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center" Height="25" Width="200" FontSize="16" TextAlignment="Justify" />
+                        <Button Content="OK" Grid.Row="2" Grid.Column="1" Click="PopUpEdit_OK_Click" VerticalAlignment="Center" HorizontalAlignment="Center" Width="175"/>
+                    </Grid>
+                </StackPanel>
+            </Border>
+        </Popup>
+        
     </Grid>
 </Window>
