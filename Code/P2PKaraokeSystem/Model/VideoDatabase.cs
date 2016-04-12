@@ -52,9 +52,12 @@ namespace P2PKaraokeSystem.Model
         {
             LoadSearch(keywords);
             //send to peer for query : TODO add button to send query, otherwise too much lol
-            clientList.ForEach(delegate (ServerStruct serverstruce)
+            //clear VideosFromPeer
+
+            clientList.ForEach(delegate (ServerStruct serverstruct)
             {
-                ClientSendManager manager = new ClientSendManager(serverstruce.serveripString, serverstruce.serverport);
+                System.Diagnostics.Debug.WriteLine("Called ForEach\n");
+                ClientSendManager manager = new ClientSendManager(serverstruct.serveripString, serverstruct.serverport);
                 byte[] sendKeywords = Encoding.ASCII.GetBytes(keywords);
                 byte[] sendbuff;
                 manager.AddPayload(out sendbuff, sendKeywords, PacketType.SEARCH_QUERY);
@@ -128,7 +131,6 @@ namespace P2PKaraokeSystem.Model
                     VideosFromPeer.Add(video, new List<ServerStruct>());
                     VideosFromPeer[video].Add(serverstruct);
                 }
-                //add to videos
                 if (!Videos.Contains(video)) Videos.Add(video);
             }
         }
@@ -165,6 +167,26 @@ namespace P2PKaraokeSystem.Model
             Int32 int32_port = Int32.Parse(port);
             ServerStruct serverstruct = new ServerStruct(ipAddress, int32_port);
             if (!clientList.Contains(serverstruct)) clientList.Add(serverstruct);
+        }
+
+        public void SendVideoRequest(Video selectedVideo)
+        {
+            try
+            {
+                List<ServerStruct> serverlist = VideosFromPeer[selectedVideo];
+                serverlist.ForEach(delegate (ServerStruct serverstruct)
+                {
+                    ClientSendManager manager = new ClientSendManager(serverstruct.serveripString, serverstruct.serverport);
+                    byte[] filepath = Encoding.ASCII.GetBytes(selectedVideo.FilePath);
+                    byte[] sendbuff;
+                    manager.AddPayload(out sendbuff, filepath, PacketType.PLAY_REQUEST);
+                    manager.SendTCP(sendbuff, 0, sendbuff.Length);
+                });
+            }
+            catch
+            {
+                Console.WriteLine("error in SendVideoRequest");
+            }
         }
 
         public void SaveToFile(string path)

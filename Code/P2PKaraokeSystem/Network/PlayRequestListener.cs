@@ -11,7 +11,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 namespace P2PKaraokeSystem.Network
-{  
+{
 
     public class PlayRequestListener : DataReceiveListener
     {
@@ -22,7 +22,7 @@ namespace P2PKaraokeSystem.Network
             Console.WriteLine("PlayRequestListener OnDataReceived\n");
             String FilePath = "";
             for (int i = 0; i < data.Length; i++)
-            {                
+            {
                 FilePath += Convert.ToChar(data[i]);
             }
             Console.Write("FilePath = ");
@@ -35,47 +35,47 @@ namespace P2PKaraokeSystem.Network
                 return;
             }
 
-  /*          var aviHeaderParser = new P2PKaraokeSystem.PlaybackLogic.AviHeaderParser();   
-            aviHeaderParser.LoadFile(FilePath);
-            Avi.AVISTREAMINFO avi_info = aviHeaderParser.AudioHeaderReader.StreamInfo;
-            Avi.PCMWAVEFORMAT format_info = aviHeaderParser.AudioHeaderReader.FormatInfo;
-   */
-           // aviHeaderParser.UnLoadFile();
-            
-            /*turn Avi.AVISTREAMINFO into byte array  */
-  /*         byte[] byteInfo = new byte[Marshal.SizeOf(avi_info) + Marshal.SizeOf(format_info)];
-            IntPtr ptr;
-            ptr = Marshal.AllocHGlobal(byteInfo.Length);
-            Marshal.StructureToPtr(avi_info, ptr, false);
-            int address = ptr.ToInt32();
-            Marshal.Copy(new IntPtr(address), byteInfo, 0, Marshal.SizeOf(avi_info));
-            Marshal.StructureToPtr(format_info, ptr, false);
-            address = ptr.ToInt32();
-            Marshal.Copy(new IntPtr(address), byteInfo, Marshal.SizeOf(avi_info), Marshal.SizeOf(format_info));  
-            Marshal.FreeHGlobal(ptr);
+            /*          var aviHeaderParser = new P2PKaraokeSystem.PlaybackLogic.AviHeaderParser();   
+                      aviHeaderParser.LoadFile(FilePath);
+                      Avi.AVISTREAMINFO avi_info = aviHeaderParser.AudioHeaderReader.StreamInfo;
+                      Avi.PCMWAVEFORMAT format_info = aviHeaderParser.AudioHeaderReader.FormatInfo;
+             */
+            // aviHeaderParser.UnLoadFile();
 
-            byte[] temsize = BitConverter.GetBytes((Int32)Marshal.SizeOf(avi_info)).Take(4).ToArray();
-            byte[] temret = new byte[temsize.Length + byteInfo.Length];
-            System.Buffer.BlockCopy(temsize, 0, temret, 0, temsize.Length);
-            System.Buffer.BlockCopy(byteInfo, 0, temret, temsize.Length, byteInfo.Length);
-            byteInfo = temret;
-      
-            byte[] sendBuffer = new byte[byteInfo.Length + 2];
-            ClientSendManager sender = new ClientSendManager("127.0.0.1", 12345);
-            sender.AddPayload(out sendBuffer, byteInfo, PacketType.MEDIA_INFO);
-            sender.SendTCP(sendBuffer, 0, sendBuffer.Length);
-           
-   
-            Thread.Sleep(100);
-*/
+            /*turn Avi.AVISTREAMINFO into byte array  */
+            /*         byte[] byteInfo = new byte[Marshal.SizeOf(avi_info) + Marshal.SizeOf(format_info)];
+                      IntPtr ptr;
+                      ptr = Marshal.AllocHGlobal(byteInfo.Length);
+                      Marshal.StructureToPtr(avi_info, ptr, false);
+                      int address = ptr.ToInt32();
+                      Marshal.Copy(new IntPtr(address), byteInfo, 0, Marshal.SizeOf(avi_info));
+                      Marshal.StructureToPtr(format_info, ptr, false);
+                      address = ptr.ToInt32();
+                      Marshal.Copy(new IntPtr(address), byteInfo, Marshal.SizeOf(avi_info), Marshal.SizeOf(format_info));  
+                      Marshal.FreeHGlobal(ptr);
+
+                      byte[] temsize = BitConverter.GetBytes((Int32)Marshal.SizeOf(avi_info)).Take(4).ToArray();
+                      byte[] temret = new byte[temsize.Length + byteInfo.Length];
+                      System.Buffer.BlockCopy(temsize, 0, temret, 0, temsize.Length);
+                      System.Buffer.BlockCopy(byteInfo, 0, temret, temsize.Length, byteInfo.Length);
+                      byteInfo = temret;
+
+                      byte[] sendBuffer = new byte[byteInfo.Length + 2];
+                      ClientSendManager sender = new ClientSendManager("127.0.0.1", 12345);
+                      sender.AddPayload(out sendBuffer, byteInfo, PacketType.MEDIA_INFO);
+                      sender.SendTCP(sendBuffer, 0, sendBuffer.Length);
+
+
+                      Thread.Sleep(100);
+          */
             /*  debugging: what is sent*/
             /* for (int i = 0; i < Marshal.SizeOf(avi_info); i++ )
             {
                 Console.Write(byteInfo[i]);
             }*/
             /*Console.WriteLine("debug");*/
-            
-           /*  * send the avi file to whom request*/
+
+            /*  * send the avi file to whom request*/
             string fileName = FilePath;
 
             Byte[] senddata;
@@ -88,7 +88,7 @@ namespace P2PKaraokeSystem.Network
 
             int read;
             long totalWritten = 0;
-            byte[] buffer = new byte[1024*32 - 2];
+            byte[] buffer = new byte[1024 * 32 - 2];
             while (((read = fileStream.Read(buffer, 8, 1024 * 32 - 10))) > 0)
             {
                 byte[] temsize = BitConverter.GetBytes(totalWritten);
@@ -96,12 +96,12 @@ namespace P2PKaraokeSystem.Network
 
                 Console.WriteLine(file.Length - totalWritten);
                 c3.AddPayload(out senddata, buffer, PacketType.VIDEO_STREAM);
-          //      Console.WriteLine("send form {0} to {1}", totalWritten, totalWritten + buffer.Length - 8);
-         /*    for (int i = 2; i <(senddata.Length); i++)
-            {
-                Console.Write(senddata[i]);
-            }*/
-                c3.SendTCP(senddata, 0, read+10);
+                //      Console.WriteLine("send form {0} to {1}", totalWritten, totalWritten + buffer.Length - 8);
+                /*    for (int i = 2; i <(senddata.Length); i++)
+                   {
+                       Console.Write(senddata[i]);
+                   }*/
+                c3.SendTCP(senddata, 0, read + 10);
                 totalWritten += read;
                 Thread.Sleep(50);
             }
