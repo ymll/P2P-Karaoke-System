@@ -27,12 +27,15 @@ namespace P2PKaraokeSystem.PlaybackLogic.Decode
             if (gotPicture)
             {
                 IntPtr imageFramePtr = this.playerViewModel.AvailableImageBufferPool.Take();
-                var pImageFrame = (AVFrame*)imageFramePtr.ToPointer();
+                if (imageFramePtr != IntPtr.Zero)
+                {
+                    var pImageFrame = (AVFrame*)imageFramePtr.ToPointer();
 
-                ConvertFrameToImage(pImageFrame);
+                    ConvertFrameToImage(pImageFrame);
 
-                newPts = SynchronizeVideo(pImageFrame, newPts);
-                this.playerViewModel.PendingVideoFrames.Add(new Tuple<IntPtr, double>(imageFramePtr, newPts));
+                    newPts = SynchronizeVideo(pImageFrame, newPts);
+                    this.playerViewModel.PendingVideoFrames.Add(new Tuple<IntPtr, double>(imageFramePtr, newPts));
+                }
             }
 
             return newPts;

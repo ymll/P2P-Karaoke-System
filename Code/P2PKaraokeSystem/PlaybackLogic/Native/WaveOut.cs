@@ -148,6 +148,7 @@ namespace WaveLib
             WaveOutHelper.Try(WaveNative.waveOutOpen(out m_WaveOut, device, format, m_BufferProc, 0, WaveNative.CALLBACK_FUNCTION));
             AllocateBuffers(bufferSize, bufferCount);
             m_Thread = new Thread(new ThreadStart(ThreadProc));
+            m_Thread.Name = "Audio Player";
             m_Thread.Start();
         }
         ~WaveOutPlayer()

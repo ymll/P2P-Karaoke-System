@@ -28,8 +28,10 @@ namespace P2PKaraokeSystem.PlaybackLogic
 
         private MediaDecodeInfo mediaDecodeInfo;
         private MediaLoader mediaLoader;
-        private MediaDecoder mediaDecoder;
-        private MediaPlayer mediaPlayer;
+
+        private JobThread frameReaderThread;
+        private JobThread audioDecoderThread;
+        private JobThread videoPlayerThread;
 
         public FFmpegDecoder(PlayerViewModel playerViewModel, PlaybackModel playbackModel)
         {
@@ -40,13 +42,18 @@ namespace P2PKaraokeSystem.PlaybackLogic
 
             mediaDecodeInfo = new MediaDecodeInfo();
             mediaLoader = new MediaLoader(mediaDecodeInfo, playerViewModel);
-            mediaDecoder = new MediaDecoder(mediaDecodeInfo, playerViewModel, isVideoLoadedEvent);
-            mediaPlayer = new MediaPlayer(mediaDecodeInfo, playerViewModel, playbackModel, isVideoPlayingEvent);
+
+            var frameReader = new MediaDecoder(mediaDecodeInfo, playerViewModel);
+            var audioDecoder = new AudioDecoder(mediaDecodeInfo.Audio, mediaDecodeInfo, playerViewModel);
+
+            var videoPlayer = new VideoPlayer(mediaDecodeInfo.Video, playerViewModel, isVideoPlayingEvent);
+            var audioPlayer = new AudioPlayer(mediaDecodeInfo.Audio, playerViewModel, playbackModel, isVideoPlayingEvent);
+
+            frameReaderThread = new JobThread("Frame Reader", frameReader, null, isVideoLoadedEvent);
+            audioDecoderThread = new JobThread("Audio Decoder", audioDecoder, null, isVideoLoadedEvent);
+            videoPlayerThread = new JobThread("Video Player", videoPlayer, null, isVideoPlayingEvent);
 
             playbackModel.PropertyChanged += playbackModel_PropertyChanged;
-
-            mediaPlayer.StartAsync();
-            mediaDecoder.StartAsync();
         }
 
         void playbackModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -54,12 +61,14 @@ namespace P2PKaraokeSystem.PlaybackLogic
             if ("CurrentVideo".Equals(e.PropertyName))
             {
                 this.isVideoLoadedEvent.Reset();
+                this.isVideoPlayingEvent.Reset();
                 UnLoad();
 
                 if (this.playbackModel.CurrentVideo != null)
                 {
                     Load(this.playbackModel.CurrentVideo.FilePath);
                     this.isVideoLoadedEvent.Set();
+                    this.isVideoPlayingEvent.Set();
                 }
             }
             else if ("State".Equals(e.PropertyName))
@@ -82,16 +91,27 @@ namespace P2PKaraokeSystem.PlaybackLogic
             this.playbackModel.Loaded = true;
         }
 
+        public void StartAsync()
+        {
+            videoPlayerThread.Start();
+            audioDecoderThread.Start();
+            frameReaderThread.Start();
+        }
+
         private void UnLoad()
         {
             Tuple<IntPtr, double> imageFramePtrWithTime;
             IntPtr imageFramePtr;
+            AVPacket packet;
+            AudioWaveData waveData;
+
             while (this.playerViewModel.PendingVideoFrames.TryTake(out imageFramePtrWithTime))
             {
                 var pImageFrame = (AVFrame*)imageFramePtrWithTime.Item1.ToPointer();
                 ffmpeg.av_free(pImageFrame->data0);
                 ffmpeg.av_frame_free(&pImageFrame);
             }
+            this.playerViewModel.PendingVideoFrames.Add(null);
 
             while (this.playerViewModel.AvailableImageBufferPool.TryTake(out imageFramePtr))
             {
@@ -99,6 +119,21 @@ namespace P2PKaraokeSystem.PlaybackLogic
                 ffmpeg.av_free(pImageFrame->data0);
                 ffmpeg.av_frame_free(&pImageFrame);
             }
+            this.playerViewModel.AvailableImageBufferPool.Add(IntPtr.Zero);
+
+            while (this.playerViewModel.PendingAudioPackets.TryTake(out packet))
+            {
+                ffmpeg.av_free_packet(&packet);
+            }
+            packet.size = 0;
+            this.playerViewModel.PendingAudioPackets.Add(packet);
+
+            while (this.playerViewModel.PendingAudioWaveData.TryTake(out waveData))
+            {
+
+            }
+            waveData.size = 0;
+            this.playerViewModel.PendingAudioWaveData.Add(waveData);
 
             ffmpeg.avcodec_close(mediaDecodeInfo.Video.pCodecContext);
 

@@ -9,60 +9,44 @@ using System.Threading.Tasks;
 
 namespace P2PKaraokeSystem.PlaybackLogic.Decode
 {
-    public unsafe class MediaDecoder
+    public unsafe class MediaDecoder : Job
     {
         private VideoDecoder videoDecoder;
-        private AudioDecoder audioDecoder;
 
         private MediaDecodeInfo mediaDecodeInfo;
-        private ManualResetEventSlim isVideoLoadedEvent;
+        private PlayerViewModel playerViewModel;
+        private double pts;
 
-        public MediaDecoder(MediaDecodeInfo mediaDecodeInfo, PlayerViewModel playerViewModel, ManualResetEventSlim isVideoLoadedEvent)
+        public MediaDecoder(MediaDecodeInfo mediaDecodeInfo, PlayerViewModel playerViewModel)
         {
             this.videoDecoder = new VideoDecoder(mediaDecodeInfo.Video, playerViewModel);
-            this.audioDecoder = new AudioDecoder(mediaDecodeInfo.Audio, mediaDecodeInfo, playerViewModel);
 
             this.mediaDecodeInfo = mediaDecodeInfo;
-            this.isVideoLoadedEvent = isVideoLoadedEvent;
+            this.playerViewModel = playerViewModel;
         }
 
-        public void StartAsync()
-        {
-            new Thread(() =>
-            {
-                Start();
-            }).Start();
-
-            new Thread(() =>
-            {
-                audioDecoder.Start();
-            }).Start();
-        }
-
-        private void Start()
+        public void RunRepeatly(ManualResetEventSlim stopSignal, ManualResetEventSlim continueSignal)
         {
             AVPacket packet = new AVPacket();
             AVPacket* pPacket = &packet;
-            double pts = 0;
-
             ffmpeg.av_init_packet(pPacket);
 
-            while (true)
+            if (ReadFrame(pPacket))
             {
-                this.isVideoLoadedEvent.Wait();
-
-                if (ReadFrame(pPacket))
+                if (packet.stream_index == mediaDecodeInfo.Video.pStream->index)
                 {
-                    if (packet.stream_index == mediaDecodeInfo.Video.pStream->index)
-                    {
-                        pts = this.videoDecoder.Decode(pPacket, pts);
-                    }
-                    else if (packet.stream_index == mediaDecodeInfo.Audio.pStream->index)
-                    {
-                        this.audioDecoder.OnNewPacket(pPacket);
-                    }
+                    pts = this.videoDecoder.Decode(pPacket, pts);
+                }
+                else if (packet.stream_index == mediaDecodeInfo.Audio.pStream->index)
+                {
+                    playerViewModel.PendingAudioPackets.Add(packet);
                 }
             }
+        }
+
+        public void CleanUp()
+        {
+
         }
 
         private bool ReadFrame(AVPacket* pPacket)

@@ -13,7 +13,7 @@ using System.Windows.Media.Imaging;
 
 namespace P2PKaraokeSystem.PlaybackLogic.Decode
 {
-    public unsafe class VideoPlayer
+    public unsafe class VideoPlayer : Job
     {
         private VideoDecodeInfo videoDecodeInfo;
         private PlayerViewModel playerViewModel;
@@ -27,23 +27,34 @@ namespace P2PKaraokeSystem.PlaybackLogic.Decode
             this.isVideoPlayingEvent = isVideoPlayingEvent;
         }
 
-        public void Play()
+        public void RunRepeatly(ManualResetEventSlim stopSignal, ManualResetEventSlim continueSignal)
         {
-            this.isVideoPlayingEvent.Wait();
-
             Tuple<IntPtr, double> imageFramePtr = this.playerViewModel.PendingVideoFrames.Take();
-            var pImageFrame = (AVFrame*)imageFramePtr.Item1.ToPointer();
-
-            WriteImageToBuffer(pImageFrame);
-            this.playerViewModel.AvailableImageBufferPool.Add(imageFramePtr.Item1);
-
-            double pts = imageFramePtr.Item2;
-            if (pts < lastPts)
+            if (imageFramePtr != null)
             {
-                lastPts = 0;
+                var pImageFrame = (AVFrame*)imageFramePtr.Item1.ToPointer();
+
+                WriteImageToBuffer(pImageFrame);
+                this.playerViewModel.AvailableImageBufferPool.Add(imageFramePtr.Item1);
+
+                double pts = imageFramePtr.Item2;
+                if (pts < lastPts)
+                {
+                    lastPts = 0;
+                }
+                else if (pts - lastPts > 0.5)
+                {
+                    pts = 0;
+                    lastPts = 0;
+                }
+                Thread.Sleep(TimeSpan.FromSeconds(pts - lastPts));
+                this.lastPts = pts;
             }
-            Thread.Sleep(TimeSpan.FromSeconds(pts - lastPts));
-            this.lastPts = pts;
+        }
+
+        public void CleanUp()
+        {
+
         }
 
         private void WriteImageToBuffer(AVFrame* pImageFrame)
@@ -55,27 +66,10 @@ namespace P2PKaraokeSystem.PlaybackLogic.Decode
             this.playerViewModel.VideoScreenBitmap.Dispatcher.Invoke(() =>
             {
                 this.playerViewModel.VideoScreenBitmap.Lock();
-                CopyMemory(this.playerViewModel.VideoScreenBitmap.BackBuffer, imageBufferPtr, videoDecodeInfo.ImageFrameBufferSize);
+                Util.CopyMemory(this.playerViewModel.VideoScreenBitmap.BackBuffer, imageBufferPtr, videoDecodeInfo.ImageFrameBufferSize);
                 this.playerViewModel.VideoScreenBitmap.AddDirtyRect(new Int32Rect(0, 0, videoDecodeInfo.Width, videoDecodeInfo.Height));
                 this.playerViewModel.VideoScreenBitmap.Unlock();
             });
         }
-
-        private void SaveBufferToFile()
-        {
-            this.playerViewModel.VideoScreenBitmap.Dispatcher.Invoke(() =>
-            {
-                using (FileStream stream = new FileStream("images/Screenshot.jpg", FileMode.Create))
-                {
-                    JpegBitmapEncoder encoder = new JpegBitmapEncoder();
-
-                    encoder.Frames.Add(BitmapFrame.Create(this.playerViewModel.VideoScreenBitmap));
-                    encoder.Save(stream);
-                }
-            });
-        }
-
-        [DllImport("Kernel32.dll", EntryPoint = "RtlMoveMemory")]
-        public static extern void CopyMemory(IntPtr Destination, IntPtr Source, int Length);
     }
 }

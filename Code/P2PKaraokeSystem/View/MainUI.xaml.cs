@@ -3,6 +3,7 @@ using P2PKaraokeSystem.PlaybackLogic;
 using P2PKaraokeSystem.PlaybackLogic.Native.FFmpeg;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -64,7 +65,7 @@ namespace P2PKaraokeSystem.View
 
             this._karaokeSystemModel = (KaraokeSystemModel)this.DataContext;
             new LyricPlayer(this._karaokeSystemModel.Playback, this._karaokeSystemModel.View);
-            new FFmpegDecoder(this._karaokeSystemModel.View, this._karaokeSystemModel.Playback);
+            new FFmpegDecoder(this._karaokeSystemModel.View, this._karaokeSystemModel.Playback).StartAsync();
         }
 
         private void playImg_MouseDown(object sender, MouseButtonEventArgs e)
@@ -135,18 +136,29 @@ namespace P2PKaraokeSystem.View
             this._karaokeSystemModel.Playback.State = PlayState.Playing;
             this._karaokeSystemModel.Playback.Volume = 270;
             preVol = 270;
-
-        }
-
-        private void OnKeyDownHandler(object sender, KeyEventArgs e)
-        {
-            if (e.Key == Key.Return)
-            {
-                this._karaokeSystemModel.VideoDatabase.LoadForSearch("Z:\\Users\\sonia\\note\\year4\\sem2\\CSCI3280\\Project\\Code\\P2PKaraokeSystem\\VideoDatabase\\db.csv", searchBox.Text);
-            }
         }
 
         private void screenImg_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (this._karaokeSystemModel.View.VideoScreenBitmap != null)
+            {
+                this._karaokeSystemModel.View.VideoScreenBitmap.Dispatcher.Invoke(() =>
+                {
+                    string filepath = "screenshots/" + DateTime.Now.ToString("yyyy-MM-dd HHmmss") + ".jpg";
+                    Directory.CreateDirectory(filepath);
+                    using (FileStream stream = new FileStream(filepath, FileMode.Create))
+                    {
+                        JpegBitmapEncoder encoder = new JpegBitmapEncoder();
+
+                        encoder.Frames.Add(BitmapFrame.Create(this._karaokeSystemModel.View.VideoScreenBitmap));
+                        encoder.Save(stream);
+                    }
+                    MessageBox.Show("Your screenshot is saved at \"" + filepath + "\"", "Screen captured!");
+                });
+            }
+        }
+
+        private void connectionImg_MouseDown(object sender, MouseButtonEventArgs e)
         {
             popUp.IsOpen = true;
             this._karaokeSystemModel.VideoDatabase.SaveIpPort(ipAdd.Text, portNum.Text);
@@ -155,6 +167,17 @@ namespace P2PKaraokeSystem.View
         private void PopUp_OK_Click(object sender, RoutedEventArgs e)
         {
             popUp.IsOpen = false;
+        }
+
+        private void RemoveMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            int selectedIndex = Playlist.SelectedIndex;
+            if (selectedIndex >= 0)
+            {
+                VideoDatabase.Video video = this._karaokeSystemModel.VideoDatabase.Videos[selectedIndex];
+                this._karaokeSystemModel.VideoDatabase.Videos.Remove(video);
+                Playlist.Items.Refresh();
+            }
         }
     }
 }
