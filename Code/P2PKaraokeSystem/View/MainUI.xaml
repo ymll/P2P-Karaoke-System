@@ -331,9 +331,31 @@
                                         <Binding Path="Text" ElementName="searchBox" />
                                     </MultiBinding>
                                 </DockPanel.Visibility>
-                                <TextBlock Text="{Binding Title}" HorizontalAlignment="Left" Foreground="White" VerticalAlignment="Center" FontSize="24" FontWeight="Bold"></TextBlock>
+                                <TextBlock HorizontalAlignment="Left" Foreground="White" VerticalAlignment="Center" FontSize="24" FontWeight="Bold">
+                                    <TextBlock.Style>
+                                        <Style TargetType="{x:Type TextBlock}">
+                                            <Setter Property="Text" Value="{Binding Title}" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding Path=Title.Length, FallbackValue=0, TargetNullValue=0}" Value="0">
+                                                    <Setter Property="Text" Value="N/A" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
                                 <TextBlock Text="   ---    " HorizontalAlignment="Left" Foreground="White" VerticalAlignment="Center"></TextBlock>
-                                <TextBlock Text="{Binding Performer.Name}" HorizontalAlignment="Center" Foreground="LightGray" VerticalAlignment="Center" FontSize="16" FontWeight="Bold"></TextBlock>
+                                <TextBlock HorizontalAlignment="Center" Foreground="LightGray" VerticalAlignment="Center" FontSize="16" FontWeight="Bold">
+                                    <TextBlock.Style>
+                                        <Style TargetType="{x:Type TextBlock}">
+                                            <Setter Property="Text" Value="{Binding Performer.Name}" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding Path=Performer.Name.Length, FallbackValue=0, TargetNullValue=0}" Value="0">
+                                                    <Setter Property="Text" Value="N/A" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
                                 <TextBlock Text="[Time]" HorizontalAlignment="Right" Foreground="White" VerticalAlignment="Center"></TextBlock>
                                 <DockPanel.ContextMenu>
                                     <ContextMenu>
