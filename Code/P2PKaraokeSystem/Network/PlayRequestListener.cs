@@ -26,7 +26,14 @@ namespace P2PKaraokeSystem.Network
                 FilePath += Convert.ToChar(data[i]);
             }
             Console.Write("FilePath = ");
-            Console.WriteLine(FilePath);   
+            Console.WriteLine(FilePath);
+            if (File.Exists(FilePath))
+            {
+                //send response to that person
+            }
+            else {
+                return;
+            }
 
   /*          var aviHeaderParser = new P2PKaraokeSystem.PlaybackLogic.AviHeaderParser();   
             aviHeaderParser.LoadFile(FilePath);
@@ -80,20 +87,23 @@ namespace P2PKaraokeSystem.Network
             FileStream fileStream = File.Open(fileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
 
             int read;
-            int totalWritten = 0;
-            byte[] buffer = new byte[1024*32-2];
-            while (((read = fileStream.Read(buffer, 0, buffer.Length))) > 0 || (file.Length - totalWritten > 0))
+            long totalWritten = 0;
+            byte[] buffer = new byte[1024*32 - 2];
+            while (((read = fileStream.Read(buffer, 8, 1024 * 32 - 10))) > 0)
             {
+                byte[] temsize = BitConverter.GetBytes(totalWritten);
+                System.Buffer.BlockCopy(temsize, 0, buffer, 0, temsize.Length);
 
                 Console.WriteLine(file.Length - totalWritten);
                 c3.AddPayload(out senddata, buffer, PacketType.VIDEO_STREAM);
-            /* for (int i = 0; i <(senddata.Length); i++)
+          //      Console.WriteLine("send form {0} to {1}", totalWritten, totalWritten + buffer.Length - 8);
+         /*    for (int i = 2; i <(senddata.Length); i++)
             {
                 Console.Write(senddata[i]);
             }*/
-                c3.SendTCP(senddata, 0, read+2);
+                c3.SendTCP(senddata, 0, read+10);
                 totalWritten += read;
-                Thread.Sleep(200);
+                Thread.Sleep(50);
             }
             Console.WriteLine("Return form sending ...");
         }
