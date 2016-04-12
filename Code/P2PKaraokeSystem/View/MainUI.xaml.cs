@@ -24,7 +24,7 @@ namespace P2PKaraokeSystem.View
     {
         private KaraokeSystemModel _karaokeSystemModel;
         int preVol = 127;
-
+        public string searchKeyWords;
 
         public MainUI()
         {
@@ -178,6 +178,14 @@ namespace P2PKaraokeSystem.View
                 VideoDatabase.Video video = this._karaokeSystemModel.VideoDatabase.Videos[selectedIndex];
                 this._karaokeSystemModel.VideoDatabase.Videos.Remove(video);
                 Playlist.Items.Refresh();
+            }
+        }
+
+        private void searchEnterDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Return)
+            {
+                searchKeyWords = searchBox.Text;
             }
         }
     }
