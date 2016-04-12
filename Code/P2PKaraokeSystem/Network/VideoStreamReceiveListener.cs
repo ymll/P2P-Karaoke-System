@@ -10,7 +10,7 @@ namespace P2PKaraokeSystem.Network
     public class VideoStreamReceiveListener : DataReceiveListener
     {
         private static long upto = 0;
-        public void OnDataReceived(PacketType packetType, byte[] data)
+        public void OnDataReceived(PacketType packetType, byte[] data, String ipAddress, Int32 portNo)
         {
             Console.WriteLine(packetType);
             Console.WriteLine("VideoStreamReceiveListener OnDataReceived\n");

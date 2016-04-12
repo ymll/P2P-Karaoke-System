@@ -12,7 +12,7 @@ namespace P2PKaraokeSystem.Network
 {
     public class MediaInfoReceiveListener : DataReceiveListener
     {      
-        public void OnDataReceived(PacketType packetType, byte[] data)
+        public void OnDataReceived(PacketType packetType, byte[] data, String ipAddress, Int32 portNo)
         {
             Console.WriteLine("MediaInfoReceiveListener OnDataReceived\n");
            /* for (int i = 0; i < data.Length; i++){

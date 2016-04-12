@@ -79,7 +79,7 @@ namespace P2PKaraokeSystem.Network
                         Console.WriteLine("\n");
                 /*      for (int k = 0; k < i-payloadSize; k++)
                             Console.Write(Convert.ToChar(destData[k]));*/
-                        this.NotifyListeners(packetType, destData);
+                        this.NotifyListeners(packetType, destData, ((IPEndPoint)client.Client.RemoteEndPoint).Address.ToString(), ((IPEndPoint)client.Client.RemoteEndPoint).Port);
                     }
 
                 } 
