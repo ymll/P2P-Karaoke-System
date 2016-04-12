@@ -3,6 +3,7 @@ using P2PKaraokeSystem.PlaybackLogic;
 using P2PKaraokeSystem.PlaybackLogic.Native.FFmpeg;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -138,6 +139,26 @@ namespace P2PKaraokeSystem.View
         }
 
         private void screenImg_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (this._karaokeSystemModel.View.VideoScreenBitmap != null)
+            {
+                this._karaokeSystemModel.View.VideoScreenBitmap.Dispatcher.Invoke(() =>
+                {
+                    string filepath = "screenshots/" + DateTime.Now.ToString("yyyy-MM-dd HHmmss") + ".jpg";
+                    Directory.CreateDirectory(filepath);
+                    using (FileStream stream = new FileStream(filepath, FileMode.Create))
+                    {
+                        JpegBitmapEncoder encoder = new JpegBitmapEncoder();
+
+                        encoder.Frames.Add(BitmapFrame.Create(this._karaokeSystemModel.View.VideoScreenBitmap));
+                        encoder.Save(stream);
+                    }
+                    MessageBox.Show("Your screenshot is saved at \"" + filepath + "\"", "Screen captured!");
+                });
+            }
+        }
+
+        private void connectionImg_MouseDown(object sender, MouseButtonEventArgs e)
         {
             popUp.IsOpen = true;
         }

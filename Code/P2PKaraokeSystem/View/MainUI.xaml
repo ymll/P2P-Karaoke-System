@@ -240,13 +240,13 @@
             </Image.Style>
         </Image>
 
-        <!-- Connection Form -->
         <Image x:Name="screenCapImg"
-                Grid.Row="2"
-        	    HorizontalAlignment="Left" VerticalAlignment="Top"
-        	    Height="31" Width="40"
-        	    Margin="850,29,0,0"
-                MouseDown="screenImg_MouseDown">
+        	Grid.Row="2"
+        	HorizontalAlignment="Left" VerticalAlignment="Top"
+        	Height="31" Width="40"
+        	Margin="800,29,0,0"
+            ToolTip="Click to capture screen"
+        	MouseDown="screenImg_MouseDown">
             <Image.Style>
                 <Style TargetType="{x:Type Image}">
                     <Style.Triggers>
@@ -259,6 +259,33 @@
                         <MultiDataTrigger>
                             <MultiDataTrigger.Conditions>
                                 <Condition Binding="{Binding IsMouseOver, ElementName=screenCapImg}" Value="False"/>
+                            </MultiDataTrigger.Conditions>
+                            <Setter Property="Source" Value="..\View\UIMaterial\Image\screen.png"/>
+                        </MultiDataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Image.Style>
+        </Image>
+
+        <!-- Connection Form -->
+        <Image x:Name="connectionImg"
+                Grid.Row="2"
+        	    HorizontalAlignment="Left" VerticalAlignment="Top"
+        	    Height="31" Width="40"
+        	    Margin="850,29,0,0"
+                MouseDown="connectionImg_MouseDown">
+            <Image.Style>
+                <Style TargetType="{x:Type Image}">
+                    <Style.Triggers>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding IsMouseOver, ElementName=connectionImg}" Value="True"/>
+                            </MultiDataTrigger.Conditions>
+                            <Setter Property="Source" Value="..\View\UIMaterial\Image\screen_blue.png"/>
+                        </MultiDataTrigger>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding IsMouseOver, ElementName=connectionImg}" Value="False"/>
                             </MultiDataTrigger.Conditions>
                             <Setter Property="Source" Value="..\View\UIMaterial\Image\screen.png"/>
                         </MultiDataTrigger>
@@ -331,9 +358,31 @@
                                         <Binding Path="Text" ElementName="searchBox" />
                                     </MultiBinding>
                                 </DockPanel.Visibility>
-                                <TextBlock Text="{Binding Title}" HorizontalAlignment="Left" Foreground="White" VerticalAlignment="Center" FontSize="24" FontWeight="Bold"></TextBlock>
+                                <TextBlock HorizontalAlignment="Left" Foreground="White" VerticalAlignment="Center" FontSize="24" FontWeight="Bold">
+                                    <TextBlock.Style>
+                                        <Style TargetType="{x:Type TextBlock}">
+                                            <Setter Property="Text" Value="{Binding Title}" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding Path=Title.Length, FallbackValue=0, TargetNullValue=0}" Value="0">
+                                                    <Setter Property="Text" Value="N/A" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
                                 <TextBlock Text="   ---    " HorizontalAlignment="Left" Foreground="White" VerticalAlignment="Center"></TextBlock>
-                                <TextBlock Text="{Binding Performer.Name}" HorizontalAlignment="Center" Foreground="LightGray" VerticalAlignment="Center" FontSize="16" FontWeight="Bold"></TextBlock>
+                                <TextBlock HorizontalAlignment="Center" Foreground="LightGray" VerticalAlignment="Center" FontSize="16" FontWeight="Bold">
+                                    <TextBlock.Style>
+                                        <Style TargetType="{x:Type TextBlock}">
+                                            <Setter Property="Text" Value="{Binding Performer.Name}" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding Path=Performer.Name.Length, FallbackValue=0, TargetNullValue=0}" Value="0">
+                                                    <Setter Property="Text" Value="N/A" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
                                 <TextBlock Text="[Time]" HorizontalAlignment="Right" Foreground="White" VerticalAlignment="Center"></TextBlock>
                                 <DockPanel.ContextMenu>
                                     <ContextMenu>

@@ -158,13 +158,14 @@ namespace P2PKaraokeSystem.Model
                 try
                 {
                     TimeSpan timeSpan = TimeSpan.FromMilliseconds(currentMillisecond);
-                    IOneLineLyric oneLineLyric = _lyricFile.AfterOrAt(timeSpan);
-                    return oneLineLyric.Content;
+                    if (_lyricFile != null)
+                    {
+                        IOneLineLyric oneLineLyric = _lyricFile.AfterOrAt(timeSpan);
+                        return oneLineLyric.Content;
+                    }
                 }
-                catch (Exception)
-                {
-                    return "";
-                }
+                catch (Exception) { }
+                return "";
             }
         }
     }
