@@ -87,6 +87,22 @@ namespace P2PKaraokeSystem.PlaybackLogic
 
         private void Load(string path)
         {
+            if (!File.Exists(path))
+            {
+                Byte[] requestFile = Encoding.ASCII.GetBytes(path);
+                Byte[] sendBytes;
+                ClientReceiveManager clientRecv = new ClientReceiveManager("127.0.0.1", 12346, 1024 * 32);
+                clientRecv.RegisterListener(PacketType.VIDEO_STREAM, new VideoStreamReceiveListener());
+                clientRecv.StartReceiveTcpPacket();
+                //TODO: send to all known addresses
+                ClientSendManager clientSendManager = new ClientSendManager("127.0.0.1", 12345);
+                clientSendManager.AddPayload(out sendBytes, requestFile, PacketType.PLAY_REQUEST);
+                clientSendManager.SendTCP(sendBytes, 0, sendBytes.Length);
+                //TODO: problem: freeze The UI window before can play
+                while (!File.Exists(path));
+            }
+            //TODO: problem: freeze The UI window before can play
+            while (new FileInfo(path).Length < 25000000) ;
             mediaLoader.Load(path);
             this.playbackModel.Loaded = true;
         }
