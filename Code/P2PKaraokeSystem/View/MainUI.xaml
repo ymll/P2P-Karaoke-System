@@ -2,37 +2,39 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:local_model="clr-namespace:P2PKaraokeSystem.Model"
+        xmlns:local_converter="clr-namespace:P2PKaraokeSystem.View.Converter"
         Title="P2P Karaoke System" Height="677" Width="1289" Icon="..\View\UIMaterial\Image\icon.ico" WindowState="Maximized" WindowStartupLocation="CenterScreen">
     <Window.DataContext>
         <local_model:KaraokeSystemModel/>
     </Window.DataContext>
 
     <Window.Resources>
-        <Style TargetType="TextBox">
+        <local_converter:PlaylistVisiblityConverter x:Key="PlaylistVisiblityConverter"/>
+        <Style TargetType="{x:Type TextBox}">
             <Setter Property="Template">
                 <Setter.Value>
-                    <ControlTemplate TargetType="TextBox">
+                    <ControlTemplate TargetType="{x:Type TextBox}">
                         <Border BorderThickness="{TemplateBinding Border.BorderThickness}"
                       BorderBrush="DeepPink"
                       Background="{TemplateBinding Panel.Background}"
-                      Name="border"
+                      x:Name="border"
                       SnapsToDevicePixels="True">
                             <ScrollViewer HorizontalScrollBarVisibility="Hidden"
                                VerticalScrollBarVisibility="Hidden"
-                               Name="PART_ContentHost"
+                               x:Name="PART_ContentHost"
                                Focusable="False" />
                         </Border>
                         <ControlTemplate.Triggers>
-                            <Trigger Property="UIElement.IsEnabled" Value="False">
-                                <Setter Property="UIElement.Opacity" TargetName="border"
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Opacity" TargetName="border"
                         Value="0.56"/>
                             </Trigger>
-                            <Trigger Property="UIElement.IsMouseOver" Value="True">
-                                <Setter Property="Border.BorderBrush" TargetName="border" 
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="BorderBrush" TargetName="border" 
                         Value="DeepPink"/>
                             </Trigger>
-                            <Trigger Property="UIElement.IsKeyboardFocused" Value="True">
-                                <Setter Property="Border.BorderBrush" TargetName="border" 
+                            <Trigger Property="IsKeyboardFocused" Value="True">
+                                <Setter Property="BorderBrush" TargetName="border" 
                        Value="DeepPink"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
@@ -306,11 +308,10 @@
                    Margin="958,0,0,0" MinHeight="30"
                    VerticalAlignment="Top"
                    Background="Black" Foreground="DeepPink"
-                   Text="Please input keyword for search" TextAlignment="Justify" TextWrapping="Wrap" FontSize="16"
+                   Text="" TextAlignment="Justify" TextWrapping="Wrap" FontSize="16"
                    AcceptsReturn="False"
                    BorderBrush="DeepPink" BorderThickness="2"
-                   SelectionBrush="DeepPink" Opacity="0.75"
-                   KeyDown="OnKeyDownHandler">
+                   SelectionBrush="DeepPink" Opacity="0.75">
         </TextBox>
 
         <!-- Music List-->
@@ -320,14 +321,26 @@
             Margin="958,28,0,0"
             HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Auto">
             <Border BorderBrush="DeepPink" BorderThickness="2">
-                <ListView ItemsSource="{Binding VideoDatabase.Videos}" SelectionMode="Single" Background="Black" MouseDoubleClick="ListView_MouseDoubleClick">
+                <ListView Name="Playlist" ItemsSource="{Binding VideoDatabase.Videos}" SelectionMode="Single" Background="Black" MouseDoubleClick="ListView_MouseDoubleClick">
                     <ListView.ItemTemplate>
                         <DataTemplate>
-                            <DockPanel Height="40">
+                            <DockPanel Height="40" Background="Transparent">
+                                <DockPanel.Visibility>
+                                    <MultiBinding Converter="{StaticResource PlaylistVisiblityConverter}">
+                                        <Binding />
+                                        <Binding Path="Text" ElementName="searchBox" />
+                                    </MultiBinding>
+                                </DockPanel.Visibility>
                                 <TextBlock Text="{Binding Title}" HorizontalAlignment="Left" Foreground="White" VerticalAlignment="Center" FontSize="24" FontWeight="Bold"></TextBlock>
                                 <TextBlock Text="   ---    " HorizontalAlignment="Left" Foreground="White" VerticalAlignment="Center"></TextBlock>
                                 <TextBlock Text="{Binding Performer.Name}" HorizontalAlignment="Center" Foreground="LightGray" VerticalAlignment="Center" FontSize="16" FontWeight="Bold"></TextBlock>
                                 <TextBlock Text="[Time]" HorizontalAlignment="Right" Foreground="White" VerticalAlignment="Center"></TextBlock>
+                                <DockPanel.ContextMenu>
+                                    <ContextMenu>
+                                        <MenuItem Header="Edit" />
+                                        <MenuItem Header="Remove Item" Click="RemoveMenuItem_Click" />
+                                    </ContextMenu>
+                                </DockPanel.ContextMenu>
                             </DockPanel>
                         </DataTemplate>
                     </ListView.ItemTemplate>
@@ -339,8 +352,5 @@
                 </ListView>
             </Border>
         </ScrollViewer>
-
     </Grid>
-    
-    
 </Window>

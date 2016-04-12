@@ -135,15 +135,6 @@ namespace P2PKaraokeSystem.View
             this._karaokeSystemModel.Playback.State = PlayState.Playing;
             this._karaokeSystemModel.Playback.Volume = 270;
             preVol = 270;
-
-        }
-
-        private void OnKeyDownHandler(object sender, KeyEventArgs e)
-        {
-            if (e.Key == Key.Return)
-            {
-                this._karaokeSystemModel.VideoDatabase.LoadForSearch("Z:\\Users\\sonia\\note\\year4\\sem2\\CSCI3280\\Project\\Code\\P2PKaraokeSystem\\VideoDatabase\\db.csv", searchBox.Text);
-            }
         }
 
         private void screenImg_MouseDown(object sender, MouseButtonEventArgs e)
@@ -154,6 +145,17 @@ namespace P2PKaraokeSystem.View
         private void PopUp_OK_Click(object sender, RoutedEventArgs e)
         {
             popUp.IsOpen = false;
+        }
+
+        private void RemoveMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            int selectedIndex = Playlist.SelectedIndex;
+            if (selectedIndex >= 0)
+            {
+                VideoDatabase.Video video = this._karaokeSystemModel.VideoDatabase.Videos[selectedIndex];
+                this._karaokeSystemModel.VideoDatabase.Videos.Remove(video);
+                Playlist.Items.Refresh();
+            }
         }
     }
 }

@@ -117,6 +117,7 @@
     <Compile Include="PlaybackLogic\Native\WaveOut.cs" />
     <Compile Include="PlaybackLogic\Util.cs" />
     <Compile Include="PlaybackLogic\VideoHeaderReader.cs" />
+    <Compile Include="View\Converter\PlaylistVisiblityConverter.cs" />
     <Compile Include="View\MainUI.xaml.cs">
       <DependentUpon>MainUI.xaml</DependentUpon>
     </Compile>

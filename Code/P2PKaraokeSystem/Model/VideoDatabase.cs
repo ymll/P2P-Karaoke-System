@@ -41,11 +41,6 @@ namespace P2PKaraokeSystem.Model
             Load(new StringReader(text));
         }
 
-        public void LoadForSearch(string path, string keywords)
-        {
-            LoadSearch(keywords);
-        }
-
         private void Load(TextReader textReader)
         {
             using (CsvReader csv = new CsvReader(textReader))
@@ -58,37 +53,6 @@ namespace P2PKaraokeSystem.Model
 
                     Videos.Add(video);
                     allVideos.Add(video);
-                }
-            }
-        }
-
-        private void LoadSearch(string keywords)
-        {
-
-            Video[] tempVideoArr = new Video[allVideos.Count];
-            allVideos.CopyTo(tempVideoArr, 0);
-            int videoCount = allVideos.Count;
-
-            Videos.Clear();
-            string[] words = keywords.Split(' ');
-
-            for (int k = 0; k < words.Count(); k++)
-            {
-                for (int i = 0; i < videoCount; i++)
-                {
-                    if (tempVideoArr[i].Performer.Name == words[k] || tempVideoArr[i].Title == words[k])
-                    {
-                        Videos.Add(tempVideoArr[i]);
-                    }
-                }
-            }
-
-            if (keywords == "")
-            {
-                Videos.Clear();
-                for (int i = 0; i < videoCount; i++)
-                {
-                    Videos.Add(allVideos[i]);
                 }
             }
         }
