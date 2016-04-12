@@ -72,16 +72,24 @@
     </ApplicationDefinition>
     <Compile Include="Model\VideoDatabase.cs" />
     <Compile Include="Network\AbstractNetworkManager.cs" />
+    <Compile Include="Network\AudioStreamReceiveListener.cs" />
     <Compile Include="Network\ClientReceiveManager.cs" />
     <Compile Include="Network\AbstractReceiveManager.cs" />
     <Compile Include="Network\AbstractSendManager.cs" />
     <Compile Include="Network\ClientSendManager.cs" />
     <Compile Include="Network\DataReceiveListener.cs" />
     <Compile Include="Network\DataSendListener.cs" />
+    <Compile Include="Network\LyricRequestListener.cs" />
+    <Compile Include="Network\MediaInfoReceiveListener.cs" />
+    <Compile Include="Network\PlayRequestListener.cs" />
+    <Compile Include="Network\SearchQueryReceiveListener.cs" />
+    <Compile Include="Network\SearchResultReceiveListener.cs" />
     <Compile Include="Network\ServerStruct.cs" />
     <Compile Include="Network\PacketType.cs" />
     <Compile Include="Network\ServerReceiveManager.cs" />
     <Compile Include="Network\ServerSendManager.cs" />
+    <Compile Include="Network\SubtitleReceiveListener.cs" />
+    <Compile Include="Network\VideoStreamReceiveListener.cs" />
     <Compile Include="PlaybackLogic\AudioFrameReader.cs" />
     <Compile Include="PlaybackLogic\AudioHeaderReader.cs" />
     <Compile Include="PlaybackLogic\Decode\AudioDecodeInfo.cs" />
