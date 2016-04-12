@@ -1,5 +1,7 @@
-﻿using P2PKaraokeSystem.Model;
+﻿using Microsoft.Win32;
+using P2PKaraokeSystem.Model;
 using P2PKaraokeSystem.PlaybackLogic;
+using P2PKaraokeSystem.PlaybackLogic.Decode;
 using P2PKaraokeSystem.PlaybackLogic.Native.FFmpeg;
 using System;
 using System.Collections.Generic;
@@ -203,7 +205,7 @@ namespace P2PKaraokeSystem.View
             tempvideo.Title = EditTitle.Text;
             tempvideo.Performer.Name = EditSinger.Text;
             this._karaokeSystemModel.VideoDatabase.Videos.RemoveAt(selectedIndex);
-            this._karaokeSystemModel.VideoDatabase.Videos.Insert(selectedIndex,tempvideo);
+            this._karaokeSystemModel.VideoDatabase.Videos.Insert(selectedIndex, tempvideo);
             Playlist.Items.Refresh();
             popUpEdit.IsOpen = false;
         }
@@ -213,6 +215,39 @@ namespace P2PKaraokeSystem.View
             if (e.Key == Key.Return)
             {
                 searchKeyWords = searchBox.Text;
+            }
+        }
+
+        private void AddSongButton_Click(object sender, RoutedEventArgs e)
+        {
+            OpenFileDialog fileDialog = new OpenFileDialog();
+            fileDialog.ReadOnlyChecked = true;
+            fileDialog.Multiselect = true;
+
+            bool? isOpened = fileDialog.ShowDialog();
+
+            if (isOpened.GetValueOrDefault(false))
+            {
+                foreach (string fileName in fileDialog.FileNames)
+                {
+                    MediaDecodeInfo mediaDecodeInfo = new MediaDecodeInfo();
+                    MediaLoader loader = new MediaLoader(mediaDecodeInfo, this._karaokeSystemModel.View);
+                    try
+                    {
+                        loader.RetrieveFormatAndStreamInfo(fileName);
+                    }
+                    catch (Exception)
+                    {
+                        continue;
+                    }
+
+                    VideoDatabase.Video video = new VideoDatabase.Video(fileName, mediaDecodeInfo.LengthInMillisecond);
+
+                    if (!this._karaokeSystemModel.VideoDatabase.Videos.Any(v => fileName.Equals(v.FilePath)))
+                    {
+                        this._karaokeSystemModel.VideoDatabase.Videos.Add(video);
+                    }
+                }
             }
         }
     }

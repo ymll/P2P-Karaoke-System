@@ -49,7 +49,7 @@ namespace P2PKaraokeSystem.Model
         {
             LoadSearch(keywords);
             //send to peer for query
-            clientList.ForEach(delegate (ServerStruct serverstruce)
+            clientList.ForEach(delegate(ServerStruct serverstruce)
             {
                 ClientSendManager manager = new ClientSendManager(serverstruce.serveripString, serverstruce.serverport);
                 byte[] sendKeywords = Encoding.ASCII.GetBytes(keywords);
@@ -67,7 +67,7 @@ namespace P2PKaraokeSystem.Model
                 {
                     Performer performer = new Performer(csv.GetField<string>("PerformerName"));
                     Lyric lyric = new Lyric(csv.GetField<string>("LyricFilePath"));
-                    Video video = new Video(csv.GetField<string>("VideoTitle"), csv.GetField<string>("VideoFilePath"), performer, lyric);
+                    Video video = new Video(csv.GetField<string>("VideoTitle"), csv.GetField<string>("VideoFilePath"), csv.GetField<long>("LengthInMillisecond"), performer, lyric);
 
                     Videos.Add(video);
                     allVideos.Add(video);
@@ -110,7 +110,7 @@ namespace P2PKaraokeSystem.Model
         {
             String[] words = keywords.Split(' ');
             ObservableCollection<Video> VideosPeer = new ObservableCollection<Video>();
-            
+
             Video[] tempVideoArr = new Video[allVideos.Count];
             allVideos.CopyTo(tempVideoArr, 0);
             int videoCount = allVideos.Count;
@@ -120,7 +120,7 @@ namespace P2PKaraokeSystem.Model
             for (int i = 0; i < videoCount; i++)
             {
                 contain = false;
-                for (int k = 0; i< words.Count(); k++)
+                for (int k = 0; i < words.Count(); k++)
                 {
                     //if (tempVideoArr[i].Performer.Name.Contains(words[k])) contain = true;
                     //if (tempVideoArr[i].Title.Contains(words[k])) contain = true;
@@ -130,7 +130,7 @@ namespace P2PKaraokeSystem.Model
             }
             if (VideosPeer.Count == 0) return null;
             else return VideosPeer;
-            
+
         }
 
         public void SaveIpPort(string ipAddress, string port)
@@ -162,6 +162,7 @@ namespace P2PKaraokeSystem.Model
             using (CsvWriter csv = new CsvWriter(textWriter))
             {
                 csv.WriteField<string>("PerformerName");
+                csv.WriteField<string>("LengthInMillisecond");
                 csv.WriteField<string>("LyricFilePath");
                 csv.WriteField<string>("VideoTitle");
                 csv.WriteField<string>("VideoFilePath");
@@ -170,6 +171,7 @@ namespace P2PKaraokeSystem.Model
                 foreach (Video video in Videos)
                 {
                     csv.WriteField<string>(video.Performer.Name);
+                    csv.WriteField<long>(video.LengthInMillisecond);
                     csv.WriteField<string>(video.Lyric.FilePath);
                     csv.WriteField<string>(video.Title);
                     csv.WriteField<string>(video.FilePath);
@@ -182,13 +184,21 @@ namespace P2PKaraokeSystem.Model
         {
             public String Title { get; set; }
             public String FilePath { get; set; }
+            public long LengthInMillisecond { get; set; }
             public Performer Performer { get; set; }
             public Lyric Lyric { get; set; }
 
-            public Video(String title, String filePath, Performer performer, Lyric lyric)
+            public Video(String filePath, long lengthInMillisecond)
+                : this(Path.GetFileNameWithoutExtension(filePath), filePath, lengthInMillisecond, new Performer(""), new Lyric(""))
+            {
+
+            }
+
+            public Video(String title, String filePath, long lengthInMillisecond, Performer performer, Lyric lyric)
             {
                 this.Title = title;
                 this.FilePath = filePath;
+                this.LengthInMillisecond = lengthInMillisecond;
                 this.Performer = performer;
                 this.Lyric = lyric;
             }
