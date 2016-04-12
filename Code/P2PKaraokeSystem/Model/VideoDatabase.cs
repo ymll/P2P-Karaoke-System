@@ -209,7 +209,6 @@ namespace P2PKaraokeSystem.Model
             public String FilePath { get; set; }
             public Performer Performer { get; set; }
             public Lyric Lyric { get; set; }
-            public 
 
             public Video(String title, String filePath, Performer performer, Lyric lyric)
             {
