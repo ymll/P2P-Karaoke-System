@@ -71,19 +71,5 @@ namespace P2PKaraokeSystem.PlaybackLogic.Decode
                 this.playerViewModel.VideoScreenBitmap.Unlock();
             });
         }
-
-        private void SaveBufferToFile()
-        {
-            this.playerViewModel.VideoScreenBitmap.Dispatcher.Invoke(() =>
-            {
-                using (FileStream stream = new FileStream("images/Screenshot.jpg", FileMode.Create))
-                {
-                    JpegBitmapEncoder encoder = new JpegBitmapEncoder();
-
-                    encoder.Frames.Add(BitmapFrame.Create(this.playerViewModel.VideoScreenBitmap));
-                    encoder.Save(stream);
-                }
-            });
-        }
     }
 }

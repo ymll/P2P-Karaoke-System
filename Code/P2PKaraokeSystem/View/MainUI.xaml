@@ -240,13 +240,13 @@
             </Image.Style>
         </Image>
 
-        <!-- Connection Form -->
         <Image x:Name="screenCapImg"
-                Grid.Row="2"
-        	    HorizontalAlignment="Left" VerticalAlignment="Top"
-        	    Height="31" Width="40"
-        	    Margin="850,29,0,0"
-                MouseDown="screenImg_MouseDown">
+        	Grid.Row="2"
+        	HorizontalAlignment="Left" VerticalAlignment="Top"
+        	Height="31" Width="40"
+        	Margin="800,29,0,0"
+            ToolTip="Click to capture screen"
+        	MouseDown="screenImg_MouseDown">
             <Image.Style>
                 <Style TargetType="{x:Type Image}">
                     <Style.Triggers>
@@ -259,6 +259,33 @@
                         <MultiDataTrigger>
                             <MultiDataTrigger.Conditions>
                                 <Condition Binding="{Binding IsMouseOver, ElementName=screenCapImg}" Value="False"/>
+                            </MultiDataTrigger.Conditions>
+                            <Setter Property="Source" Value="..\View\UIMaterial\Image\screen.png"/>
+                        </MultiDataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Image.Style>
+        </Image>
+
+        <!-- Connection Form -->
+        <Image x:Name="connectionImg"
+                Grid.Row="2"
+        	    HorizontalAlignment="Left" VerticalAlignment="Top"
+        	    Height="31" Width="40"
+        	    Margin="850,29,0,0"
+                MouseDown="connectionImg_MouseDown">
+            <Image.Style>
+                <Style TargetType="{x:Type Image}">
+                    <Style.Triggers>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding IsMouseOver, ElementName=connectionImg}" Value="True"/>
+                            </MultiDataTrigger.Conditions>
+                            <Setter Property="Source" Value="..\View\UIMaterial\Image\screen_blue.png"/>
+                        </MultiDataTrigger>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding IsMouseOver, ElementName=connectionImg}" Value="False"/>
                             </MultiDataTrigger.Conditions>
                             <Setter Property="Source" Value="..\View\UIMaterial\Image\screen.png"/>
                         </MultiDataTrigger>
