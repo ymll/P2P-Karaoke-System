@@ -9,6 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Collections;
+using System.ComponentModel;
 
 
 namespace P2PKaraokeSystem.Model
@@ -20,19 +21,41 @@ namespace P2PKaraokeSystem.Model
         public ObservableCollection<Video> VideosFromPeer { get; set; }
         public static List<ServerStruct> clientList = new List<ServerStruct>();
 
+        private string DatabaseFileLocation;
+        private readonly string[] DIRECTORIES_FOR_DB_FILE = new string[]{
+                Environment.CurrentDirectory,
+                Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
+                Environment.GetFolderPath(Environment.SpecialFolder.MyVideos),
+                Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory),
+                Path.GetTempPath()
+            };
+        private const string DATABASE_FILENAME = "KaraokeSystemDatabase.csv";
+
         public VideoDatabase()
         {
             Videos = new ObservableCollection<Video>();
             allVideos = new ObservableCollection<Video>();
 
-            try
-            {
-                LoadFromFile("..\\..\\VideoDatabase\\db.csv");
-            }
-            catch (Exception)
-            {
+            LoadFromFile();
+        }
 
+        public void LoadFromFile()
+        {
+            foreach (string directory in DIRECTORIES_FOR_DB_FILE)
+            {
+                string filepath = Path.Combine(directory, DATABASE_FILENAME);
+                try
+                {
+                    Directory.CreateDirectory(directory);
+                    LoadFromFile(filepath);
+                    DatabaseFileLocation = filepath;
+                    return;
+                }
+                catch (Exception) { }
             }
+
+            // If database file not exist, create a new one
+            SaveToFile();
         }
 
         public void LoadFromFile(string path)
@@ -140,15 +163,47 @@ namespace P2PKaraokeSystem.Model
             if (!clientList.Contains(serverstruct)) clientList.Add(serverstruct);
         }
 
-        public void SaveToFile(string path)
+        public string SaveToFile()
         {
-            using (StreamWriter streamWriter = new StreamWriter(path))
+            if (DatabaseFileLocation != null)
             {
-                Save(streamWriter);
+                if (SaveToFile(DatabaseFileLocation))
+                {
+                    return DatabaseFileLocation;
+                }
             }
+
+            foreach (string directory in DIRECTORIES_FOR_DB_FILE)
+            {
+                string filepath = Path.Combine(directory, DATABASE_FILENAME);
+
+                if (SaveToFile(filepath))
+                {
+                    DatabaseFileLocation = filepath;
+                    return filepath;
+                }
+            }
+
+            return null;
         }
 
-        public String SaveToText()
+        private bool SaveToFile(string path)
+        {
+            try
+            {
+                using (StreamWriter streamWriter = new StreamWriter(path))
+                {
+                    Save(streamWriter);
+                }
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+            return true;
+        }
+
+        private String SaveToText()
         {
             using (StringWriter stringWriter = new StringWriter())
             {
