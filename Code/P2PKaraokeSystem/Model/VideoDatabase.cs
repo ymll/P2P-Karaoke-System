@@ -16,7 +16,7 @@ namespace P2PKaraokeSystem.Model
     public class VideoDatabase : AbstractNotifyPropertyChanged
     {
         public ObservableCollection<Video> Videos { get; private set; }
-        public ObservableCollection<Video> allVideos { get; private set; }
+        public static ObservableCollection<Video> allVideos { get; private set; }
         public ObservableCollection<Video> VideosFromPeer { get; set; }
         public static List<ServerStruct> clientList = new List<ServerStruct>();
 
@@ -106,7 +106,7 @@ namespace P2PKaraokeSystem.Model
             }
         }
 
-        public ObservableCollection<Video> LoadSearchToPeer(string keywords)
+        public static ObservableCollection<Video> LoadSearchToPeer(string keywords)
         {
             String[] words = keywords.Split(' ');
             ObservableCollection<Video> VideosPeer = new ObservableCollection<Video>();
