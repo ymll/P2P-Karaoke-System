@@ -15,7 +15,7 @@ namespace P2PKaraokeSystem.Model
 {
     public class VideoDatabase : AbstractNotifyPropertyChanged
     {
-        public ObservableCollection<Video> Videos { get; private set; }
+        public static ObservableCollection<Video> Videos { get; private set; }
         public static ObservableCollection<Video> allVideos { get; private set; }
         //public ObservableCollection<Video> VideosFromPeer { get; set; }
         public static Dictionary<Video, List<ServerStruct>> VideosFromPeer { get; private set; }
@@ -128,6 +128,8 @@ namespace P2PKaraokeSystem.Model
                     VideosFromPeer.Add(video, new List<ServerStruct>());
                     VideosFromPeer[video].Add(serverstruct);
                 }
+                //add to videos
+                if (!Videos.Contains(video)) Videos.Add(video);
             }
         }
 
