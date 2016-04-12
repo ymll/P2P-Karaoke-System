@@ -64,9 +64,11 @@ namespace P2PKaraokeSystem.Network
             try
             {          
                 TcpClient client = new TcpClient();
+                Console.Write(ServeripString);
+                Console.Write(serverport);
                 client.Connect(ServeripString, serverport);
                 NetworkStream networkStream = client.GetStream();
-                networkStream.Write(sendBuffer, 0, size);
+                networkStream.Write(sendBuffer, from, size);
                 networkStream.Flush();
                 client.Close();
             }

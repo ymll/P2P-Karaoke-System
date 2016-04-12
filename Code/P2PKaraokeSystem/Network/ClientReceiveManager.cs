@@ -13,7 +13,7 @@ namespace P2PKaraokeSystem.Network
     {      
         // TODO: Implement TCP receiver for client
         private TcpListener server = null;
-        int bufferSize = 1024 * 8;
+        int bufferSize = 1024 * 32;
         Int32 port = 12345;
         String LocalipString = "127.0.0.1";
         public ClientReceiveManager() {  }//use the above setting
