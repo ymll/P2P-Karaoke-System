@@ -132,10 +132,19 @@ namespace P2PKaraokeSystem.View
 
         private void ListView_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            this._karaokeSystemModel.Playback.CurrentVideo = ((sender as ListView).SelectedItem as Model.VideoDatabase.Video);
-            this._karaokeSystemModel.Playback.State = PlayState.Playing;
-            this._karaokeSystemModel.Playback.Volume = 270;
-            preVol = 270;
+            VideoDatabase.Video selectedVideo = ((sender as ListView).SelectedItem as VideoDatabase.Video);
+            if (VideoDatabase.allVideos.Contains(selectedVideo))
+            {
+                this._karaokeSystemModel.Playback.CurrentVideo = selectedVideo;
+                this._karaokeSystemModel.Playback.State = PlayState.Playing;
+                this._karaokeSystemModel.Playback.Volume = 270;
+                preVol = 270;
+            }
+            else
+            {
+                this._karaokeSystemModel.VideoDatabase.SendVideoRequest(selectedVideo);
+            }
+
         }
 
         private void screenImg_MouseDown(object sender, MouseButtonEventArgs e)
@@ -175,8 +184,8 @@ namespace P2PKaraokeSystem.View
             int selectedIndex = Playlist.SelectedIndex;
             if (selectedIndex >= 0)
             {
-                VideoDatabase.Video video = this._karaokeSystemModel.VideoDatabase.Videos[selectedIndex];
-                this._karaokeSystemModel.VideoDatabase.Videos.Remove(video);
+                VideoDatabase.Video video = VideoDatabase.Videos[selectedIndex];
+                VideoDatabase.Videos.Remove(video);
                 Playlist.Items.Refresh();
             }
         }
@@ -186,6 +195,8 @@ namespace P2PKaraokeSystem.View
             if (e.Key == Key.Return)
             {
                 searchKeyWords = searchBox.Text;
+                this._karaokeSystemModel.VideoDatabase.LoadForSearch(null, searchKeyWords);
+                System.Diagnostics.Debug.WriteLine("SearchEnterDown\n");
             }
         }
     }
