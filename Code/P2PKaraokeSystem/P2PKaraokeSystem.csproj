@@ -243,6 +243,8 @@
     <Content Include="lib\x86\swscale-4.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Resource Include="View\UIMaterial\Image\cap.png" />
+    <Resource Include="View\UIMaterial\Image\cap_blue.png" />
     <Resource Include="View\UIMaterial\Image\minus.png" />
     <Resource Include="View\UIMaterial\Image\minus_blue.png" />
     <Resource Include="View\UIMaterial\Image\plus.png" />

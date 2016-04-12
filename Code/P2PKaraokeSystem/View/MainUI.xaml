@@ -254,13 +254,13 @@
                             <MultiDataTrigger.Conditions>
                                 <Condition Binding="{Binding IsMouseOver, ElementName=screenCapImg}" Value="True"/>
                             </MultiDataTrigger.Conditions>
-                            <Setter Property="Source" Value="..\View\UIMaterial\Image\screen_blue.png"/>
+                            <Setter Property="Source" Value="..\View\UIMaterial\Image\cap_blue.png"/>
                         </MultiDataTrigger>
                         <MultiDataTrigger>
                             <MultiDataTrigger.Conditions>
                                 <Condition Binding="{Binding IsMouseOver, ElementName=screenCapImg}" Value="False"/>
                             </MultiDataTrigger.Conditions>
-                            <Setter Property="Source" Value="..\View\UIMaterial\Image\screen.png"/>
+                            <Setter Property="Source" Value="..\View\UIMaterial\Image\cap.png"/>
                         </MultiDataTrigger>
                     </Style.Triggers>
                 </Style>
