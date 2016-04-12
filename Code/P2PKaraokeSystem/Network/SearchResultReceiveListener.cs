@@ -30,7 +30,7 @@ namespace P2PKaraokeSystem.Network
                     memStream.Seek(0, SeekOrigin.Begin);
                     var obj = binForm.Deserialize(memStream);
                     ObservableCollection<Model.VideoDatabase.Video> videoCollection = (ObservableCollection<Model.VideoDatabase.Video>) obj;
-                    Model.VideoDatabase.LoadResultFromPeer(videoCollection);    //TODO: LoadResultFromPeer
+                    Model.VideoDatabase.LoadResultFromPeer(videoCollection, ipAddress, portNo);    //TODO: LoadResultFromPeer
                 }
             }
             catch (SerializationException e)

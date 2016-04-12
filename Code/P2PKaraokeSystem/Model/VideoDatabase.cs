@@ -17,13 +17,16 @@ namespace P2PKaraokeSystem.Model
     {
         public ObservableCollection<Video> Videos { get; private set; }
         public static ObservableCollection<Video> allVideos { get; private set; }
-        public ObservableCollection<Video> VideosFromPeer { get; set; }
-        public static List<ServerStruct> clientList = new List<ServerStruct>();
+        //public ObservableCollection<Video> VideosFromPeer { get; set; }
+        public static Dictionary<Video, List<ServerStruct>> VideosFromPeer { get; private set; }
+        public static List<ServerStruct> clientList { get; private set; }
 
         public VideoDatabase()
         {
             Videos = new ObservableCollection<Video>();
             allVideos = new ObservableCollection<Video>();
+            VideosFromPeer = new Dictionary<Video, List<ServerStruct>>();
+            clientList = new List<ServerStruct>();
 
             try
             {
@@ -48,7 +51,7 @@ namespace P2PKaraokeSystem.Model
         public void LoadForSearch(string path, string keywords)
         {
             LoadSearch(keywords);
-            //send to peer for query
+            //send to peer for query : TODO add button to send query, otherwise too much lol
             clientList.ForEach(delegate (ServerStruct serverstruce)
             {
                 ClientSendManager manager = new ClientSendManager(serverstruce.serveripString, serverstruce.serverport);
@@ -102,6 +105,28 @@ namespace P2PKaraokeSystem.Model
                 for (int i = 0; i < videoCount; i++)
                 {
                     Videos.Add(allVideos[i]);
+                }
+            }
+        }
+
+        public static void LoadResultFromPeer(ObservableCollection<Video> videoCollection, String ipAddress, Int32 portNo)
+        {
+            //for each entry, if is new, add
+            //else 
+            foreach (Video video in videoCollection)
+            {
+                List<ServerStruct> tempList;
+                ServerStruct serverstruct = new ServerStruct(ipAddress, portNo);
+                if (VideosFromPeer.TryGetValue(video, out tempList))
+                {
+                    if (!VideosFromPeer[video].Contains(serverstruct)) {
+                        VideosFromPeer[video].Add(serverstruct);
+                    }
+                }
+                else
+                {
+                    VideosFromPeer.Add(video, new List<ServerStruct>());
+                    VideosFromPeer[video].Add(serverstruct);
                 }
             }
         }
@@ -184,6 +209,7 @@ namespace P2PKaraokeSystem.Model
             public String FilePath { get; set; }
             public Performer Performer { get; set; }
             public Lyric Lyric { get; set; }
+            public 
 
             public Video(String title, String filePath, Performer performer, Lyric lyric)
             {
