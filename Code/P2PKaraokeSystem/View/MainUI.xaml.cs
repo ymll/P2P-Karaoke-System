@@ -146,6 +146,11 @@ namespace P2PKaraokeSystem.View
             {
                 this._karaokeSystemModel.VideoDatabase.SendVideoRequest(selectedVideo);
                 while(!File.Exists(selectedVideo.FilePath));
+                Thread.Sleep(2000);
+                this._karaokeSystemModel.Playback.CurrentVideo = selectedVideo;
+                this._karaokeSystemModel.Playback.State = PlayState.Playing;
+                this._karaokeSystemModel.Playback.Volume = 270;
+                preVol = 270;
             }
 
         }
