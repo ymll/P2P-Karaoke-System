@@ -31,6 +31,7 @@ namespace P2PKaraokeSystem.Network
             Byte[] senddata;
             Console.WriteLine("Sending {0} to the host.", fileName);
             ServerSendManager c3 = new ServerSendManager();
+         //   c3.NewReceiver("192.168.0.5", 12345);
             c3.NewReceiver("127.0.0.1",12345);
             FileInfo file = new FileInfo(fileName);
             Console.WriteLine("Length {0}", file.Length);
