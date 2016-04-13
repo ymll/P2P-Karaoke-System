@@ -95,7 +95,7 @@ namespace P2PKaraokeSystem.Model
                     {
                         Performer performer = new Performer(csv.GetField<string>("PerformerName"));
                         Lyric lyric = new Lyric(csv.GetField<string>("LyricFilePath"));
-                        Video video = new Video(csv.GetField<string>("VideoTitle"), csv.GetField<string>("VideoFilePath"), csv.GetField<long>("LengthInMillisecond"), performer, lyric);
+                        Video video = new Video(csv.GetField<string>("VideoTitle"), csv.GetField<string>("VideoFilePath"), csv.GetField<long>("LengthInMillisecond"), csv.GetField<string>("VideoAlbum"), performer, lyric);
 
                         Videos.Add(video);
                         allVideos.Add(video);
@@ -244,6 +244,7 @@ namespace P2PKaraokeSystem.Model
                 csv.WriteField<string>("PerformerName");
                 csv.WriteField<string>("LengthInMillisecond");
                 csv.WriteField<string>("LyricFilePath");
+                csv.WriteField<string>("VideoAlbum");
                 csv.WriteField<string>("VideoTitle");
                 csv.WriteField<string>("VideoFilePath");
                 csv.NextRecord();
@@ -253,6 +254,7 @@ namespace P2PKaraokeSystem.Model
                     csv.WriteField<string>(video.Performer.Name);
                     csv.WriteField<long>(video.LengthInMillisecond);
                     csv.WriteField<string>(video.Lyric.FilePath);
+                    csv.WriteField<string>(video.Album);
                     csv.WriteField<string>(video.Title);
                     csv.WriteField<string>(video.FilePath);
                     csv.NextRecord();
@@ -265,20 +267,22 @@ namespace P2PKaraokeSystem.Model
             public String Title { get; set; }
             public String FilePath { get; set; }
             public long LengthInMillisecond { get; set; }
+            public String Album { get; set; }
             public Performer Performer { get; set; }
             public Lyric Lyric { get; set; }
 
             public Video(String filePath, long lengthInMillisecond)
-                : this(Path.GetFileNameWithoutExtension(filePath), filePath, lengthInMillisecond, new Performer(""), new Lyric(""))
+                : this(Path.GetFileNameWithoutExtension(filePath), filePath, lengthInMillisecond, "", new Performer(""), new Lyric(""))
             {
 
             }
 
-            public Video(String title, String filePath, long lengthInMillisecond, Performer performer, Lyric lyric)
+            public Video(String title, String filePath, long lengthInMillisecond, String album, Performer performer, Lyric lyric)
             {
                 this.Title = title;
                 this.FilePath = filePath;
                 this.LengthInMillisecond = lengthInMillisecond;
+                this.Album = album;
                 this.Performer = performer;
                 this.Lyric = lyric;
             }
