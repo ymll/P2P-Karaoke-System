@@ -1,0 +1,264 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{EA1E5000-C83F-416A-889B-4E86A974CA3A}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>P2PKaraokeSystem</RootNamespace>
+    <AssemblyName>P2PKaraokeSystem</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>icon.ico</ApplicationIcon>
+  </PropertyGroup>
+  <PropertyGroup>
+    <NoWin32Manifest>true</NoWin32Manifest>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="CsvHelper, Version=2.0.0.0, Culture=neutral, PublicKeyToken=8c4959082be5c823, processorArchitecture=MSIL">
+      <HintPath>packages\CsvHelper.2.13.5.0\lib\net40-client\CsvHelper.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Kfstorm.LrcParser, Version=1.0.3.12, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\Kfstorm.LrcParser.1.0.3\lib\portable-net40+sl50+win+wpa81+wp80\Kfstorm.LrcParser.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Xaml">
+      <RequiredTargetFramework>4.0</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="WindowsBase" />
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+  </ItemGroup>
+  <ItemGroup>
+    <ApplicationDefinition Include="App.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </ApplicationDefinition>
+    <Compile Include="Model\VideoDatabase.cs" />
+    <Compile Include="Network\AbstractNetworkManager.cs" />
+    <Compile Include="Network\AudioStreamReceiveListener.cs" />
+    <Compile Include="Network\ClientReceiveManager.cs" />
+    <Compile Include="Network\AbstractReceiveManager.cs" />
+    <Compile Include="Network\AbstractSendManager.cs" />
+    <Compile Include="Network\ClientSendManager.cs" />
+    <Compile Include="Network\DataReceiveListener.cs" />
+    <Compile Include="Network\DataSendListener.cs" />
+    <Compile Include="Network\LyricRequestListener.cs" />
+    <Compile Include="Network\MediaInfoReceiveListener.cs" />
+    <Compile Include="Network\PlayRequestListener.cs" />
+    <Compile Include="Network\SearchQueryReceiveListener.cs" />
+    <Compile Include="Network\SearchResultReceiveListener.cs" />
+    <Compile Include="Network\ServerStruct.cs" />
+    <Compile Include="Network\PacketType.cs" />
+    <Compile Include="Network\ServerReceiveManager.cs" />
+    <Compile Include="Network\ServerSendManager.cs" />
+    <Compile Include="Network\SubtitleReceiveListener.cs" />
+    <Compile Include="Network\VideoStreamReceiveListener.cs" />
+    <Compile Include="PlaybackLogic\AudioFrameReader.cs" />
+    <Compile Include="PlaybackLogic\AudioHeaderReader.cs" />
+    <Compile Include="PlaybackLogic\Decode\AudioDecodeInfo.cs" />
+    <Compile Include="PlaybackLogic\Decode\AudioDecoder.cs" />
+    <Compile Include="PlaybackLogic\Decode\AudioLoader.cs" />
+    <Compile Include="PlaybackLogic\Decode\AudioPlayer.cs" />
+    <Compile Include="PlaybackLogic\Decode\MediaDecodeInfo.cs" />
+    <Compile Include="PlaybackLogic\Decode\MediaDecoder.cs" />
+    <Compile Include="PlaybackLogic\Decode\MediaLoader.cs" />
+    <Compile Include="PlaybackLogic\Decode\StreamDecodeInfo.cs" />
+    <Compile Include="PlaybackLogic\Decode\StreamLoader.cs" />
+    <Compile Include="PlaybackLogic\Decode\VideoDecodeInfo.cs" />
+    <Compile Include="PlaybackLogic\Decode\VideoDecoder.cs" />
+    <Compile Include="PlaybackLogic\Decode\VideoLoader.cs" />
+    <Compile Include="PlaybackLogic\Decode\VideoPlayer.cs" />
+    <Compile Include="PlaybackLogic\FFmpegDecoder.cs" />
+    <Compile Include="PlaybackLogic\Job.cs" />
+    <Compile Include="PlaybackLogic\JobThread.cs" />
+    <Compile Include="PlaybackLogic\LyricPlayer.cs" />
+    <Compile Include="PlaybackLogic\MediaHeaderReader.cs" />
+    <Compile Include="PlaybackLogic\Native\Avi.cs" />
+    <Compile Include="PlaybackLogic\Native\FFmpeg\FFmpeg.avcodec.g.cs" />
+    <Compile Include="PlaybackLogic\Native\FFmpeg\FFmpeg.avdevice.g.cs" />
+    <Compile Include="PlaybackLogic\Native\FFmpeg\FFmpeg.avfilter.g.cs" />
+    <Compile Include="PlaybackLogic\Native\FFmpeg\FFmpeg.avformat.g.cs" />
+    <Compile Include="PlaybackLogic\Native\FFmpeg\FFmpeg.avutil.g.cs" />
+    <Compile Include="PlaybackLogic\Native\FFmpeg\FFmpeg.postprocess.g.cs" />
+    <Compile Include="PlaybackLogic\Native\FFmpeg\FFmpeg.swresample.g.cs" />
+    <Compile Include="PlaybackLogic\Native\FFmpeg\FFmpeg.swscale.g.cs" />
+    <Compile Include="PlaybackLogic\Native\FFmpeg\FFmpegLoader.cs" />
+    <Compile Include="PlaybackLogic\Native\FFmpeg\InteropHelper.cs" />
+    <Compile Include="PlaybackLogic\Native\FFmpeg\Unresolved.cs" />
+    <Compile Include="PlaybackLogic\Native\WaveNative.cs" />
+    <Compile Include="PlaybackLogic\Native\WaveOut.cs" />
+    <Compile Include="PlaybackLogic\Util.cs" />
+    <Compile Include="PlaybackLogic\VideoHeaderReader.cs" />
+    <Compile Include="View\Converter\PlaylistVisiblityConverter.cs" />
+    <Compile Include="View\Converter\TimeStringConverter.cs" />
+    <Compile Include="View\MainUI.xaml.cs">
+      <DependentUpon>MainUI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="App.xaml.cs">
+      <DependentUpon>App.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Page Include="View\MainUI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Model\AbstractNotifyPropertyChanged.cs" />
+    <Compile Include="Model\KaraokeSystemModel.cs" />
+    <Compile Include="Model\PlaybackModel.cs" />
+    <Compile Include="Model\PlayerViewModel.cs" />
+    <Compile Include="PlaybackLogic\AviHeaderParser.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <None Include="packages.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <AppDesigner Include="Properties\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="View\UIMaterial\Image\icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="View\UIMaterial\Image\backward.png" />
+    <Resource Include="View\UIMaterial\Image\fastforward.png" />
+    <Resource Include="View\UIMaterial\Image\play.png" />
+    <Resource Include="View\UIMaterial\Image\stop.png" />
+    <Resource Include="View\UIMaterial\Image\volumeoff.png" />
+    <Resource Include="View\UIMaterial\Image\volumeup.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="View\UIMaterial\Image\backward_blue.png" />
+    <Resource Include="View\UIMaterial\Image\fastforward_blue.png" />
+    <Resource Include="View\UIMaterial\Image\play_blue.png" />
+    <Resource Include="View\UIMaterial\Image\stop_blue.png" />
+    <Resource Include="View\UIMaterial\Image\volumeoff_blue.png" />
+    <Resource Include="View\UIMaterial\Image\volumeup_blue.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="lib\x64\avcodec-57.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="lib\x64\avdevice-57.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="lib\x64\avfilter-6.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="lib\x64\avformat-57.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="lib\x64\avutil-55.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="lib\x64\postproc-54.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="lib\x64\swresample-2.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="lib\x64\swscale-4.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="lib\x86\avcodec-57.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="lib\x86\avdevice-57.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="lib\x86\avfilter-6.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="lib\x86\avformat-57.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="lib\x86\avutil-55.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="lib\x86\postproc-54.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="lib\x86\swresample-2.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="lib\x86\swscale-4.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Resource Include="View\UIMaterial\Image\cap.png" />
+    <Resource Include="View\UIMaterial\Image\cap_blue.png" />
+    <Resource Include="View\UIMaterial\Image\minus.png" />
+    <Resource Include="View\UIMaterial\Image\minus_blue.png" />
+    <Resource Include="View\UIMaterial\Image\plus.png" />
+    <Resource Include="View\UIMaterial\Image\plus_blue.png" />
+    <Resource Include="View\UIMaterial\Image\screen.png" />
+    <Resource Include="View\UIMaterial\Image\screen_blue.png" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

@@ -15,8 +15,6 @@
 [Dd]ebugPublic/
 [Rr]elease/
 [Rr]eleases/
-x64/
-x86/
 bld/
 [Bb]in/
 [Oo]bj/
@@ -137,7 +135,7 @@ publish/
 # Publish Web Output
 *.[Pp]ublish.xml
 *.azurePubxml
-# TODO: Comment the next line if you want to checkin your web deploy settings 
+# TODO: Comment the next line if you want to checkin your web deploy settings
 # but database connection strings (with potential passwords) will be unencrypted
 *.pubxml
 *.publishproj
@@ -234,3 +232,15 @@ _Pvt_Extensions
 
 # FAKE - F# Make
 .fake/
+
+# MAC
+.DS_Store
+
+# Windows
+Thumbs.db
+
+# Project music file
+**/VideoDatabase/Video/
+
+#FFmpeg library
+-Code/P2PKaraokeSystem/lib

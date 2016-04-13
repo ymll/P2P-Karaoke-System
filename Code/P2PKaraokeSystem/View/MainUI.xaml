@@ -1,0 +1,471 @@
+﻿<Window x:Class="P2PKaraokeSystem.View.MainUI"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local_model="clr-namespace:P2PKaraokeSystem.Model"
+        xmlns:local_converter="clr-namespace:P2PKaraokeSystem.View.Converter"
+        Title="P2P Karaoke System" Height="677" Width="1289" Icon="..\View\UIMaterial\Image\icon.ico" WindowState="Maximized" WindowStartupLocation="CenterScreen">
+    <Window.DataContext>
+        <local_model:KaraokeSystemModel/>
+    </Window.DataContext>
+
+    <Window.Resources>
+        <local_converter:PlaylistVisiblityConverter x:Key="PlaylistVisiblityConverter"/>
+        <local_converter:TimeStringConverter x:Key="TimeStringConverter"/>
+        <Style TargetType="{x:Type TextBox}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type TextBox}">
+                        <Border BorderThickness="{TemplateBinding Border.BorderThickness}"
+                      BorderBrush="DeepPink"
+                      Background="{TemplateBinding Panel.Background}"
+                      x:Name="border"
+                      SnapsToDevicePixels="True">
+                            <ScrollViewer HorizontalScrollBarVisibility="Hidden"
+                               VerticalScrollBarVisibility="Hidden"
+                               x:Name="PART_ContentHost"
+                               Focusable="False" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Opacity" TargetName="border"
+                        Value="0.56"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="BorderBrush" TargetName="border" 
+                        Value="DeepPink"/>
+                            </Trigger>
+                            <Trigger Property="IsKeyboardFocused" Value="True">
+                                <Setter Property="BorderBrush" TargetName="border" 
+                       Value="DeepPink"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+    </Window.Resources>
+
+    <Grid Background="black" RenderTransformOrigin="0.874,0.372">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="Auto"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Video -->
+        <Image x:Name="videoScreen" Source="{Binding View.VideoScreenBitmap}"
+            HorizontalAlignment="Left" VerticalAlignment="Top"
+            Height="505" Width="960"
+            Margin="-2,0,0,0"/>
+
+        <!-- Play Button -->
+        <Image x:Name="playImg"
+               Grid.Row="2"
+               HorizontalAlignment="Left" VerticalAlignment="Top" 
+               Height="76" Width="80"
+               Margin="435,0,0,0"
+               MouseDown="playImg_MouseDown">
+            <Image.Style>
+                <Style TargetType="{x:Type Image}">
+                    <Style.Triggers>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding IsMouseOver, ElementName=playImg}" Value="True"/>
+                            </MultiDataTrigger.Conditions>
+                            <Setter Property="Source" Value="..\View\UIMaterial\Image\play_blue.png"/>
+                        </MultiDataTrigger>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding IsMouseOver, ElementName=playImg}" Value="False"/>
+                            </MultiDataTrigger.Conditions>
+                            <Setter Property="Source" Value="..\View\UIMaterial\Image\play.png"/>
+                        </MultiDataTrigger>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding Playback.State}" Value="{x:Static local_model:PlayState.Playing}"/>
+                                <Condition Binding="{Binding IsMouseOver, ElementName=playImg}" Value="True"/>
+                            </MultiDataTrigger.Conditions>
+                            <Setter Property="Source" Value="..\View\UIMaterial\Image\stop_blue.png"/>
+                        </MultiDataTrigger>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding Playback.State}" Value="{x:Static local_model:PlayState.Playing}"/>
+                                <Condition Binding="{Binding IsMouseOver, ElementName=playImg}" Value="False"/>
+                            </MultiDataTrigger.Conditions>
+                            <Setter Property="Source" Value="..\View\UIMaterial\Image\stop.png"/>
+                        </MultiDataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Image.Style>
+        </Image>
+
+        <!-- Backward Button -->
+        <Image x:Name="backwardImg"
+               Grid.Row="2"
+               HorizontalAlignment="Left" VerticalAlignment="Top"
+               Height="31" Width="65"
+               Margin="365,29,0,0">
+            <Image.Style>
+                <Style TargetType="{x:Type Image}">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsMouseOver, ElementName=backwardImg}" Value="True">
+                            <Setter Property="Source" Value="..\View\UIMaterial\Image\backward_blue.png"/>
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding IsMouseOver, ElementName=backwardImg}" Value="False">
+                            <Setter Property="Source" Value="..\View\UIMaterial\Image\backward.png"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Image.Style>
+        </Image>
+
+        <!-- Forward Button -->
+        <Image x:Name="fastforwardImg"
+               Grid.Row="2"
+        	HorizontalAlignment="Left" VerticalAlignment="Top"
+        	Height="31" Width="65"
+        	Margin="535,29,0,0">
+            <Image.Style>
+                <Style TargetType="{x:Type Image}">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsMouseOver, ElementName=fastforwardImg}" Value="True">
+                            <Setter Property="Source" Value="..\View\UIMaterial\Image\fastforward_blue.png"/>
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding IsMouseOver, ElementName=fastforwardImg}" Value="False">
+                            <Setter Property="Source" Value="..\View\UIMaterial\Image\fastforward.png"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Image.Style>
+        </Image>
+
+
+        <!-- Sound Button -->
+
+        <Image x:Name="soundMinImg"
+                Grid.Row="2"
+        	    HorizontalAlignment="Left" VerticalAlignment="Top"
+        	    Height="31" Width="40"
+        	    Margin="50,29,0,0"
+                MouseDown="soundMinImg_MouseDown">
+            <Image.Style>
+                <Style TargetType="{x:Type Image}">
+                    <Style.Triggers>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding IsMouseOver, ElementName=soundMinImg}" Value="True"/>
+                            </MultiDataTrigger.Conditions>
+                            <Setter Property="Source" Value="..\View\UIMaterial\Image\minus_blue.png"/>
+                        </MultiDataTrigger>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding IsMouseOver, ElementName=soundMinImg}" Value="False"/>
+                            </MultiDataTrigger.Conditions>
+                            <Setter Property="Source" Value="..\View\UIMaterial\Image\minus.png"/>
+                        </MultiDataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Image.Style>
+        </Image>
+
+        <Image x:Name="soundImg"
+                Grid.Row="2"
+        	    HorizontalAlignment="Left" VerticalAlignment="Top"
+        	    Height="31" Width="40"
+        	    Margin="100,29,0,0"
+        	    MouseDown="soundImg_MouseDown">
+            <Image.Style>
+                <Style TargetType="{x:Type Image}">
+                    <Style.Triggers>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <!--<Condition Binding="{Binding Playback.Volume}" Value="255"/>-->
+                                <Condition Binding="{Binding IsMouseOver, ElementName=soundImg}" Value="True"/>
+                            </MultiDataTrigger.Conditions>
+                            <Setter Property="Source" Value="..\View\UIMaterial\Image\volumeup_blue.png"/>
+                        </MultiDataTrigger>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <!--<Condition Binding="{Binding Playback.Volume}" Value="255"/>-->
+                                <Condition Binding="{Binding IsMouseOver, ElementName=soundImg}" Value="False"/>
+                            </MultiDataTrigger.Conditions>
+                            <Setter Property="Source" Value="..\View\UIMaterial\Image\volumeup.png"/>
+                        </MultiDataTrigger>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding Playback.Volume}" Value="0"/>
+                                <Condition Binding="{Binding IsMouseOver, ElementName=soundImg}" Value="True"/>
+                            </MultiDataTrigger.Conditions>
+                            <Setter Property="Source" Value="..\View\UIMaterial\Image\volumeoff_blue.png"/>
+                        </MultiDataTrigger>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding Playback.Volume}" Value="0"/>
+                                <Condition Binding="{Binding IsMouseOver, ElementName=soundImg}" Value="False"/>
+                            </MultiDataTrigger.Conditions>
+                            <Setter Property="Source" Value="..\View\UIMaterial\Image\volumeoff.png"/>
+                        </MultiDataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Image.Style>
+        </Image>
+
+        <Image x:Name="soundPlusImg"
+                Grid.Row="2"
+        	    HorizontalAlignment="Left" VerticalAlignment="Top"
+        	    Height="31" Width="40"
+        	    Margin="150,29,0,0"
+                MouseDown="soundPlusImg_MouseDown">
+            <Image.Style>
+                <Style TargetType="{x:Type Image}">
+                    <Style.Triggers>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding IsMouseOver, ElementName=soundPlusImg}" Value="True"/>
+                            </MultiDataTrigger.Conditions>
+                            <Setter Property="Source" Value="..\View\UIMaterial\Image\plus_blue.png"/>
+                        </MultiDataTrigger>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding IsMouseOver, ElementName=soundPlusImg}" Value="False"/>
+                            </MultiDataTrigger.Conditions>
+                            <Setter Property="Source" Value="..\View\UIMaterial\Image\plus.png"/>
+                        </MultiDataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Image.Style>
+        </Image>
+
+        <Image x:Name="screenCapImg"
+        	Grid.Row="2"
+        	HorizontalAlignment="Left" VerticalAlignment="Top"
+        	Height="31" Width="40"
+        	Margin="800,29,0,0"
+            ToolTip="Click to capture screen"
+        	MouseDown="screenImg_MouseDown">
+            <Image.Style>
+                <Style TargetType="{x:Type Image}">
+                    <Style.Triggers>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding IsMouseOver, ElementName=screenCapImg}" Value="True"/>
+                            </MultiDataTrigger.Conditions>
+                            <Setter Property="Source" Value="..\View\UIMaterial\Image\cap_blue.png"/>
+                        </MultiDataTrigger>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding IsMouseOver, ElementName=screenCapImg}" Value="False"/>
+                            </MultiDataTrigger.Conditions>
+                            <Setter Property="Source" Value="..\View\UIMaterial\Image\cap.png"/>
+                        </MultiDataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Image.Style>
+        </Image>
+
+        <!-- Connection Form -->
+        <Image x:Name="connectionImg"
+                Grid.Row="2"
+        	    HorizontalAlignment="Left" VerticalAlignment="Top"
+        	    Height="31" Width="40"
+        	    Margin="850,29,0,0"
+                MouseDown="connectionImg_MouseDown">
+            <Image.Style>
+                <Style TargetType="{x:Type Image}">
+                    <Style.Triggers>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding IsMouseOver, ElementName=connectionImg}" Value="True"/>
+                            </MultiDataTrigger.Conditions>
+                            <Setter Property="Source" Value="..\View\UIMaterial\Image\screen_blue.png"/>
+                        </MultiDataTrigger>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding IsMouseOver, ElementName=connectionImg}" Value="False"/>
+                            </MultiDataTrigger.Conditions>
+                            <Setter Property="Source" Value="..\View\UIMaterial\Image\screen.png"/>
+                        </MultiDataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Image.Style>
+        </Image>
+
+        <Popup Name="popUp" IsOpen="False" Placement="Center" Height="300" Width="400">
+            <Border BorderBrush="DeepPink" BorderThickness="3">
+                <StackPanel Orientation="Horizontal" Background="Gray">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="100"/>
+                            <RowDefinition Height="100" />
+                            <RowDefinition Height="50" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="100" />
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="IP Address" Grid.Row="0" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        <TextBox Name="ipAdd" Grid.Row="0" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center" Height="25" Width="200" FontSize="16" TextAlignment="Justify" />
+                        <TextBlock Text="Port Number" Grid.Row="1" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        <TextBox Name="portNum" Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center" Height="25" Width="200" FontSize="16" TextAlignment="Justify" />
+                        <Button Content="OK" Grid.Row="2" Grid.Column="1" Click="PopUp_OK_Click" VerticalAlignment="Center" HorizontalAlignment="Center" Width="175"/>
+                        <Button Content="PPM Image Test" Grid.Row="3" Grid.Column="1" Click="PopUp_PPM_Click" VerticalAlignment="Center" HorizontalAlignment="Center" Width="175"/>
+                    </Grid>
+                </StackPanel>
+            </Border>
+        </Popup>
+
+        <!-- Lyric Box -->
+        <Label x:Name="lyric"
+               Grid.Row="1"
+               Background="Black"
+               Foreground="White" FontSize="16"
+               HorizontalAlignment="Left" VerticalAlignment="Center"
+               HorizontalContentAlignment="Stretch" VerticalContentAlignment="Center"
+               Margin="0,5,328,0" Height="50" Width="960">
+            <Label.Content>
+                <AccessText x:Name="lyricText" TextWrapping="Wrap" Text="{Binding View.CurrentLyric}"/>
+            </Label.Content>
+        </Label>
+
+        <!-- Search Bar -->
+        <TextBox x:Name="searchBox"
+                   Margin="958,0,0,0" MinHeight="30"
+                   VerticalAlignment="Top"
+                   Background="Black" Foreground="DeepPink"
+                   Text="" TextAlignment="Justify" TextWrapping="Wrap" FontSize="16"
+                   BorderBrush="DeepPink" BorderThickness="2"
+                   SelectionBrush="DeepPink" Opacity="0.75"
+                   KeyDown="searchEnterDown">
+        </TextBox>
+
+        <!-- Music List-->
+        <ScrollViewer x:Name="musicList"
+            Grid.RowSpan="3" Grid.ColumnSpan="2"
+            Margin="958,28,0,0"
+            HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Auto">
+            <Border BorderBrush="DeepPink" BorderThickness="2">
+                <DockPanel>
+                    <Button Name="AddSongButton" DockPanel.Dock="Top" Content="Add a song to database" Background="DeepPink" FontSize="24" Click="AddSongButton_Click" />
+                    <ListView Name="Playlist" ItemsSource="{Binding VideoDatabase.Videos}" SelectionMode="Single" Background="Black" MouseDoubleClick="ListView_MouseDoubleClick" DockPanel.Dock="Bottom">
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel>
+                                    <StackPanel.Visibility>
+                                        <MultiBinding Converter="{StaticResource PlaylistVisiblityConverter}">
+                                            <Binding />
+                                            <Binding Path="Text" ElementName="searchBox" />
+                                        </MultiBinding>
+                                    </StackPanel.Visibility>
+                                    <DockPanel Name="DockPan" Height="40" Background="Transparent">
+                                        <TextBlock Name ="songTitle" HorizontalAlignment="Left" Foreground="White" VerticalAlignment="Center" FontSize="24" FontWeight="Bold">
+                                            <TextBlock.Style>
+                                                <Style TargetType="{x:Type TextBlock}">
+                                                    <Setter Property="Text" Value="{Binding Title}" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding Path=Title.Length, FallbackValue=0, TargetNullValue=0}" Value="0">
+                                                            <Setter Property="Text" Value="N/A" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
+                                        <TextBlock Text="   ---    " HorizontalAlignment="Left" Foreground="White" VerticalAlignment="Center"></TextBlock>
+                                        <TextBlock Name ="songSinger" HorizontalAlignment="Center" Foreground="LightGray" VerticalAlignment="Center" FontSize="16" FontWeight="Bold">
+                                            <TextBlock.Style>
+                                                <Style TargetType="{x:Type TextBlock}">
+                                                    <Setter Property="Text" Value="{Binding Performer.Name}" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding Path=Performer.Name.Length, FallbackValue=0, TargetNullValue=0}" Value="0">
+                                                            <Setter Property="Text" Value="N/A" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
+                                        <TextBlock Text="{Binding Converter={StaticResource TimeStringConverter}}"  HorizontalAlignment="Right" Foreground="White" VerticalAlignment="Center"></TextBlock>
+                                        <DockPanel.ContextMenu>
+                                            <ContextMenu>
+                                                <MenuItem Header="Edit" Click="EditMenuItem_Click"/>
+                                                <MenuItem Header="Remove Item" Click="RemoveMenuItem_Click" />
+                                            </ContextMenu>
+                                        </DockPanel.ContextMenu>
+                                    </DockPanel>
+                                    <DockPanel>
+                                        <TextBlock Text="Album: " Foreground="White" />
+                                        <TextBlock Foreground="White">
+                                            <TextBlock.Style>
+                                                <Style TargetType="{x:Type TextBlock}">
+                                                    <Setter Property="Text" Value="{Binding Path=Album}" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding Path=Album.Length, FallbackValue=0, TargetNullValue=0}" Value="0">
+                                                            <Setter Property="Text" Value="N/A" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
+                                    </DockPanel>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                        <ListView.ItemContainerStyle>
+                            <Style TargetType="ListViewItem">
+                                <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                            </Style>
+                        </ListView.ItemContainerStyle>
+                    </ListView>
+                </DockPanel>
+            </Border>
+        </ScrollViewer>
+
+        <Popup Name="popUpEdit" IsOpen="False" Placement="Center" Height="500" Width="400">
+            <Border BorderBrush="DeepPink" BorderThickness="3">
+                <StackPanel Orientation="Horizontal" Background="Gray">
+                    <Grid DataContext="{Binding SelectedItem, ElementName=Playlist}">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="100"/>
+                            <RowDefinition Height="100" />
+                            <RowDefinition Height="100" />
+                            <RowDefinition Height="100" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="100" />
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Title" Grid.Row="0" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        <TextBox Text="{Binding Title}" Grid.Row="0" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center" Height="25" Width="200" FontSize="16" TextAlignment="Justify" />
+                        <TextBlock Text="Album" Grid.Row="1" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        <TextBox Text="{Binding Album}" Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center" Height="25" Width="200" FontSize="16" TextAlignment="Justify" />
+                        <TextBlock Text="Singer" Grid.Row="2" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        <TextBox Text="{Binding Performer.Name}" Grid.Row="2" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center" Height="25" Width="200" FontSize="16" TextAlignment="Justify" />
+                        <TextBlock Text="Lyrics" Grid.Row="3" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        <DockPanel Grid.Row="3" Grid.Column="1" Height="25" Width="200" >
+                            <TextBox Name="EditLyrics" Grid.Row="2"  IsEnabled="False" Grid.Column="1" DockPanel.Dock="Left" VerticalAlignment="Center" HorizontalAlignment="Center" Height="25" Width="123.6" FontSize="16" TextAlignment="Justify">
+                                <TextBox.Style>
+                                    <Style TargetType="{x:Type TextBox}">
+                                        <Setter Property="Text" Value="{Binding Lyric.FilePath}" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Path=Lyric.FilePath.Length, FallbackValue=0, TargetNullValue=0}" Value="0">
+                                                <Setter Property="Text" Value="N/A" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBox.Style>
+                            </TextBox>
+                            <Button Name="EditLyricButton" Content="Browse" DockPanel.Dock="Right" VerticalAlignment="Center" HorizontalAlignment="Center" Height="25" Width="76.4" Click="EditLyricButton_Click" />
+                        </DockPanel>
+                        <Button Content="OK" Grid.Row="4" Grid.Column="1" Click="PopUpEdit_OK_Click" VerticalAlignment="Center" HorizontalAlignment="Center" Width="175"/>
+                    </Grid>
+                </StackPanel>
+            </Border>
+        </Popup>
+
+    </Grid>
+</Window>
