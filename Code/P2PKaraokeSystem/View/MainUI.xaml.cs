@@ -72,7 +72,6 @@ namespace P2PKaraokeSystem.View
 
             PeerSharingManager peerSharingManager = new PeerSharingManager(this._karaokeSystemModel.Network);
             peerSharingManager.StartSharing();
-            peerSharingManager.StopSharing();
         }
 
         private void playImg_MouseDown(object sender, MouseButtonEventArgs e)

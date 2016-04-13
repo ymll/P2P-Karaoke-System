@@ -83,6 +83,7 @@
     <Compile Include="Network\DataSendListener.cs" />
     <Compile Include="Network\LyricRequestListener.cs" />
     <Compile Include="Network\MediaInfoReceiveListener.cs" />
+    <Compile Include="Network\PeerServerManager.cs" />
     <Compile Include="Network\PeerSharingManager.cs" />
     <Compile Include="Network\PlayRequestListener.cs" />
     <Compile Include="Network\SearchQueryReceiveListener.cs" />
