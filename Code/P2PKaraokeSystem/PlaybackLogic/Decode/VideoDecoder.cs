@@ -68,7 +68,7 @@ namespace P2PKaraokeSystem.PlaybackLogic.Decode
             {
                 pts = 0;
             }
-            pts *= q2d(videoDecodeInfo.pCodecContext->time_base);
+            pts *= q2d(videoDecodeInfo.pStream->time_base);
 
             return pts;
         }
@@ -84,7 +84,7 @@ namespace P2PKaraokeSystem.PlaybackLogic.Decode
                 pts = videoDecodeInfo.Clock;
             }
 
-            double frame_delay = q2d(videoDecodeInfo.pCodecContext->time_base);
+            double frame_delay = q2d(videoDecodeInfo.pStream->time_base);
             frame_delay += pFrame->repeat_pict * (frame_delay * 0.5);
             videoDecodeInfo.Clock += frame_delay;
 

@@ -40,7 +40,7 @@ namespace P2PKaraokeSystem.PlaybackLogic.Decode
 
         }
 
-        
+
 
         private AudioWaveData? Decode(out double pts)
         {
@@ -61,7 +61,7 @@ namespace P2PKaraokeSystem.PlaybackLogic.Decode
                     int len = 0;
                     if (pPacket != null)
                     {
-                         len= ffmpeg.avcodec_decode_audio4(audioDecodeInfo.pCodecContext, audioDecodeInfo.pFrame, &gotFrame, pPacket);
+                        len = ffmpeg.avcodec_decode_audio4(audioDecodeInfo.pCodecContext, audioDecodeInfo.pFrame, &gotFrame, pPacket);
                     }
                     else
                     {
@@ -86,7 +86,7 @@ namespace P2PKaraokeSystem.PlaybackLogic.Decode
                     {
                         if (audioDecodeInfo.pFrame->format != (int)AVSampleFormat.AV_SAMPLE_FMT_S16)
                         {
-                            dataSize = ffmpeg.av_samples_get_buffer_size(
+                            /*dataSize = ffmpeg.av_samples_get_buffer_size(
                                null,
                                audioDecodeInfo.NumOfChannels,
                                audioDecodeInfo.pFrame->nb_samples,
@@ -95,7 +95,7 @@ namespace P2PKaraokeSystem.PlaybackLogic.Decode
 
                             pts = audioDecodeInfo.Clock;
                             n = 2 * audioDecodeInfo.NumOfChannels;
-                            audioDecodeInfo.Clock += (dataSize / (double)(n * audioDecodeInfo.pCodecContext->sample_rate));
+                            audioDecodeInfo.Clock += (dataSize / (double)(n * audioDecodeInfo.pCodecContext->sample_rate));*/
                             return DecodeFrameFromPacket();
                         }
                         else
@@ -128,7 +128,7 @@ namespace P2PKaraokeSystem.PlaybackLogic.Decode
                         continue;
                     }
 
-                    
+
                     n = 2 * audioDecodeInfo.NumOfChannels;
                     audioDecodeInfo.Clock += (dataSize / (double)(n * audioDecodeInfo.pCodecContext->sample_rate));
                     pts = audioDecodeInfo.Clock;
