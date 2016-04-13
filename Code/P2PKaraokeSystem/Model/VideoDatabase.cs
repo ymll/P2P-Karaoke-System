@@ -10,6 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Collections;
 using System.ComponentModel;
+using P2PKaraokeSystem.PlaybackLogic.Decode;
 
 
 namespace P2PKaraokeSystem.Model
@@ -49,12 +50,11 @@ namespace P2PKaraokeSystem.Model
                     Directory.CreateDirectory(directory);
                     LoadFromFile(filepath);
                     DatabaseFileLocation = filepath;
-                    return;
+                    break;
                 }
                 catch (Exception) { }
             }
 
-            // If database file not exist, create a new one
             SaveToFile();
         }
 
@@ -88,14 +88,38 @@ namespace P2PKaraokeSystem.Model
             {
                 while (csv.Read())
                 {
-                    Performer performer = new Performer(csv.GetField<string>("PerformerName"));
-                    Lyric lyric = new Lyric(csv.GetField<string>("LyricFilePath"));
-                    Video video = new Video(csv.GetField<string>("VideoTitle"), csv.GetField<string>("VideoFilePath"), csv.GetField<long>("LengthInMillisecond"), performer, lyric);
+                    long lengthInMillisecond;
+                    string videoFilePath = csv.GetField<string>("VideoFilePath");
 
-                    Videos.Add(video);
-                    allVideos.Add(video);
+                    if (IsVideo(videoFilePath, out lengthInMillisecond))
+                    {
+                        Performer performer = new Performer(csv.GetField<string>("PerformerName"));
+                        Lyric lyric = new Lyric(csv.GetField<string>("LyricFilePath"));
+                        Video video = new Video(csv.GetField<string>("VideoTitle"), csv.GetField<string>("VideoFilePath"), csv.GetField<long>("LengthInMillisecond"), performer, lyric);
+
+                        Videos.Add(video);
+                        allVideos.Add(video);
+                    }
                 }
             }
+        }
+
+        public bool IsVideo(string filepath, out long lengthInMillisecond)
+        {
+            MediaDecodeInfo mediaDecodeInfo = new MediaDecodeInfo();
+            MediaLoader loader = new MediaLoader(mediaDecodeInfo, null);
+            try
+            {
+                loader.RetrieveFormatAndStreamInfo(filepath);
+            }
+            catch (Exception)
+            {
+                lengthInMillisecond = -1;
+                return false;
+            }
+
+            lengthInMillisecond = mediaDecodeInfo.LengthInMillisecond;
+            return true;
         }
 
         private void LoadSearch(string keywords)

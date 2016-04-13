@@ -62,8 +62,8 @@ namespace P2PKaraokeSystem.View
             */
             //end testing code
 
-            InitializeComponent();
             FFmpegLoader.LoadFFmpeg();
+            InitializeComponent();
 
             this._karaokeSystemModel = (KaraokeSystemModel)this.DataContext;
             new LyricPlayer(this._karaokeSystemModel.Playback, this._karaokeSystemModel.View);
@@ -178,7 +178,7 @@ namespace P2PKaraokeSystem.View
             {
                 VideoDatabase.Video video = this._karaokeSystemModel.VideoDatabase.Videos[selectedIndex];
                 this._karaokeSystemModel.VideoDatabase.Videos.Remove(video);
-                Playlist.Items.Refresh();
+                this._karaokeSystemModel.VideoDatabase.SaveToFile();
             }
         }
 
@@ -201,13 +201,12 @@ namespace P2PKaraokeSystem.View
         private void PopUpEdit_OK_Click(object sender, RoutedEventArgs e)
         {
             int selectedIndex = videoIndex;
-            VideoDatabase.Video tempvideo = this._karaokeSystemModel.VideoDatabase.Videos[selectedIndex];
-            tempvideo.Title = EditTitle.Text;
-            tempvideo.Performer.Name = EditSinger.Text;
-            this._karaokeSystemModel.VideoDatabase.Videos.RemoveAt(selectedIndex);
-            this._karaokeSystemModel.VideoDatabase.Videos.Insert(selectedIndex, tempvideo);
+            VideoDatabase.Video selectedVideo = this._karaokeSystemModel.VideoDatabase.Videos[selectedIndex];
+            selectedVideo.Title = EditTitle.Text;
+            selectedVideo.Performer.Name = EditSinger.Text;
             Playlist.Items.Refresh();
             popUpEdit.IsOpen = false;
+            this._karaokeSystemModel.VideoDatabase.SaveToFile();
         }
 
         private void searchEnterDown(object sender, KeyEventArgs e)
@@ -230,24 +229,19 @@ namespace P2PKaraokeSystem.View
             {
                 foreach (string fileName in fileDialog.FileNames)
                 {
-                    MediaDecodeInfo mediaDecodeInfo = new MediaDecodeInfo();
-                    MediaLoader loader = new MediaLoader(mediaDecodeInfo, this._karaokeSystemModel.View);
-                    try
-                    {
-                        loader.RetrieveFormatAndStreamInfo(fileName);
-                    }
-                    catch (Exception)
-                    {
-                        continue;
-                    }
+                    long lengthInMillisecond;
 
-                    VideoDatabase.Video video = new VideoDatabase.Video(fileName, mediaDecodeInfo.LengthInMillisecond);
-
-                    if (!this._karaokeSystemModel.VideoDatabase.Videos.Any(v => fileName.Equals(v.FilePath)))
+                    if (this._karaokeSystemModel.VideoDatabase.IsVideo(fileName, out lengthInMillisecond))
                     {
-                        this._karaokeSystemModel.VideoDatabase.Videos.Add(video);
+                        VideoDatabase.Video video = new VideoDatabase.Video(fileName, lengthInMillisecond);
+
+                        if (!this._karaokeSystemModel.VideoDatabase.Videos.Any(v => fileName.Equals(v.FilePath)))
+                        {
+                            this._karaokeSystemModel.VideoDatabase.Videos.Add(video);
+                        }
                     }
                 }
+                this._karaokeSystemModel.VideoDatabase.SaveToFile();
             }
         }
     }
