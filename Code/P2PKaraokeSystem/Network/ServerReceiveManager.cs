@@ -15,7 +15,7 @@ namespace P2PKaraokeSystem.Network
         private TcpListener server = null;
         int bufferSize = 500;
         Int32 port = 12345;
-        String LocalipString = "127.0.0.1";
+        String LocalipString = "127.0.0.1";//"192.168.0.2";// "192.168.0.5";//
         public ServerReceiveManager() {  }//use the above setting
         public ServerReceiveManager(String Localip, Int32 newPort, int bufSize)
         {

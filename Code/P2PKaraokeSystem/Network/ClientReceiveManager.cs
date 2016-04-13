@@ -15,6 +15,7 @@ namespace P2PKaraokeSystem.Network
         private TcpListener server = null;
         int bufferSize = 1024 * 32;
         Int32 port = 12345;
+
         String LocalipString = "127.0.0.1";//"192.168.0.2";//"192.168.0.5";//
         public ClientReceiveManager() {  }//use the above setting
         public ClientReceiveManager(String Localip, Int32 newPort, int bufSize)
@@ -66,7 +67,7 @@ namespace P2PKaraokeSystem.Network
                 byte[] destData ;//= new byte[bufferSize];
                 byte[] recvBuffer = new byte[bufferSize];
                 PacketType packetType;
-                while ((i = stream.Read(recvBuffer, 0, recvBuffer.Length)) != 0)
+                while ((i = stream.Read(recvBuffer, 0, recvBuffer.Length)) > 0)
                 {
                  /*   Console.WriteLine("buff recv:\n");
                     for (int k = 0; k < i; k++)
