@@ -20,8 +20,8 @@ namespace WaveLib
     {
         public static void Try(int err)
         {
-            if (err != WaveNative.MMSYSERR_NOERROR)
-                throw new Exception(err.ToString());
+            if (err != WaveNative.MMSYSERR_NOERROR) { 
+                throw new Exception(err.ToString());}
         }
     }
 

@@ -15,6 +15,8 @@ namespace P2PKaraokeSystem.PlaybackLogic.Decode
         private MediaDecodeInfo mediaDecodeInfo;
         private PlayerViewModel playerViewModel;
 
+        private AudioWaveData audioWaveData;
+
         public AudioDecoder(AudioDecodeInfo audioDecodeInfo, MediaDecodeInfo mediaDecodeInfo, PlayerViewModel playerViewModel)
         {
             this.audioDecodeInfo = audioDecodeInfo;
@@ -38,10 +40,14 @@ namespace P2PKaraokeSystem.PlaybackLogic.Decode
 
         }
 
+        
+
         private AudioWaveData? Decode(out double pts)
         {
-            AudioWaveData audioWaveData = new AudioWaveData();
+            audioWaveData = new AudioWaveData();
             AVPacket* pPacket = null;
+            AVPacket packet;
+
             int dataSize = 0;
             int n;
 
@@ -52,11 +58,27 @@ namespace P2PKaraokeSystem.PlaybackLogic.Decode
                 while (audioDecodeInfo.PacketSize > 0)
                 {
                     int gotFrame = 0;
-                    int len = ffmpeg.avcodec_decode_audio4(audioDecodeInfo.pCodecContext, audioDecodeInfo.pFrame, &gotFrame, pPacket);
+                    int len = 0;
+                    if (pPacket != null)
+                    {
+                         len= ffmpeg.avcodec_decode_audio4(audioDecodeInfo.pCodecContext, audioDecodeInfo.pFrame, &gotFrame, pPacket);
+                    }
+                    else
+                    {
+                        packet = playerViewModel.PendingAudioPackets.Take();
+                        pPacket = &packet;
+                        len = ffmpeg.avcodec_decode_audio4(audioDecodeInfo.pCodecContext, audioDecodeInfo.pFrame, &gotFrame, pPacket);
+                        /*
+                        packet.data = MediaDecodeInfo.FlushPacket.data;
+                        pPacket = &packet;
+                        
+                        len = ffmpeg.avcodec_decode_video2(audioDecodeInfo.pCodecContext, audioDecodeInfo.pFrame, &gotFrame, pPacket); */
+                    }
 
                     if (len < 0)
                     {
                         audioDecodeInfo.PacketSize = 0;
+                        pts = 0.0;
                         break;
                     }
 
@@ -64,6 +86,16 @@ namespace P2PKaraokeSystem.PlaybackLogic.Decode
                     {
                         if (audioDecodeInfo.pFrame->format != (int)AVSampleFormat.AV_SAMPLE_FMT_S16)
                         {
+                            dataSize = ffmpeg.av_samples_get_buffer_size(
+                               null,
+                               audioDecodeInfo.NumOfChannels,
+                               audioDecodeInfo.pFrame->nb_samples,
+                               audioDecodeInfo.pCodecContext->sample_fmt,
+                               1);
+
+                            pts = audioDecodeInfo.Clock;
+                            n = 2 * audioDecodeInfo.NumOfChannels;
+                            audioDecodeInfo.Clock += (dataSize / (double)(n * audioDecodeInfo.pCodecContext->sample_rate));
                             return DecodeFrameFromPacket();
                         }
                         else
@@ -74,6 +106,10 @@ namespace P2PKaraokeSystem.PlaybackLogic.Decode
                                 audioDecodeInfo.pFrame->nb_samples,
                                 audioDecodeInfo.pCodecContext->sample_fmt,
                                 1);
+
+                            pts = audioDecodeInfo.Clock;
+                            n = 2 * audioDecodeInfo.NumOfChannels;
+                            audioDecodeInfo.Clock += (dataSize / (double)(n * audioDecodeInfo.pCodecContext->sample_rate));
 
                             byte[] buffer = new byte[dataSize];
                             fixed (byte* bufferPtr = buffer)
@@ -92,9 +128,11 @@ namespace P2PKaraokeSystem.PlaybackLogic.Decode
                         continue;
                     }
 
-                    pts = audioDecodeInfo.Clock;
+                    
                     n = 2 * audioDecodeInfo.NumOfChannels;
                     audioDecodeInfo.Clock += (dataSize / (double)(n * audioDecodeInfo.pCodecContext->sample_rate));
+                    pts = audioDecodeInfo.Clock;
+
 
                     audioWaveData.start = 0;
                     audioWaveData.size = dataSize;
@@ -111,7 +149,7 @@ namespace P2PKaraokeSystem.PlaybackLogic.Decode
                     return null;
                 }
 
-                AVPacket packet = playerViewModel.PendingAudioPackets.Take();
+                packet = playerViewModel.PendingAudioPackets.Take();
                 if (packet.size == 0)
                 {
                     return null;
