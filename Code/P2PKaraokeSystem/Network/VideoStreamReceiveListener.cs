@@ -1,23 +1,38 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
+using System.Threading;
 
 namespace P2PKaraokeSystem.Network
 {
     public class VideoStreamReceiveListener : DataReceiveListener
     {
-        public void OnDataReceived(PacketType packetType, byte[] data)
-        {
-            Console.WriteLine(packetType);
-            Console.WriteLine("VideoStreamReceiveListener OnDataReceived\n");
-            
-            FileStream fileStream = File.Open("../../VideoDatabase/Video/save.avi", FileMode.Append);
-            fileStream.Write(data, 0, data.Length);
-            fileStream.Dispose();
+        private long upto = 0;
 
+        public void OnDataReceived(PacketType packetType, byte[] data, String ipAddress, Int32 portNo)
+        {
+   
+                Console.WriteLine(packetType);
+                Console.WriteLine("VideoStreamReceiveListener OnDataReceived\n");
+          
+
+                FileStream fileStream = File.Open("../../VideoDatabase/Video/save.avi", FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite);
+                byte[] temsize = new byte[8];
+                System.Buffer.BlockCopy(data, 0, temsize, 0, temsize.Length);
+                long startpt = BitConverter.ToInt64(temsize, 0);
+                Console.WriteLine("form {0} to {1}", startpt, startpt + data.Length - 8); 
+
+                fileStream.Seek(startpt, SeekOrigin.Begin);
+                fileStream.Write(data, 8, data.Length - 8);
+                upto += data.Length;
+                Console.Write(upto);
+                Console.WriteLine("");
+
+                fileStream.Flush();
+                fileStream.Close();
+          
         }
     }
 }
