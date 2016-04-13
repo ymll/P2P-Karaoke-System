@@ -25,18 +25,17 @@ namespace P2PKaraokeSystem.View
         private KaraokeSystemModel _karaokeSystemModel;
         int preVol = 127;
         public string searchKeyWords;
-        //ListView playlist = (ListView)System.Windows.FrameworkElement.FindName("Playlist");
 
         public MainUI()
         {
             //testing code:
 
-            Network.ClientReceiveManager clientRecv = new Network.ClientReceiveManager("192.168.110.85", 12345, 1024 * 32);
+            Network.ClientReceiveManager clientRecv = new Network.ClientReceiveManager("127.0.0.1", 12345, 1024 * 10);//"192.168.110.84"
             clientRecv.RegisterListener(Network.PacketType.PLAY_REQUEST, new Network.PlayRequestListener());
             clientRecv.RegisterListener(Network.PacketType.SEARCH_QUERY, new Network.SearchQueryReceiveListener());
             clientRecv.RegisterListener(Network.PacketType.SEARCH_RESULT, new Network.SearchResultReceiveListener());
             clientRecv.RegisterListener(Network.PacketType.MEDIA_INFO, new Network.MediaInfoReceiveListener());
-            clientRecv.RegisterListener(Network.PacketType.VIDEO_STREAM, new Network.VideoStreamReceiveListener());
+         //   clientRecv.RegisterListener(Network.PacketType.VIDEO_STREAM, new Network.VideoStreamReceiveListener());
             clientRecv.RegisterListener(Network.PacketType.SUBTITLE, new Network.SubtitleReceiveListener());
             clientRecv.RegisterListener(Network.PacketType.LYRIC_REQUEST, new Network.LyricRequestListener());
             clientRecv.StartReceiveTcpPacket();
@@ -146,6 +145,7 @@ namespace P2PKaraokeSystem.View
             else
             {
                 this._karaokeSystemModel.VideoDatabase.SendVideoRequest(selectedVideo);
+                while(!File.Exists(selectedVideo.FilePath));
             }
 
         }
@@ -157,7 +157,7 @@ namespace P2PKaraokeSystem.View
                 this._karaokeSystemModel.View.VideoScreenBitmap.Dispatcher.Invoke(() =>
                 {
                     string filepath = "screenshots/" + DateTime.Now.ToString("yyyy-MM-dd HHmmss") + ".jpg";
-                    Directory.CreateDirectory(filepath);
+                    Directory.CreateDirectory("screenshots/");
                     using (FileStream stream = new FileStream(filepath, FileMode.Create))
                     {
                         JpegBitmapEncoder encoder = new JpegBitmapEncoder();
