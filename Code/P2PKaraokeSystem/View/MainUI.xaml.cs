@@ -147,7 +147,7 @@ namespace P2PKaraokeSystem.View
                 this._karaokeSystemModel.View.VideoScreenBitmap.Dispatcher.Invoke(() =>
                 {
                     string filepath = "screenshots/" + DateTime.Now.ToString("yyyy-MM-dd HHmmss") + ".jpg";
-                    Directory.CreateDirectory(filepath);
+                    Directory.CreateDirectory("screenshots/");
                     using (FileStream stream = new FileStream(filepath, FileMode.Create))
                     {
                         JpegBitmapEncoder encoder = new JpegBitmapEncoder();
@@ -197,7 +197,9 @@ namespace P2PKaraokeSystem.View
 
         private void PopUp_PPM_Click(object sender, RoutedEventArgs e)
         {
-
+                string sendingString = "../../VideoDatabase/ppm/1.ppm;
+                Byte[] buffer = Encoding.ASCII.GetBytes(sendingString);
+                Byte[] sendBytes;
         }
 
         private void searchEnterDown(object sender, KeyEventArgs e)
