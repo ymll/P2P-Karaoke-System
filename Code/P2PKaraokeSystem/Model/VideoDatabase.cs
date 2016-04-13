@@ -257,19 +257,41 @@ namespace P2PKaraokeSystem.Model
             if (!clientList.Contains(serverstruct)) clientList.Add(serverstruct);
         }
 
-        public void SendVideoRequest(Video selectedVideo)
+ public void SendVideoRequest(Video selectedVideo)
         {
             try
             {
+
                 List<ServerStruct> serverlist = VideosFromPeer[selectedVideo];
-                serverlist.ForEach(delegate (ServerStruct serverstruct)
+                byte[] filepath = Encoding.ASCII.GetBytes(selectedVideo.FilePath);
+                Console.WriteLine(serverlist.Count);
+                byte[] sendbuff;
+                serverlist.ForEach(delegate(ServerStruct serverstruct)
                 {
-                    ClientSendManager manager = new ClientSendManager(serverstruct.serveripString, serverstruct.serverport);
-                    byte[] filepath = Encoding.ASCII.GetBytes(selectedVideo.FilePath);
-                    byte[] sendbuff;
-                    manager.AddPayload(out sendbuff, filepath, PacketType.PLAY_REQUEST);
-                    manager.SendTCP(sendbuff, 0, sendbuff.Length);
+                    ClientSendManager manager = new ClientSendManager(serverstruct.serveripString, serverstruct.serverport); 
+                    if (serverlist.Count == 1)
+                    {     
+                        byte[] temsize = BitConverter.GetBytes(2);
+                        byte[] data = new byte[filepath.Length + temsize.Length];
+                        System.Buffer.BlockCopy(temsize, 0, data, 0, temsize.Length);
+                        System.Buffer.BlockCopy(filepath, 0, data, temsize.Length, filepath.Length);
+                        manager.AddPayload(out sendbuff, data, PacketType.PLAY_REQUEST);
+                        manager.SendTCP(sendbuff, 0, sendbuff.Length);   
+                    }
+                    else
+                    {
+                        int number = 1;  
+                        if (number > 2) return;
+                        byte[] temsize = BitConverter.GetBytes(2-number);
+                        byte[] data = new byte[filepath.Length + temsize.Length];
+                        System.Buffer.BlockCopy(temsize, 0, data, 0, temsize.Length);
+                        System.Buffer.BlockCopy(filepath, 0, data, temsize.Length, filepath.Length);
+                        manager.AddPayload(out sendbuff, data, PacketType.PLAY_REQUEST);
+                        manager.SendTCP(sendbuff, 0, sendbuff.Length);
+                        number++;
+                    }  
                 });
+            
             }
             catch
             {
