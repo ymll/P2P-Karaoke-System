@@ -295,24 +295,31 @@
             </Image.Style>
         </Image>
 
-        <Popup Name="popUp" IsOpen="False" Placement="Center" Height="300" Width="400">
+        <Popup Name="popUp" IsOpen="False" Placement="Center" Height="400" Width="400">
             <Border BorderBrush="DeepPink" BorderThickness="3">
                 <StackPanel Orientation="Horizontal" Background="Gray">
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="100"/>
-                            <RowDefinition Height="100" />
+                            <RowDefinition Height="5" />
+                            <RowDefinition Height="50" />
+                            <RowDefinition Height="75" />
+                            <RowDefinition Height="75" />
                             <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="100" />
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
-                        <TextBlock Text="IP Address" Grid.Row="0" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        <TextBox Name="ipAdd" Grid.Row="0" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center" Height="25" Width="200" FontSize="16" TextAlignment="Justify" />
-                        <TextBlock Text="Port Number" Grid.Row="1" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        <TextBox Name="portNum" Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center" Height="25" Width="200" FontSize="16" TextAlignment="Justify" />
-                        <Button Content="OK" Grid.Row="2" Grid.Column="1" Click="PopUp_OK_Click" VerticalAlignment="Center" HorizontalAlignment="Center" Width="175"/>
+                        <TextBlock Text="Your port#: " Grid.Row="0" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        <TextBlock Text="{Binding Network.LocalPort}" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="24"/>
+                        <Separator Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"/>
+                        <TextBlock Text="Connect to other computer" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Center" VerticalAlignment="Bottom" FontSize="18" FontWeight="Bold"/>
+                        <TextBlock Text="IP Address" Grid.Row="3" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        <TextBox Name="ipAdd" Text="127.0.0.1" Grid.Row="3" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center" Height="25" Width="200" FontSize="16" TextAlignment="Justify" />
+                        <TextBlock Text="Port Number" Grid.Row="4" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        <TextBox Name="portNum" Text="12345" Grid.Row="4" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center" Height="25" Width="200" FontSize="16" TextAlignment="Justify" />
+                        <Button Content="OK" Grid.Row="5" Grid.Column="1" Click="PopUp_OK_Click" VerticalAlignment="Center" HorizontalAlignment="Center" Width="175"/>
                     </Grid>
                 </StackPanel>
             </Border>

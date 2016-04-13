@@ -68,6 +68,7 @@ namespace P2PKaraokeSystem.View
             this._karaokeSystemModel = (KaraokeSystemModel)this.DataContext;
             new LyricPlayer(this._karaokeSystemModel.Playback, this._karaokeSystemModel.View);
             new FFmpegDecoder(this._karaokeSystemModel.View, this._karaokeSystemModel.Playback).StartAsync();
+
         }
 
         private void playImg_MouseDown(object sender, MouseButtonEventArgs e)
@@ -163,11 +164,11 @@ namespace P2PKaraokeSystem.View
         private void connectionImg_MouseDown(object sender, MouseButtonEventArgs e)
         {
             popUp.IsOpen = true;
-            this._karaokeSystemModel.VideoDatabase.SaveIpPort(ipAdd.Text, portNum.Text);
         }
 
         private void PopUp_OK_Click(object sender, RoutedEventArgs e)
         {
+            this._karaokeSystemModel.VideoDatabase.SaveIpPort(ipAdd.Text, portNum.Text);
             popUp.IsOpen = false;
         }
 

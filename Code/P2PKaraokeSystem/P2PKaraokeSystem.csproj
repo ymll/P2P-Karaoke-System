@@ -70,6 +70,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Model\NetworkModel.cs" />
     <Compile Include="Model\VideoDatabase.cs" />
     <Compile Include="Network\AbstractNetworkManager.cs" />
     <Compile Include="Network\AudioStreamReceiveListener.cs" />
