@@ -111,6 +111,7 @@ namespace P2PKaraokeSystem.Model
             try
             {
                 loader.RetrieveFormatAndStreamInfo(filepath);
+
             }
             catch (Exception)
             {
@@ -119,7 +120,7 @@ namespace P2PKaraokeSystem.Model
             }
 
             lengthInMillisecond = mediaDecodeInfo.LengthInMillisecond;
-            return true;
+            return lengthInMillisecond > 0;
         }
 
         private void LoadSearch(string keywords)
@@ -295,7 +296,22 @@ namespace P2PKaraokeSystem.Model
 
         public class Lyric
         {
-            public String FilePath { get; private set; }
+            private String _filePath = "";
+            public String FilePath
+            {
+                get { return _filePath; }
+                set
+                {
+                    if (ValidateAndLoad(value))
+                    {
+                        _filePath = value;
+                    }
+                    else
+                    {
+                        _filePath = "";
+                    }
+                }
+            }
             private ILrcFile _lyricFile;
 
             public Lyric(String filePath)
@@ -308,20 +324,20 @@ namespace P2PKaraokeSystem.Model
                     cl.AddPayload(out sendBytes, data, PacketType.LYRIC_REQUEST);
                     cl.SendTCP(sendBytes, 0, sendBytes.Length);
                 }
-                Load(filePath);
+                FilePath = filePath;
             }
 
-            public void Load(String filePath)
+            public bool ValidateAndLoad(String filePath)
             {
                 try
                 {
                     string text = File.ReadAllText(filePath);
                     _lyricFile = LrcFile.FromText(text);
-                    this.FilePath = filePath;
+                    return true;
                 }
                 catch (Exception)
                 {
-                    this.FilePath = "";
+                    return false;
                 }
             }
 

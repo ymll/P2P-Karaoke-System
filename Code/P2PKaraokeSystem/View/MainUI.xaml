@@ -405,12 +405,13 @@
             </Border>
         </ScrollViewer>
 
-        <Popup Name="popUpEdit" IsOpen="False" Placement="Center" Height="300" Width="400">
+        <Popup Name="popUpEdit" IsOpen="False" Placement="Center" Height="400" Width="400">
             <Border BorderBrush="DeepPink" BorderThickness="3">
                 <StackPanel Orientation="Horizontal" Background="Gray">
-                    <Grid>
+                    <Grid DataContext="{Binding SelectedItem, ElementName=Playlist}">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="100"/>
+                            <RowDefinition Height="100" />
                             <RowDefinition Height="100" />
                             <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
@@ -419,10 +420,26 @@
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
                         <TextBlock Text="Title" Grid.Row="0" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        <TextBox Name="EditTitle" Grid.Row="0" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center" Height="25" Width="200" FontSize="16" TextAlignment="Justify" />
+                        <TextBox Text="{Binding Title}" Grid.Row="0" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center" Height="25" Width="200" FontSize="16" TextAlignment="Justify" />
                         <TextBlock Text="Singer" Grid.Row="1" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        <TextBox Name="EditSinger" Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center" Height="25" Width="200" FontSize="16" TextAlignment="Justify" />
-                        <Button Content="OK" Grid.Row="2" Grid.Column="1" Click="PopUpEdit_OK_Click" VerticalAlignment="Center" HorizontalAlignment="Center" Width="175"/>
+                        <TextBox Text="{Binding Performer.Name}" Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center" Height="25" Width="200" FontSize="16" TextAlignment="Justify" />
+                        <TextBlock Text="Lyrics" Grid.Row="2" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        <DockPanel Grid.Row="2" Grid.Column="1" Height="25" Width="200" >
+                            <TextBox Name="EditLyrics" Grid.Row="2"  IsEnabled="False" Grid.Column="1" DockPanel.Dock="Left" VerticalAlignment="Center" HorizontalAlignment="Center" Height="25" Width="123.6" FontSize="16" TextAlignment="Justify">
+                                <TextBox.Style>
+                                    <Style TargetType="{x:Type TextBox}">
+                                        <Setter Property="Text" Value="{Binding Lyric.FilePath}" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Path=Lyric.FilePath.Length, FallbackValue=0, TargetNullValue=0}" Value="0">
+                                                <Setter Property="Text" Value="N/A" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBox.Style>
+                            </TextBox>
+                            <Button Name="EditLyricButton" Content="Browse" DockPanel.Dock="Right" VerticalAlignment="Center" HorizontalAlignment="Center" Height="25" Width="76.4" Click="EditLyricButton_Click" />
+                        </DockPanel>
+                        <Button Content="OK" Grid.Row="3" Grid.Column="1" Click="PopUpEdit_OK_Click" VerticalAlignment="Center" HorizontalAlignment="Center" Width="175"/>
                     </Grid>
                 </StackPanel>
             </Border>
