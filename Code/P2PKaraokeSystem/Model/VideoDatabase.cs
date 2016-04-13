@@ -9,6 +9,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Collections;
+using System.ComponentModel;
+using P2PKaraokeSystem.PlaybackLogic.Decode;
 
 
 namespace P2PKaraokeSystem.Model
@@ -20,19 +22,40 @@ namespace P2PKaraokeSystem.Model
         public ObservableCollection<Video> VideosFromPeer { get; set; }
         public static List<ServerStruct> clientList = new List<ServerStruct>();
 
+        private string DatabaseFileLocation;
+        private readonly string[] DIRECTORIES_FOR_DB_FILE = new string[]{
+                Environment.CurrentDirectory,
+                Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
+                Environment.GetFolderPath(Environment.SpecialFolder.MyVideos),
+                Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory),
+                Path.GetTempPath()
+            };
+        private const string DATABASE_FILENAME = "KaraokeSystemDatabase.csv";
+
         public VideoDatabase()
         {
             Videos = new ObservableCollection<Video>();
             allVideos = new ObservableCollection<Video>();
 
-            try
-            {
-                LoadFromFile("..\\..\\VideoDatabase\\db.csv");
-            }
-            catch (Exception)
-            {
+            LoadFromFile();
+        }
 
+        public void LoadFromFile()
+        {
+            foreach (string directory in DIRECTORIES_FOR_DB_FILE)
+            {
+                string filepath = Path.Combine(directory, DATABASE_FILENAME);
+                try
+                {
+                    Directory.CreateDirectory(directory);
+                    LoadFromFile(filepath);
+                    DatabaseFileLocation = filepath;
+                    break;
+                }
+                catch (Exception) { }
             }
+
+            SaveToFile();
         }
 
         public void LoadFromFile(string path)
@@ -49,7 +72,7 @@ namespace P2PKaraokeSystem.Model
         {
             LoadSearch(keywords);
             //send to peer for query
-            clientList.ForEach(delegate (ServerStruct serverstruce)
+            clientList.ForEach(delegate(ServerStruct serverstruce)
             {
                 ClientSendManager manager = new ClientSendManager(serverstruce.serveripString, serverstruce.serverport);
                 byte[] sendKeywords = Encoding.ASCII.GetBytes(keywords);
@@ -65,14 +88,38 @@ namespace P2PKaraokeSystem.Model
             {
                 while (csv.Read())
                 {
-                    Performer performer = new Performer(csv.GetField<string>("PerformerName"));
-                    Lyric lyric = new Lyric(csv.GetField<string>("LyricFilePath"));
-                    Video video = new Video(csv.GetField<string>("VideoTitle"), csv.GetField<string>("VideoFilePath"), performer, lyric);
+                    long lengthInMillisecond;
+                    string videoFilePath = csv.GetField<string>("VideoFilePath");
 
-                    Videos.Add(video);
-                    allVideos.Add(video);
+                    if (IsVideo(videoFilePath, out lengthInMillisecond))
+                    {
+                        Performer performer = new Performer(csv.GetField<string>("PerformerName"));
+                        Lyric lyric = new Lyric(csv.GetField<string>("LyricFilePath"));
+                        Video video = new Video(csv.GetField<string>("VideoTitle"), csv.GetField<string>("VideoFilePath"), csv.GetField<long>("LengthInMillisecond"), performer, lyric);
+
+                        Videos.Add(video);
+                        allVideos.Add(video);
+                    }
                 }
             }
+        }
+
+        public bool IsVideo(string filepath, out long lengthInMillisecond)
+        {
+            MediaDecodeInfo mediaDecodeInfo = new MediaDecodeInfo();
+            MediaLoader loader = new MediaLoader(mediaDecodeInfo, null);
+            try
+            {
+                loader.RetrieveFormatAndStreamInfo(filepath);
+            }
+            catch (Exception)
+            {
+                lengthInMillisecond = -1;
+                return false;
+            }
+
+            lengthInMillisecond = mediaDecodeInfo.LengthInMillisecond;
+            return true;
         }
 
         private void LoadSearch(string keywords)
@@ -110,7 +157,7 @@ namespace P2PKaraokeSystem.Model
         {
             String[] words = keywords.Split(' ');
             ObservableCollection<Video> VideosPeer = new ObservableCollection<Video>();
-            
+
             Video[] tempVideoArr = new Video[allVideos.Count];
             allVideos.CopyTo(tempVideoArr, 0);
             int videoCount = allVideos.Count;
@@ -120,7 +167,7 @@ namespace P2PKaraokeSystem.Model
             for (int i = 0; i < videoCount; i++)
             {
                 contain = false;
-                for (int k = 0; i< words.Count(); k++)
+                for (int k = 0; i < words.Count(); k++)
                 {
                     //if (tempVideoArr[i].Performer.Name.Contains(words[k])) contain = true;
                     //if (tempVideoArr[i].Title.Contains(words[k])) contain = true;
@@ -130,7 +177,7 @@ namespace P2PKaraokeSystem.Model
             }
             if (VideosPeer.Count == 0) return null;
             else return VideosPeer;
-            
+
         }
 
         public void SaveIpPort(string ipAddress, string port)
@@ -140,15 +187,47 @@ namespace P2PKaraokeSystem.Model
             if (!clientList.Contains(serverstruct)) clientList.Add(serverstruct);
         }
 
-        public void SaveToFile(string path)
+        public string SaveToFile()
         {
-            using (StreamWriter streamWriter = new StreamWriter(path))
+            if (DatabaseFileLocation != null)
             {
-                Save(streamWriter);
+                if (SaveToFile(DatabaseFileLocation))
+                {
+                    return DatabaseFileLocation;
+                }
             }
+
+            foreach (string directory in DIRECTORIES_FOR_DB_FILE)
+            {
+                string filepath = Path.Combine(directory, DATABASE_FILENAME);
+
+                if (SaveToFile(filepath))
+                {
+                    DatabaseFileLocation = filepath;
+                    return filepath;
+                }
+            }
+
+            return null;
         }
 
-        public String SaveToText()
+        private bool SaveToFile(string path)
+        {
+            try
+            {
+                using (StreamWriter streamWriter = new StreamWriter(path))
+                {
+                    Save(streamWriter);
+                }
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+            return true;
+        }
+
+        private String SaveToText()
         {
             using (StringWriter stringWriter = new StringWriter())
             {
@@ -162,6 +241,7 @@ namespace P2PKaraokeSystem.Model
             using (CsvWriter csv = new CsvWriter(textWriter))
             {
                 csv.WriteField<string>("PerformerName");
+                csv.WriteField<string>("LengthInMillisecond");
                 csv.WriteField<string>("LyricFilePath");
                 csv.WriteField<string>("VideoTitle");
                 csv.WriteField<string>("VideoFilePath");
@@ -170,6 +250,7 @@ namespace P2PKaraokeSystem.Model
                 foreach (Video video in Videos)
                 {
                     csv.WriteField<string>(video.Performer.Name);
+                    csv.WriteField<long>(video.LengthInMillisecond);
                     csv.WriteField<string>(video.Lyric.FilePath);
                     csv.WriteField<string>(video.Title);
                     csv.WriteField<string>(video.FilePath);
@@ -182,13 +263,21 @@ namespace P2PKaraokeSystem.Model
         {
             public String Title { get; set; }
             public String FilePath { get; set; }
+            public long LengthInMillisecond { get; set; }
             public Performer Performer { get; set; }
             public Lyric Lyric { get; set; }
 
-            public Video(String title, String filePath, Performer performer, Lyric lyric)
+            public Video(String filePath, long lengthInMillisecond)
+                : this(Path.GetFileNameWithoutExtension(filePath), filePath, lengthInMillisecond, new Performer(""), new Lyric(""))
+            {
+
+            }
+
+            public Video(String title, String filePath, long lengthInMillisecond, Performer performer, Lyric lyric)
             {
                 this.Title = title;
                 this.FilePath = filePath;
+                this.LengthInMillisecond = lengthInMillisecond;
                 this.Performer = performer;
                 this.Lyric = lyric;
             }

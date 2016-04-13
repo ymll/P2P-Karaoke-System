@@ -12,6 +12,12 @@ namespace P2PKaraokeSystem.PlaybackLogic.Decode
         public VideoDecodeInfo Video;
         public AudioDecodeInfo Audio;
         public AVFormatContext* pFormatContext;
+
+        public long LengthInMillisecond
+        {
+            get { return pFormatContext->duration * 1000 / ffmpeg.AV_TIME_BASE; }
+        }
+
         public static AVPacket FlushPacket;
         public double Clock;
 

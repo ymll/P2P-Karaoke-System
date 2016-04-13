@@ -22,7 +22,7 @@ namespace P2PKaraokeSystem.PlaybackLogic.Decode
             this.Audio = new AudioLoader(decodeInfo.Audio);
         }
 
-        private void RetrieveFormatAndStreamInfo(string path)
+        public void RetrieveFormatAndStreamInfo(string path)
         {
             fixed (AVFormatContext** ppFormatContext = &decodeInfo.pFormatContext)
             {

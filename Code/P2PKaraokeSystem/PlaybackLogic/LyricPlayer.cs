@@ -35,7 +35,7 @@ namespace P2PKaraokeSystem.PlaybackLogic
             {
                 this.playViewModel.CurrentLyric = playbackModel.CurrentVideo.Lyric.GetCurrentLyric(currentTime);
             }
-            catch (NullReferenceException e) { }
+            catch (NullReferenceException) { }
         }
 
         void playbackModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)

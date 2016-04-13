@@ -1,5 +1,7 @@
-﻿using P2PKaraokeSystem.Model;
+﻿using Microsoft.Win32;
+using P2PKaraokeSystem.Model;
 using P2PKaraokeSystem.PlaybackLogic;
+using P2PKaraokeSystem.PlaybackLogic.Decode;
 using P2PKaraokeSystem.PlaybackLogic.Native.FFmpeg;
 using System;
 using System.Collections.Generic;
@@ -60,8 +62,8 @@ namespace P2PKaraokeSystem.View
             */
             //end testing code
 
-            InitializeComponent();
             FFmpegLoader.LoadFFmpeg();
+            InitializeComponent();
 
             this._karaokeSystemModel = (KaraokeSystemModel)this.DataContext;
             new LyricPlayer(this._karaokeSystemModel.Playback, this._karaokeSystemModel.View);
@@ -176,7 +178,7 @@ namespace P2PKaraokeSystem.View
             {
                 VideoDatabase.Video video = this._karaokeSystemModel.VideoDatabase.Videos[selectedIndex];
                 this._karaokeSystemModel.VideoDatabase.Videos.Remove(video);
-                Playlist.Items.Refresh();
+                this._karaokeSystemModel.VideoDatabase.SaveToFile();
             }
         }
 
@@ -199,13 +201,12 @@ namespace P2PKaraokeSystem.View
         private void PopUpEdit_OK_Click(object sender, RoutedEventArgs e)
         {
             int selectedIndex = videoIndex;
-            VideoDatabase.Video tempvideo = this._karaokeSystemModel.VideoDatabase.Videos[selectedIndex];
-            tempvideo.Title = EditTitle.Text;
-            tempvideo.Performer.Name = EditSinger.Text;
-            this._karaokeSystemModel.VideoDatabase.Videos.RemoveAt(selectedIndex);
-            this._karaokeSystemModel.VideoDatabase.Videos.Insert(selectedIndex,tempvideo);
+            VideoDatabase.Video selectedVideo = this._karaokeSystemModel.VideoDatabase.Videos[selectedIndex];
+            selectedVideo.Title = EditTitle.Text;
+            selectedVideo.Performer.Name = EditSinger.Text;
             Playlist.Items.Refresh();
             popUpEdit.IsOpen = false;
+            this._karaokeSystemModel.VideoDatabase.SaveToFile();
         }
 
         private void searchEnterDown(object sender, KeyEventArgs e)
@@ -213,6 +214,34 @@ namespace P2PKaraokeSystem.View
             if (e.Key == Key.Return)
             {
                 searchKeyWords = searchBox.Text;
+            }
+        }
+
+        private void AddSongButton_Click(object sender, RoutedEventArgs e)
+        {
+            OpenFileDialog fileDialog = new OpenFileDialog();
+            fileDialog.ReadOnlyChecked = true;
+            fileDialog.Multiselect = true;
+
+            bool? isOpened = fileDialog.ShowDialog();
+
+            if (isOpened.GetValueOrDefault(false))
+            {
+                foreach (string fileName in fileDialog.FileNames)
+                {
+                    long lengthInMillisecond;
+
+                    if (this._karaokeSystemModel.VideoDatabase.IsVideo(fileName, out lengthInMillisecond))
+                    {
+                        VideoDatabase.Video video = new VideoDatabase.Video(fileName, lengthInMillisecond);
+
+                        if (!this._karaokeSystemModel.VideoDatabase.Videos.Any(v => fileName.Equals(v.FilePath)))
+                        {
+                            this._karaokeSystemModel.VideoDatabase.Videos.Add(video);
+                        }
+                    }
+                }
+                this._karaokeSystemModel.VideoDatabase.SaveToFile();
             }
         }
     }
