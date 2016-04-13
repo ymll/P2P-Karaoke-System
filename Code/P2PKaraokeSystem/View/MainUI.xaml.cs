@@ -1,5 +1,6 @@
 ﻿using Microsoft.Win32;
 using P2PKaraokeSystem.Model;
+using P2PKaraokeSystem.Network;
 using P2PKaraokeSystem.PlaybackLogic;
 using P2PKaraokeSystem.PlaybackLogic.Decode;
 using P2PKaraokeSystem.PlaybackLogic.Native.FFmpeg;
@@ -69,6 +70,9 @@ namespace P2PKaraokeSystem.View
             new LyricPlayer(this._karaokeSystemModel.Playback, this._karaokeSystemModel.View);
             new FFmpegDecoder(this._karaokeSystemModel.View, this._karaokeSystemModel.Playback).StartAsync();
 
+            PeerSharingManager peerSharingManager = new PeerSharingManager(this._karaokeSystemModel.Network);
+            peerSharingManager.StartSharing();
+            peerSharingManager.StopSharing();
         }
 
         private void playImg_MouseDown(object sender, MouseButtonEventArgs e)

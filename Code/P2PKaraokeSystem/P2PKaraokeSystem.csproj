@@ -78,10 +78,12 @@
     <Compile Include="Network\AbstractReceiveManager.cs" />
     <Compile Include="Network\AbstractSendManager.cs" />
     <Compile Include="Network\ClientSendManager.cs" />
+    <Compile Include="Network\DatabaseSyncListener.cs" />
     <Compile Include="Network\DataReceiveListener.cs" />
     <Compile Include="Network\DataSendListener.cs" />
     <Compile Include="Network\LyricRequestListener.cs" />
     <Compile Include="Network\MediaInfoReceiveListener.cs" />
+    <Compile Include="Network\PeerSharingManager.cs" />
     <Compile Include="Network\PlayRequestListener.cs" />
     <Compile Include="Network\SearchQueryReceiveListener.cs" />
     <Compile Include="Network\SearchResultReceiveListener.cs" />
