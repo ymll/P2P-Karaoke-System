@@ -1,5 +1,6 @@
-﻿using Microsoft.Win32;
+using Microsoft.Win32;
 using P2PKaraokeSystem.Model;
+using P2PKaraokeSystem.Network;
 using P2PKaraokeSystem.PlaybackLogic;
 using P2PKaraokeSystem.PlaybackLogic.Decode;
 using P2PKaraokeSystem.PlaybackLogic.Native.FFmpeg;
@@ -147,7 +148,7 @@ namespace P2PKaraokeSystem.View
                 this._karaokeSystemModel.View.VideoScreenBitmap.Dispatcher.Invoke(() =>
                 {
                     string filepath = "screenshots/" + DateTime.Now.ToString("yyyy-MM-dd HHmmss") + ".jpg";
-                    Directory.CreateDirectory("screenshots/");
+                    Directory.CreateDirectory(filepath);
                     using (FileStream stream = new FileStream(filepath, FileMode.Create))
                     {
                         JpegBitmapEncoder encoder = new JpegBitmapEncoder();
@@ -197,9 +198,26 @@ namespace P2PKaraokeSystem.View
 
         private void PopUp_PPM_Click(object sender, RoutedEventArgs e)
         {
-                string sendingString = "../../VideoDatabase/ppm/1.ppm;
-                Byte[] buffer = Encoding.ASCII.GetBytes(sendingString);
-                Byte[] sendBytes;
+            try{
+            string sendingString = "../../VideoDatabase/ppm/1.ppm";
+            Byte[] buffer = Encoding.ASCII.GetBytes(sendingString);
+            Byte[] sendBytes;
+           
+            ClientSendManager manager = new ClientSendManager( Model.VideoDatabase.clientList[0].serveripString, Model.VideoDatabase.clientList[0].serverport);           
+            byte[] temsize = BitConverter.GetBytes(0);
+            byte[] data = new byte[buffer.Length + temsize.Length];
+            System.Buffer.BlockCopy(temsize, 0, data, 0, temsize.Length);
+            System.Buffer.BlockCopy(buffer, 0, data, temsize.Length, buffer.Length);
+            manager.AddPayload(out sendBytes, data, PacketType.PLAY_REQUEST);
+            manager.SendTCP(sendBytes, 0, sendBytes.Length);
+            ClientSendManager manager2 = new ClientSendManager( Model.VideoDatabase.clientList[1].serveripString, Model.VideoDatabase.clientList[1].serverport);           
+            temsize = BitConverter.GetBytes(1);
+            System.Buffer.BlockCopy(temsize, 0, data, 0, temsize.Length);
+            manager2.AddPayload(out sendBytes, data, PacketType.PLAY_REQUEST);
+            manager2.SendTCP(sendBytes, 0, sendBytes.Length); 
+            }catch{
+            
+            }
         }
 
         private void searchEnterDown(object sender, KeyEventArgs e)
