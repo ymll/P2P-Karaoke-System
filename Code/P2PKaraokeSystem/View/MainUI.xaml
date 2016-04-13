@@ -353,46 +353,63 @@
                     <ListView Name="Playlist" ItemsSource="{Binding VideoDatabase.Videos}" SelectionMode="Single" Background="Black" MouseDoubleClick="ListView_MouseDoubleClick" DockPanel.Dock="Bottom">
                         <ListView.ItemTemplate>
                             <DataTemplate>
-                                <DockPanel Name="DockPan" Height="40" Background="Transparent">
-                                    <DockPanel.Visibility>
+                                <StackPanel>
+                                    <StackPanel.Visibility>
                                         <MultiBinding Converter="{StaticResource PlaylistVisiblityConverter}">
                                             <Binding />
                                             <Binding Path="Text" ElementName="searchBox" />
                                         </MultiBinding>
-                                    </DockPanel.Visibility>
-                                    <TextBlock Name ="songTitle" HorizontalAlignment="Left" Foreground="White" VerticalAlignment="Center" FontSize="24" FontWeight="Bold">
-                                        <TextBlock.Style>
-                                            <Style TargetType="{x:Type TextBlock}">
-                                                <Setter Property="Text" Value="{Binding Title}" />
-                                                <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding Path=Title.Length, FallbackValue=0, TargetNullValue=0}" Value="0">
-                                                        <Setter Property="Text" Value="N/A" />
-                                                    </DataTrigger>
-                                                </Style.Triggers>
-                                            </Style>
-                                        </TextBlock.Style>
-                                    </TextBlock>
-                                    <TextBlock Text="   ---    " HorizontalAlignment="Left" Foreground="White" VerticalAlignment="Center"></TextBlock>
-                                    <TextBlock Name ="songSinger" HorizontalAlignment="Center" Foreground="LightGray" VerticalAlignment="Center" FontSize="16" FontWeight="Bold">
-                                        <TextBlock.Style>
-                                            <Style TargetType="{x:Type TextBlock}">
-                                                <Setter Property="Text" Value="{Binding Performer.Name}" />
-                                                <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding Path=Performer.Name.Length, FallbackValue=0, TargetNullValue=0}" Value="0">
-                                                        <Setter Property="Text" Value="N/A" />
-                                                    </DataTrigger>
-                                                </Style.Triggers>
-                                            </Style>
-                                        </TextBlock.Style>
-                                    </TextBlock>
-                                    <TextBlock Text="{Binding Converter={StaticResource TimeStringConverter}}"  HorizontalAlignment="Right" Foreground="White" VerticalAlignment="Center"></TextBlock>
-                                    <DockPanel.ContextMenu>
-                                        <ContextMenu>
-                                            <MenuItem Header="Edit" Click="EditMenuItem_Click"/>
-                                            <MenuItem Header="Remove Item" Click="RemoveMenuItem_Click" />
-                                        </ContextMenu>
-                                    </DockPanel.ContextMenu>
-                                </DockPanel>
+                                    </StackPanel.Visibility>
+                                    <DockPanel Name="DockPan" Height="40" Background="Transparent">
+                                        <TextBlock Name ="songTitle" HorizontalAlignment="Left" Foreground="White" VerticalAlignment="Center" FontSize="24" FontWeight="Bold">
+                                            <TextBlock.Style>
+                                                <Style TargetType="{x:Type TextBlock}">
+                                                    <Setter Property="Text" Value="{Binding Title}" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding Path=Title.Length, FallbackValue=0, TargetNullValue=0}" Value="0">
+                                                            <Setter Property="Text" Value="N/A" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
+                                        <TextBlock Text="   ---    " HorizontalAlignment="Left" Foreground="White" VerticalAlignment="Center"></TextBlock>
+                                        <TextBlock Name ="songSinger" HorizontalAlignment="Center" Foreground="LightGray" VerticalAlignment="Center" FontSize="16" FontWeight="Bold">
+                                            <TextBlock.Style>
+                                                <Style TargetType="{x:Type TextBlock}">
+                                                    <Setter Property="Text" Value="{Binding Performer.Name}" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding Path=Performer.Name.Length, FallbackValue=0, TargetNullValue=0}" Value="0">
+                                                            <Setter Property="Text" Value="N/A" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
+                                        <TextBlock Text="{Binding Converter={StaticResource TimeStringConverter}}"  HorizontalAlignment="Right" Foreground="White" VerticalAlignment="Center"></TextBlock>
+                                        <DockPanel.ContextMenu>
+                                            <ContextMenu>
+                                                <MenuItem Header="Edit" Click="EditMenuItem_Click"/>
+                                                <MenuItem Header="Remove Item" Click="RemoveMenuItem_Click" />
+                                            </ContextMenu>
+                                        </DockPanel.ContextMenu>
+                                    </DockPanel>
+                                    <DockPanel>
+                                        <TextBlock Text="Album: " Foreground="White" />
+                                        <TextBlock Foreground="White">
+                                            <TextBlock.Style>
+                                                <Style TargetType="{x:Type TextBlock}">
+                                                    <Setter Property="Text" Value="{Binding Path=Album}" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding Path=Album.Length, FallbackValue=0, TargetNullValue=0}" Value="0">
+                                                            <Setter Property="Text" Value="N/A" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
+                                    </DockPanel>
+                                </StackPanel>
                             </DataTemplate>
                         </ListView.ItemTemplate>
                         <ListView.ItemContainerStyle>
@@ -405,12 +422,14 @@
             </Border>
         </ScrollViewer>
 
-        <Popup Name="popUpEdit" IsOpen="False" Placement="Center" Height="300" Width="400">
+        <Popup Name="popUpEdit" IsOpen="False" Placement="Center" Height="500" Width="400">
             <Border BorderBrush="DeepPink" BorderThickness="3">
                 <StackPanel Orientation="Horizontal" Background="Gray">
-                    <Grid>
+                    <Grid DataContext="{Binding SelectedItem, ElementName=Playlist}">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="100"/>
+                            <RowDefinition Height="100" />
+                            <RowDefinition Height="100" />
                             <RowDefinition Height="100" />
                             <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
@@ -419,10 +438,28 @@
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
                         <TextBlock Text="Title" Grid.Row="0" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        <TextBox Name="EditTitle" Grid.Row="0" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center" Height="25" Width="200" FontSize="16" TextAlignment="Justify" />
-                        <TextBlock Text="Singer" Grid.Row="1" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        <TextBox Name="EditSinger" Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center" Height="25" Width="200" FontSize="16" TextAlignment="Justify" />
-                        <Button Content="OK" Grid.Row="2" Grid.Column="1" Click="PopUpEdit_OK_Click" VerticalAlignment="Center" HorizontalAlignment="Center" Width="175"/>
+                        <TextBox Text="{Binding Title}" Grid.Row="0" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center" Height="25" Width="200" FontSize="16" TextAlignment="Justify" />
+                        <TextBlock Text="Album" Grid.Row="1" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        <TextBox Text="{Binding Album}" Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center" Height="25" Width="200" FontSize="16" TextAlignment="Justify" />
+                        <TextBlock Text="Singer" Grid.Row="2" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        <TextBox Text="{Binding Performer.Name}" Grid.Row="2" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center" Height="25" Width="200" FontSize="16" TextAlignment="Justify" />
+                        <TextBlock Text="Lyrics" Grid.Row="3" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        <DockPanel Grid.Row="3" Grid.Column="1" Height="25" Width="200" >
+                            <TextBox Name="EditLyrics" Grid.Row="2"  IsEnabled="False" Grid.Column="1" DockPanel.Dock="Left" VerticalAlignment="Center" HorizontalAlignment="Center" Height="25" Width="123.6" FontSize="16" TextAlignment="Justify">
+                                <TextBox.Style>
+                                    <Style TargetType="{x:Type TextBox}">
+                                        <Setter Property="Text" Value="{Binding Lyric.FilePath}" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Path=Lyric.FilePath.Length, FallbackValue=0, TargetNullValue=0}" Value="0">
+                                                <Setter Property="Text" Value="N/A" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBox.Style>
+                            </TextBox>
+                            <Button Name="EditLyricButton" Content="Browse" DockPanel.Dock="Right" VerticalAlignment="Center" HorizontalAlignment="Center" Height="25" Width="76.4" Click="EditLyricButton_Click" />
+                        </DockPanel>
+                        <Button Content="OK" Grid.Row="4" Grid.Column="1" Click="PopUpEdit_OK_Click" VerticalAlignment="Center" HorizontalAlignment="Center" Width="175"/>
                     </Grid>
                 </StackPanel>
             </Border>

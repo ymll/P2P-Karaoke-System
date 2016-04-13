@@ -185,25 +185,11 @@ namespace P2PKaraokeSystem.View
         private void EditMenuItem_Click(object sender, RoutedEventArgs e)
         {
             popUpEdit.IsOpen = true;
-            int selectedIndex = Playlist.SelectedIndex;
-            VideoDatabase.Video tempVideo = Playlist.SelectedItem as VideoDatabase.Video;
-            saveVideoIndex(selectedIndex);
-            EditTitle.Text = tempVideo.Title;
-            EditSinger.Text = tempVideo.Performer.Name;
-        }
-
-        int videoIndex;
-        private void saveVideoIndex(int selectedIndex)
-        {
-            videoIndex = selectedIndex;
         }
 
         private void PopUpEdit_OK_Click(object sender, RoutedEventArgs e)
         {
-            int selectedIndex = videoIndex;
-            VideoDatabase.Video selectedVideo = this._karaokeSystemModel.VideoDatabase.Videos[selectedIndex];
-            selectedVideo.Title = EditTitle.Text;
-            selectedVideo.Performer.Name = EditSinger.Text;
+            VideoDatabase.Video selectedVideo = (VideoDatabase.Video)Playlist.SelectedItem;
             Playlist.Items.Refresh();
             popUpEdit.IsOpen = false;
             this._karaokeSystemModel.VideoDatabase.SaveToFile();
@@ -243,6 +229,22 @@ namespace P2PKaraokeSystem.View
                 }
                 this._karaokeSystemModel.VideoDatabase.SaveToFile();
             }
+        }
+
+        private void EditLyricButton_Click(object sender, RoutedEventArgs e)
+        {
+            OpenFileDialog fileDialog = new OpenFileDialog();
+            fileDialog.ReadOnlyChecked = true;
+
+            bool? isOpened = fileDialog.ShowDialog();
+            if (isOpened.GetValueOrDefault(false))
+            {
+                Button button = (e.OriginalSource as Button);
+                VideoDatabase.Video video = (button.DataContext as VideoDatabase.Video);
+                video.Lyric.FilePath = fileDialog.FileName;
+                button.InvalidateVisual();
+            }
+            this._karaokeSystemModel.VideoDatabase.SaveToFile();
         }
     }
 }

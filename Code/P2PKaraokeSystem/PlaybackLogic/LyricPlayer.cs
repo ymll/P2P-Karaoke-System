@@ -53,6 +53,13 @@ namespace P2PKaraokeSystem.PlaybackLogic
                         break;
                 }
             }
+            else if ("Loaded".Equals(e.PropertyName))
+            {
+                if (this.playbackModel.Loaded)
+                {
+                    currentTime = 0;
+                }
+            }
         }
 
         public void Stop()
