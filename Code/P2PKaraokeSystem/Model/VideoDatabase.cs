@@ -9,7 +9,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Collections;
-
+using System.Runtime.Serialization.Formatters.Binary;
+using System.Runtime.Serialization;
+using System.Runtime.InteropServices;
 
 namespace P2PKaraokeSystem.Model
 {
@@ -79,6 +81,45 @@ namespace P2PKaraokeSystem.Model
                     allVideos.Add(video);
                 }
             }
+           //foreach(Video video in Videos)
+           // {
+           //     System.Diagnostics.Debug.WriteLine(video.Title)
+           // }
+
+            ObservableCollection<SendableVideo> collectionCheck = new ObservableCollection<SendableVideo>();
+
+            foreach(Video video in Videos)
+            {
+                SendableVideo sendvideo = new SendableVideo(video.Title, video.FilePath, video.Performer);
+                collectionCheck.Add(sendvideo);
+            }
+
+            BinaryFormatter bf = new BinaryFormatter();
+            byte[] collectionByte;
+            using (var ms = new MemoryStream())
+            {
+                System.Diagnostics.Debug.WriteLine("\n stage1");
+                try
+                {
+                    bf.Serialize(ms, collectionCheck);
+                } catch (SerializationException e) { System.Diagnostics.Debug.WriteLine(e.Message); }
+               
+                System.Diagnostics.Debug.WriteLine("\n stage2");
+                collectionByte = ms.ToArray();
+            }
+            using (var memStream = new MemoryStream())
+            {
+                System.Diagnostics.Debug.WriteLine("\n stage3");
+                var binForm = new BinaryFormatter();
+                memStream.Write(collectionByte, 0, collectionByte.Length);
+                System.Diagnostics.Debug.WriteLine("\n stage4");
+                memStream.Seek(0, SeekOrigin.Begin);
+                System.Diagnostics.Debug.WriteLine("\n stage5");
+                var obj = binForm.Deserialize(memStream);
+                System.Diagnostics.Debug.WriteLine("\n stage6");
+                ObservableCollection<Model.VideoDatabase.SendableVideo> videoCollection = (ObservableCollection<Model.VideoDatabase.SendableVideo>)obj;
+                System.Diagnostics.Debug.WriteLine("\n\n" + videoCollection[0].Title + "\n\n");
+            }
         }
 
         private void LoadSearch(string keywords)
@@ -112,12 +153,13 @@ namespace P2PKaraokeSystem.Model
             }
         }
 
-        public static void LoadResultFromPeer(ObservableCollection<Video> videoCollection, String ipAddress, Int32 portNo)
+        public static void LoadResultFromPeer(ObservableCollection<SendableVideo> videoCollection, String ipAddress, Int32 portNo)
         {
             //for each entry, if is new, add
             //else 
-            foreach (Video video in videoCollection)
+            foreach (SendableVideo sendablevideo in videoCollection)
             {
+                Video video = new Video(sendablevideo.Title, sendablevideo.FilePath, sendablevideo.Performer, null);
                 List<ServerStruct> tempList;
                 ServerStruct serverstruct = new ServerStruct(ipAddress, portNo);
                 if (VideosFromPeer.TryGetValue(video, out tempList))
@@ -131,14 +173,19 @@ namespace P2PKaraokeSystem.Model
                     VideosFromPeer.Add(video, new List<ServerStruct>());
                     VideosFromPeer[video].Add(serverstruct);
                 }
-                if (!Videos.Contains(video)) Videos.Add(video);
+                if (!Videos.Contains(video))
+                {
+                    //todo: check if any video has same name
+                    var exist = Videos.Where(x => x.Title==video.Title).FirstOrDefault();
+                    if (exist==null) Videos.Add(video);
+                }
             }
         }
 
-        public static ObservableCollection<Video> LoadSearchToPeer(string keywords)
+        public static ObservableCollection<SendableVideo> LoadSearchToPeer(string keywords)
         {
             String[] words = keywords.Split(' ');
-            ObservableCollection<Video> VideosPeer = new ObservableCollection<Video>();
+            ObservableCollection<SendableVideo> VideosPeer = new ObservableCollection<SendableVideo>();
             
             Video[] tempVideoArr = new Video[allVideos.Count];
             allVideos.CopyTo(tempVideoArr, 0);
@@ -155,7 +202,11 @@ namespace P2PKaraokeSystem.Model
                     //if (tempVideoArr[i].Title.Contains(words[k])) contain = true;
                     if (tempVideoArr[i].Performer.Name == words[k] || tempVideoArr[i].Title == words[k]) contain = true;
                 }
-                if (contain) VideosPeer.Add(tempVideoArr[i]);
+                if (contain)
+                {
+                    SendableVideo sendvideo = new SendableVideo(tempVideoArr[i].Title, tempVideoArr[i].FilePath, tempVideoArr[i].Performer);
+                    VideosPeer.Add(sendvideo);
+                }
             }
             if (VideosPeer.Count == 0) return null;
             else return VideosPeer;
@@ -227,6 +278,7 @@ namespace P2PKaraokeSystem.Model
             }
         }
 
+        [Serializable]
         public class Video
         {
             public String Title { get; set; }
@@ -243,6 +295,21 @@ namespace P2PKaraokeSystem.Model
             }
         }
 
+        [Serializable]
+        public class SendableVideo
+        {
+            public String Title { get; set; }
+            public String FilePath { get; set; }
+            public Performer Performer { get; set; }
+            public SendableVideo(string title, String filePath, Performer performer)
+            {
+                this.Title = title;
+                this.FilePath = filePath;
+                this.Performer = performer;
+            }
+        }
+
+        [Serializable]
         public class Performer
         {
             public String Name { get; set; }
@@ -253,6 +320,7 @@ namespace P2PKaraokeSystem.Model
             }
         }
 
+        [Serializable]
         public class Lyric
         {
             public String FilePath { get; private set; }

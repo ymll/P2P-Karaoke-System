@@ -21,7 +21,7 @@ namespace P2PKaraokeSystem.Network
             //call search for peer function
             //send the return here (parse the object)
             String keyworks = ASCIIEncoding.ASCII.GetString(data);
-            ObservableCollection<Model.VideoDatabase.Video> videoCollection = Model.VideoDatabase.LoadSearchToPeer(keyworks);
+            ObservableCollection<Model.VideoDatabase.SendableVideo> videoCollection = Model.VideoDatabase.LoadSearchToPeer(keyworks);
             if (videoCollection == null) return;
             else
             {

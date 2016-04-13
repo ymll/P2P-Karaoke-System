@@ -29,15 +29,17 @@ namespace P2PKaraokeSystem.View
         public MainUI()
         {
             //testing code:
-            /*
-            ClientReceiveManager clientRecv = new ClientReceiveManager("127.0.0.1",12345,1024*32);
-            clientRecv.RegisterListener(PacketType.PLAY_REQUEST, new PlayRequestListener());
-            clientRecv.RegisterListener(PacketType.MEDIA_INFO, new MediaInfoReceiveListener());
-            clientRecv.RegisterListener(PacketType.VIDEO_STREAM, new VideoStreamReceiveListener());
-            clientRecv.RegisterListener(PacketType.SUBTITLE, new SubtitleReceiveListener());
-            clientRecv.RegisterListener(PacketType.LYRIC_REQUEST, new LyricRequestListener());
-            clientRecv.StartReceiveTcpPacket();
 
+            Network.ClientReceiveManager clientRecv = new Network.ClientReceiveManager("127.0.0.1", 12345, 1024 * 32);
+            clientRecv.RegisterListener(Network.PacketType.PLAY_REQUEST, new Network.PlayRequestListener());
+            clientRecv.RegisterListener(Network.PacketType.SEARCH_QUERY, new Network.SearchQueryReceiveListener());
+            clientRecv.RegisterListener(Network.PacketType.SEARCH_RESULT, new Network.SearchResultReceiveListener());
+            clientRecv.RegisterListener(Network.PacketType.MEDIA_INFO, new Network.MediaInfoReceiveListener());
+            clientRecv.RegisterListener(Network.PacketType.VIDEO_STREAM, new Network.VideoStreamReceiveListener());
+            clientRecv.RegisterListener(Network.PacketType.SUBTITLE, new Network.SubtitleReceiveListener());
+            clientRecv.RegisterListener(Network.PacketType.LYRIC_REQUEST, new Network.LyricRequestListener());
+            clientRecv.StartReceiveTcpPacket();
+            /*
 
             string sendingString = "../../VideoDatabase/Video/only_time.avi";
             Byte[] data = Encoding.ASCII.GetBytes(sendingString);
