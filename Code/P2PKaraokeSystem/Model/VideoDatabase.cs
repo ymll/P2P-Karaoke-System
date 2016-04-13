@@ -183,6 +183,7 @@ namespace P2PKaraokeSystem.Model
 
         public void SaveIpPort(string ipAddress, string port)
         {
+            //port = "0";
             Int32 int32_port = Int32.Parse(port);
             ServerStruct serverstruct = new ServerStruct(ipAddress, int32_port);
             if (!clientList.Contains(serverstruct)) clientList.Add(serverstruct);

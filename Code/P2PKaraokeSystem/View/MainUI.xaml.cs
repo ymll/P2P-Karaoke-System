@@ -195,6 +195,11 @@ namespace P2PKaraokeSystem.View
             this._karaokeSystemModel.VideoDatabase.SaveToFile();
         }
 
+        private void PopUp_PPM_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
         private void searchEnterDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Return)
