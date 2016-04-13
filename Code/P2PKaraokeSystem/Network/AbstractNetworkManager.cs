@@ -59,6 +59,7 @@ namespace P2PKaraokeSystem.Network
         {
             // TODO: Define packet format
             destData = new byte[dataSize];
+            Console.WriteLine("data size {0}",dataSize);
             try {
                 System.Buffer.BlockCopy(recvBuffer, payloadSize, destData, 0, dataSize);
                 byte[] temtype = new byte[payloadSize];

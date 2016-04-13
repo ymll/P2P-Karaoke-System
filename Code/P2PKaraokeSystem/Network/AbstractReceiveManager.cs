@@ -12,11 +12,11 @@ namespace P2PKaraokeSystem.Network
 
         public abstract void StartReceiveUdpDatagram();
 
-        protected void NotifyListeners(PacketType packetType, byte[] destData)
+        protected void NotifyListeners(PacketType packetType, byte[] destData, String ipAddress, Int32 portNo)
         {
             foreach (DataReceiveListener listener in this.listeners[packetType])
             {
-                listener.OnDataReceived(packetType, destData);
+                listener.OnDataReceived(packetType, destData, ipAddress, portNo);
             }
         }
     }

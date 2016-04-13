@@ -15,7 +15,7 @@ namespace P2PKaraokeSystem.Network
     public class ClientSendManager : AbstractSendManager
     {
         private Int32 serverport = 12345;
-        private String ServeripString = "127.0.0.1";
+        private String ServeripString = "127.0.0.1"; //"192.168.0.5";
         public ClientSendManager()
         {
             Form1 inputForm = new Form1();
@@ -33,7 +33,7 @@ namespace P2PKaraokeSystem.Network
                 this.AutoSize = true;
                 this.AutoSizeMode = AutoSizeMode.GrowAndShrink;
                 TextBox ipaddr = new TextBox();
-                ipaddr.Text = "127.0.0.1";
+                ipaddr.Text = "127.0.0.1";//"192.168.0.2";
                 ipaddr.Location = new Point(15, 15);
                 this.Controls.Add(ipaddr);
                 TextBox portnumber = new TextBox();
@@ -64,9 +64,11 @@ namespace P2PKaraokeSystem.Network
             try
             {          
                 TcpClient client = new TcpClient();
+                Console.Write(ServeripString);
+                Console.Write(serverport);
                 client.Connect(ServeripString, serverport);
                 NetworkStream networkStream = client.GetStream();
-                networkStream.Write(sendBuffer, 0, size);
+                networkStream.Write(sendBuffer, from, size);
                 networkStream.Flush();
                 client.Close();
             }
