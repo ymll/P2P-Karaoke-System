@@ -16,10 +16,11 @@ namespace P2PKaraokeSystem.Network
     public class PeerSharingManager
     {
         private readonly NetworkModel networkModel;
+        private readonly VideoDatabase videoDatabase;
         private ManualResetEventSlim isSharingEvent;
         private const int SELECT_TIMEOUT_IN_MICROSECOND = 1000000;
 
-        public PeerSharingManager(NetworkModel networkModel)
+        public PeerSharingManager(NetworkModel networkModel, VideoDatabase videoDatabase)
         {
             this.networkModel = networkModel;
             this.isSharingEvent = new ManualResetEventSlim();
@@ -53,7 +54,6 @@ namespace P2PKaraokeSystem.Network
             for (; ; )
             {
                 socketList.Add(tcpListener.Server);
-                //TcpClient client = this.tcpListener.AcceptSocket(socketList,);
                 Socket.Select(socketList, null, null, SELECT_TIMEOUT_IN_MICROSECOND);
                 if (socketList.Contains(tcpListener.Server))
                 {
@@ -75,6 +75,27 @@ namespace P2PKaraokeSystem.Network
             newClient.Client = newClientSocket;
 
             new PeerServerManager(newClient);
+        }
+
+        public void ConnectRemoteDevice(string server, string port)
+        {
+            int portInt;
+            if (int.TryParse(port, out portInt))
+            {
+                TcpClient localClient = new TcpClient(server, portInt);
+                NetworkStream serverStream = localClient.GetStream();
+
+                SendDatabaseToRemote(serverStream);
+            }
+        }
+
+        private void SendDatabaseToRemote(NetworkStream stream)
+        {
+            string db = videoDatabase.SaveToText();
+            byte[] dbBytes = Encoding.ASCII.GetBytes(db);
+            byte[] dataSize = BitConverter.GetBytes((long)dbBytes.Length);
+            stream.Write(dataSize, 0, dataSize.Length);
+            stream.Write(dbBytes, 0, dbBytes.Length);
         }
     }
 }

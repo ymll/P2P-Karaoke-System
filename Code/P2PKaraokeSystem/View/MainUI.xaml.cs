@@ -26,6 +26,7 @@ namespace P2PKaraokeSystem.View
     public partial class MainUI : Window
     {
         private KaraokeSystemModel _karaokeSystemModel;
+        private PeerSharingManager peerSharingManager;
         int preVol = 127;
         public string searchKeyWords;
 
@@ -70,7 +71,7 @@ namespace P2PKaraokeSystem.View
             new LyricPlayer(this._karaokeSystemModel.Playback, this._karaokeSystemModel.View);
             new FFmpegDecoder(this._karaokeSystemModel.View, this._karaokeSystemModel.Playback).StartAsync();
 
-            PeerSharingManager peerSharingManager = new PeerSharingManager(this._karaokeSystemModel.Network);
+            peerSharingManager = new PeerSharingManager(this._karaokeSystemModel.Network, this._karaokeSystemModel.VideoDatabase);
             peerSharingManager.StartSharing();
         }
 
@@ -171,8 +172,8 @@ namespace P2PKaraokeSystem.View
 
         private void PopUp_OK_Click(object sender, RoutedEventArgs e)
         {
-            this._karaokeSystemModel.VideoDatabase.SaveIpPort(ipAdd.Text, portNum.Text);
             popUp.IsOpen = false;
+            peerSharingManager.ConnectRemoteDevice(ipAdd.Text, portNum.Text);
         }
 
         private void RemoveMenuItem_Click(object sender, RoutedEventArgs e)

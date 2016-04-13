@@ -181,13 +181,6 @@ namespace P2PKaraokeSystem.Model
 
         }
 
-        public void SaveIpPort(string ipAddress, string port)
-        {
-            Int32 int32_port = Int32.Parse(port);
-            ServerStruct serverstruct = new ServerStruct(ipAddress, int32_port);
-            if (!clientList.Contains(serverstruct)) clientList.Add(serverstruct);
-        }
-
         public string SaveToFile()
         {
             if (DatabaseFileLocation != null)
@@ -228,7 +221,7 @@ namespace P2PKaraokeSystem.Model
             return true;
         }
 
-        private String SaveToText()
+        public String SaveToText()
         {
             using (StringWriter stringWriter = new StringWriter())
             {
