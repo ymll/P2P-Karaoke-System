@@ -48,13 +48,22 @@ namespace P2PKaraokeSystem.Network
             Console.WriteLine("Length {0}", file.Length);
 
             FileStream fileStream = File.Open(fileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-
             int read;
             long totalWritten = 0;
-            byte[] buffer = new byte[1024*10 - 2];
-            while (((read = fileStream.Read(buffer, 8, buffer.Length - 8))) > 0)
-            {
 
+            //type = 0, send 1,3,5,...blocks
+            //type = 1, send 2,4,6,...blocks    
+            //type = 2, send whole file
+            int bufferSize = 1024 * 10 - 2;
+            byte[] buffer = new byte[bufferSize];
+            int counter = 0;
+
+
+            while (true)
+            {
+                if (reqType < 2) fileStream.Seek((counter * 2 + reqType) * bufferSize, SeekOrigin.Begin);
+                if(  ((read = fileStream.Read(buffer, 8, buffer.Length - 8))) > 0) break;
+                counter++;
                 byte[] temsize = BitConverter.GetBytes(totalWritten);
                 System.Buffer.BlockCopy(temsize, 0, buffer, 0, temsize.Length);
                 Console.WriteLine(file.Length - totalWritten);
