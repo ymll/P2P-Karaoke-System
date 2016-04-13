@@ -23,15 +23,17 @@ namespace P2PKaraokeSystem.Network
             //Source: http://stackoverflow.com/questions/1446547/how-to-convert-an-object-to-a-byte-array-in-c-sharp
             try
             {
+                ObservableCollection<Model.VideoDatabase.SendableVideo> videoCollection;
                 using (var memStream = new MemoryStream())
                 {
                     var binForm = new BinaryFormatter();
                     memStream.Write(data, 0, data.Length);
                     memStream.Seek(0, SeekOrigin.Begin);
                     var obj = binForm.Deserialize(memStream);
-                    ObservableCollection<Model.VideoDatabase.SendableVideo> videoCollection = (ObservableCollection<Model.VideoDatabase.SendableVideo>) obj;
-                    Model.VideoDatabase.LoadResultFromPeer(videoCollection, ipAddress, portNo);    //TODO: LoadResultFromPeer
+                    videoCollection = (ObservableCollection<Model.VideoDatabase.SendableVideo>)obj;
                 }
+                Console.WriteLine("Deserialize ok");
+                Model.VideoDatabase.LoadResultFromPeer(videoCollection, ipAddress, portNo);    //TODO: LoadResultFromPeer
             }
             catch (SerializationException e)
             {

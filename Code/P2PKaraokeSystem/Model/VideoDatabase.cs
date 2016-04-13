@@ -94,52 +94,63 @@ namespace P2PKaraokeSystem.Model
                 collectionCheck.Add(sendvideo);
             }
 
-            BinaryFormatter bf = new BinaryFormatter();
-            byte[] collectionByte;
-            using (var ms = new MemoryStream())
-            {
-                System.Diagnostics.Debug.WriteLine("\n stage1");
-                try
-                {
-                    bf.Serialize(ms, collectionCheck);
-                } catch (SerializationException e) { System.Diagnostics.Debug.WriteLine(e.Message); }
+            //BinaryFormatter bf = new BinaryFormatter();
+            //byte[] collectionByte;
+            //using (var ms = new MemoryStream())
+            //{
+            //    System.Diagnostics.Debug.WriteLine("\n stage1");
+            //    try
+            //    {
+            //        bf.Serialize(ms, collectionCheck);
+            //    } catch (SerializationException e) { System.Diagnostics.Debug.WriteLine(e.Message); }
                
-                System.Diagnostics.Debug.WriteLine("\n stage2");
-                collectionByte = ms.ToArray();
-            }
-            using (var memStream = new MemoryStream())
-            {
-                System.Diagnostics.Debug.WriteLine("\n stage3");
-                var binForm = new BinaryFormatter();
-                memStream.Write(collectionByte, 0, collectionByte.Length);
-                System.Diagnostics.Debug.WriteLine("\n stage4");
-                memStream.Seek(0, SeekOrigin.Begin);
-                System.Diagnostics.Debug.WriteLine("\n stage5");
-                var obj = binForm.Deserialize(memStream);
-                System.Diagnostics.Debug.WriteLine("\n stage6");
-                ObservableCollection<Model.VideoDatabase.SendableVideo> videoCollection = (ObservableCollection<Model.VideoDatabase.SendableVideo>)obj;
-                System.Diagnostics.Debug.WriteLine("\n\n" + videoCollection[0].Title + "\n\n");
-            }
+            //    System.Diagnostics.Debug.WriteLine("\n stage2");
+            //    collectionByte = ms.ToArray();
+            //}
+            //using (var memStream = new MemoryStream())
+            //{
+            //    System.Diagnostics.Debug.WriteLine("\n stage3");
+            //    var binForm = new BinaryFormatter();
+            //    memStream.Write(collectionByte, 0, collectionByte.Length);
+            //    System.Diagnostics.Debug.WriteLine("\n stage4");
+            //    memStream.Seek(0, SeekOrigin.Begin);
+            //    System.Diagnostics.Debug.WriteLine("\n stage5");
+            //    var obj = binForm.Deserialize(memStream);
+            //    System.Diagnostics.Debug.WriteLine("\n stage6");
+            //    ObservableCollection<Model.VideoDatabase.SendableVideo> videoCollection = (ObservableCollection<Model.VideoDatabase.SendableVideo>)obj;
+            //    System.Diagnostics.Debug.WriteLine("\n\n" + videoCollection[0].Title + "\n\n");
+            //}
         }
 
         private void LoadSearch(string keywords)
         {
-
+            Console.WriteLine(keywords);
+            keywords = keywords.ToLower();
             Video[] tempVideoArr = new Video[allVideos.Count];
             allVideos.CopyTo(tempVideoArr, 0);
             int videoCount = allVideos.Count;
 
             Videos.Clear();
             string[] words = keywords.Split(' ');
-
-            for (int k = 0; k < words.Count(); k++)
+            string temp;
+            bool contain = false;
+            Console.WriteLine(videoCount + " " + words.Count());
+            for (int i = 0; i < videoCount; i++)
             {
-                for (int i = 0; i < videoCount; i++)
+                contain = false;
+                for (int k = 0; k < words.Count(); k++)
                 {
-                    if (tempVideoArr[i].Performer.Name == words[k] || tempVideoArr[i].Title == words[k])
-                    {
-                        Videos.Add(tempVideoArr[i]);
-                    }
+                    Console.WriteLine(tempVideoArr[i].Performer.Name);
+                    temp = tempVideoArr[i].Performer.Name.ToLower();
+                    if (temp.Contains(words[k])) contain = true;
+                    temp = tempVideoArr[i].Title.ToLower();
+                    if (temp.Contains(words[k])) contain = true;
+                    
+                }
+                if (contain)
+                {
+                    Console.WriteLine("contain!");
+                    Videos.Add(tempVideoArr[i]);
                 }
             }
 
@@ -157,9 +168,13 @@ namespace P2PKaraokeSystem.Model
         {
             //for each entry, if is new, add
             //else 
+            //Console.WriteLine(videoCollection.Count());
+            //Console.WriteLine(videoCollection[0].Title + " " + videoCollection[0].FilePath);
             foreach (SendableVideo sendablevideo in videoCollection)
             {
                 Video video = new Video(sendablevideo.Title, sendablevideo.FilePath, sendablevideo.Performer, null);
+                //Console.WriteLine("video created");
+                //Console.WriteLine(video.Title);
                 List<ServerStruct> tempList;
                 ServerStruct serverstruct = new ServerStruct(ipAddress, portNo);
                 if (VideosFromPeer.TryGetValue(video, out tempList))
@@ -177,39 +192,61 @@ namespace P2PKaraokeSystem.Model
                 {
                     //todo: check if any video has same name
                     var exist = Videos.Where(x => x.Title==video.Title).FirstOrDefault();
-                    if (exist==null) Videos.Add(video);
+                    if (exist == null)
+                    {
+                        Console.WriteLine("going to add to Videos list");
+                        //System.Windows.Threading.Dispatcher.Invoke(System.Windows.Threading.DispatcherPriority.Render, new Action(()=>View));     //TODO: error in refreshing Videos list
+                        Videos.Add(video);
+                        Console.WriteLine(Videos.Count());
+                    }
                 }
             }
         }
 
         public static ObservableCollection<SendableVideo> LoadSearchToPeer(string keywords)
         {
+            Console.WriteLine("Called LoadSearchToPeer");
+            keywords = keywords.ToLower();
             String[] words = keywords.Split(' ');
+            Console.WriteLine("number of words: "+words.Count());
             ObservableCollection<SendableVideo> VideosPeer = new ObservableCollection<SendableVideo>();
+            String temp;
             
             Video[] tempVideoArr = new Video[allVideos.Count];
             allVideos.CopyTo(tempVideoArr, 0);
             int videoCount = allVideos.Count;
             bool contain = false;
-
+            //Console.WriteLine("Inited");
+            //Console.WriteLine(videoCount + " " + words.Count());
             //var index = allVideos.Where(vid => (words.Any(word => vid.Title.Contains(word)) || words.Any(word => vid.Performer.Name.Contains(word))));
             for (int i = 0; i < videoCount; i++)
             {
                 contain = false;
-                for (int k = 0; i< words.Count(); k++)
+                //Console.WriteLine("videoCount = " + i);
+                for (int k = 0; k< words.Count(); k++)
                 {
-                    //if (tempVideoArr[i].Performer.Name.Contains(words[k])) contain = true;
-                    //if (tempVideoArr[i].Title.Contains(words[k])) contain = true;
-                    if (tempVideoArr[i].Performer.Name == words[k] || tempVideoArr[i].Title == words[k]) contain = true;
+                    //Console.WriteLine("words.Count() = " + k);
+                    temp = tempVideoArr[i].Performer.Name.ToLower();
+                    if (temp.Contains(words[k])) contain = true;
+                    temp = tempVideoArr[i].Title.ToLower();
+                    if (temp.Contains(words[k])) contain = true;
+                    //if (tempVideoArr[i].Performer.Name == words[k] || tempVideoArr[i].Title == words[k]) contain = true;
                 }
                 if (contain)
                 {
+                    //Console.WriteLine("Contain!");
                     SendableVideo sendvideo = new SendableVideo(tempVideoArr[i].Title, tempVideoArr[i].FilePath, tempVideoArr[i].Performer);
+                    //Console.WriteLine("before Add");
                     VideosPeer.Add(sendvideo);
                 }
             }
+            //Console.WriteLine(VideosPeer.Count());
             if (VideosPeer.Count == 0) return null;
-            else return VideosPeer;
+            else
+            {
+                //Console.WriteLine(VideosPeer[0].Title + " " + VideosPeer[0].FilePath);
+                return VideosPeer;
+            }
             
         }
 

@@ -21,22 +21,30 @@ namespace P2PKaraokeSystem.Network
             //call search for peer function
             //send the return here (parse the object)
             String keyworks = ASCIIEncoding.ASCII.GetString(data);
+            Console.WriteLine(keyworks);
             ObservableCollection<Model.VideoDatabase.SendableVideo> videoCollection = Model.VideoDatabase.LoadSearchToPeer(keyworks);
+            Console.WriteLine("success");
+            foreach (Model.VideoDatabase.SendableVideo video in videoCollection)
+            {
+                Console.WriteLine(video.Title + " " + video.Performer.Name+"\n");
+            }
             if (videoCollection == null) return;
             else
             {
                 try
                 {
                     BinaryFormatter bf = new BinaryFormatter();
+                    byte[] collectionByte;
                     using (var ms = new MemoryStream())
                     {
                         bf.Serialize(ms, videoCollection);
-                        byte[] collectionByte = ms.ToArray();
-                        ClientSendManager manager = new ClientSendManager(ipAddress, portNo);
-                        byte[] sendbuff;
-                        manager.AddPayload(out sendbuff, collectionByte, PacketType.SEARCH_RESULT);
-                        manager.SendTCP(sendbuff, 0, sendbuff.Length);
+                        collectionByte = ms.ToArray();
                     }
+                    ClientSendManager manager = new ClientSendManager(ipAddress, 12345);
+                    byte[] sendbuff;
+                    manager.AddPayload(out sendbuff, collectionByte, PacketType.SEARCH_RESULT);
+                    manager.SendTCP(sendbuff, 0, sendbuff.Length);
+                    Console.WriteLine(ipAddress + " " + 12345 + "sent\n");
                 }
                 catch (SerializationException e)
                 {

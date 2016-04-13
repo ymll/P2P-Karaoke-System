@@ -25,12 +25,13 @@ namespace P2PKaraokeSystem.View
         private KaraokeSystemModel _karaokeSystemModel;
         int preVol = 127;
         public string searchKeyWords;
+        //ListView playlist = (ListView)System.Windows.FrameworkElement.FindName("Playlist");
 
         public MainUI()
         {
             //testing code:
 
-            Network.ClientReceiveManager clientRecv = new Network.ClientReceiveManager("127.0.0.1", 12345, 1024 * 32);
+            Network.ClientReceiveManager clientRecv = new Network.ClientReceiveManager("192.168.110.85", 12345, 1024 * 32);
             clientRecv.RegisterListener(Network.PacketType.PLAY_REQUEST, new Network.PlayRequestListener());
             clientRecv.RegisterListener(Network.PacketType.SEARCH_QUERY, new Network.SearchQueryReceiveListener());
             clientRecv.RegisterListener(Network.PacketType.SEARCH_RESULT, new Network.SearchResultReceiveListener());

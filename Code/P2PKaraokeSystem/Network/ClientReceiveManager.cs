@@ -16,7 +16,7 @@ namespace P2PKaraokeSystem.Network
         int bufferSize = 1024 * 32;
         Int32 port = 12345;
 
-        String LocalipString = "127.0.0.1";//"192.168.0.2";//"192.168.0.5";//
+        String LocalipString = "192.168.110.83";//"192.168.0.2";//"192.168.0.5";//
         public ClientReceiveManager() {  }//use the above setting
         public ClientReceiveManager(String Localip, Int32 newPort, int bufSize)
         {

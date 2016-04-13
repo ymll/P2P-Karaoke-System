@@ -15,7 +15,7 @@ namespace P2PKaraokeSystem.Network
     public class ClientSendManager : AbstractSendManager
     {
         private Int32 serverport = 12345;
-        private String ServeripString = "127.0.0.1"; //"192.168.0.5";
+        private String ServeripString = "192.168.110.85"; //"192.168.0.5";
         public ClientSendManager()
         {
             Form1 inputForm = new Form1();
@@ -74,7 +74,7 @@ namespace P2PKaraokeSystem.Network
             }
             catch (Exception e)
             {
-                Console.WriteLine("Error..... " + e.StackTrace);
+                Console.WriteLine("Error..... " + e.Message);
             }
             return 0;
         }
